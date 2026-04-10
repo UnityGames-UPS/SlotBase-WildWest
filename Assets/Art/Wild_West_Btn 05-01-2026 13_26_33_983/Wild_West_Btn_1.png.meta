@@ -1,0 +1,676 @@
+fileFormatVersion: 2
+guid: 8f5159c73c8df492486b2c84a1ce3cdc
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5849005680127127857
+    second: Wild_West_Btn_1_0
+  - first:
+      213: -4827176154238511607
+    second: Wild_West_Btn_1_1
+  - first:
+      213: 1626961510475438778
+    second: Wild_West_Btn_1_2
+  - first:
+      213: 5523480035090424382
+    second: Wild_West_Btn_1_3
+  - first:
+      213: 8415338864520048988
+    second: Wild_West_Btn_1_4
+  - first:
+      213: -8573383613644987752
+    second: Wild_West_Btn_1_5
+  - first:
+      213: 5372835035520986566
+    second: Wild_West_Btn_1_6
+  - first:
+      213: -3904906259659780012
+    second: Wild_West_Btn_1_7
+  - first:
+      213: 4583337992595656451
+    second: Wild_West_Btn_1_8
+  - first:
+      213: -468288794837633012
+    second: Wild_West_Btn_1_9
+  - first:
+      213: -5591140358438687528
+    second: Wild_West_Btn_1_10
+  - first:
+      213: -4419839580252707066
+    second: Wild_West_Btn_1_11
+  - first:
+      213: 4178176614958920256
+    second: Wild_West_Btn_1_12
+  - first:
+      213: 5573013055178435345
+    second: Wild_West_Btn_1_13
+  - first:
+      213: 4583407525278531183
+    second: Wild_West_Btn_1_14
+  - first:
+      213: -5777491609547524741
+    second: Wild_West_Btn_1_15
+  - first:
+      213: -1498488370150226682
+    second: Wild_West_Btn_1_16
+  - first:
+      213: 137144074509530370
+    second: Wild_West_Btn_1_17
+  - first:
+      213: -6522661342970993814
+    second: Wild_West_Btn_1_18
+  - first:
+      213: -7878760667696883434
+    second: Wild_West_Btn_1_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Wild_West_Btn_1_0
+      rect:
+        serializedVersion: 2
+        x: 21
+        y: 782
+        width: 214
+        height: 228
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 131383d3da7db2150800000000000000
+      internalID: 5849005680127127857
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wild_West_Btn_1_1
+      rect:
+        serializedVersion: 2
+        x: 277
+        y: 782
+        width: 214
+        height: 228
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 906906afcdc620db0800000000000000
+      internalID: -4827176154238511607
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wild_West_Btn_1_2
+      rect:
+        serializedVersion: 2
+        x: 533
+        y: 782
+        width: 214
+        height: 228
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aba1f1fafd0249610800000000000000
+      internalID: 1626961510475438778
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wild_West_Btn_1_3
+      rect:
+        serializedVersion: 2
+        x: 789
+        y: 782
+        width: 214
+        height: 228
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e32e687c3d757ac40800000000000000
+      internalID: 5523480035090424382
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wild_West_Btn_1_4
+      rect:
+        serializedVersion: 2
+        x: 1045
+        y: 782
+        width: 214
+        height: 227
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c51b1446c1a49c470800000000000000
+      internalID: 8415338864520048988
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wild_West_Btn_1_5
+      rect:
+        serializedVersion: 2
+        x: 21
+        y: 526
+        width: 214
+        height: 228
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8922981f609350980800000000000000
+      internalID: -8573383613644987752
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wild_West_Btn_1_6
+      rect:
+        serializedVersion: 2
+        x: 277
+        y: 526
+        width: 214
+        height: 228
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6cd60019ff4209a40800000000000000
+      internalID: 5372835035520986566
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wild_West_Btn_1_7
+      rect:
+        serializedVersion: 2
+        x: 533
+        y: 526
+        width: 214
+        height: 228
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 45097c7227cfec9c0800000000000000
+      internalID: -3904906259659780012
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wild_West_Btn_1_8
+      rect:
+        serializedVersion: 2
+        x: 789
+        y: 526
+        width: 214
+        height: 228
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 30f4736ee994b9f30800000000000000
+      internalID: 4583337992595656451
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wild_West_Btn_1_9
+      rect:
+        serializedVersion: 2
+        x: 1045
+        y: 526
+        width: 214
+        height: 228
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c08386b72dd4089f0800000000000000
+      internalID: -468288794837633012
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wild_West_Btn_1_10
+      rect:
+        serializedVersion: 2
+        x: 21
+        y: 270
+        width: 214
+        height: 228
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8dc69e597774862b0800000000000000
+      internalID: -5591140358438687528
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wild_West_Btn_1_11
+      rect:
+        serializedVersion: 2
+        x: 277
+        y: 270
+        width: 214
+        height: 228
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60763dea15399a2c0800000000000000
+      internalID: -4419839580252707066
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wild_West_Btn_1_12
+      rect:
+        serializedVersion: 2
+        x: 533
+        y: 270
+        width: 214
+        height: 228
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 042787f8e7ddbf930800000000000000
+      internalID: 4178176614958920256
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wild_West_Btn_1_13
+      rect:
+        serializedVersion: 2
+        x: 789
+        y: 270
+        width: 214
+        height: 228
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 11b668ab8d1575d40800000000000000
+      internalID: 5573013055178435345
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wild_West_Btn_1_14
+      rect:
+        serializedVersion: 2
+        x: 1045
+        y: 270
+        width: 214
+        height: 228
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f6e341d3cd88b9f30800000000000000
+      internalID: 4583407525278531183
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wild_West_Btn_1_15
+      rect:
+        serializedVersion: 2
+        x: 21
+        y: 14
+        width: 214
+        height: 228
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b75be18ddf932dfa0800000000000000
+      internalID: -5777491609547524741
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wild_West_Btn_1_16
+      rect:
+        serializedVersion: 2
+        x: 277
+        y: 14
+        width: 214
+        height: 228
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 605442544cc443be0800000000000000
+      internalID: -1498488370150226682
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wild_West_Btn_1_17
+      rect:
+        serializedVersion: 2
+        x: 533
+        y: 14
+        width: 214
+        height: 228
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 205b0342fcb37e100800000000000000
+      internalID: 137144074509530370
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wild_West_Btn_1_18
+      rect:
+        serializedVersion: 2
+        x: 789
+        y: 14
+        width: 214
+        height: 228
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a63aa0e211ada75a0800000000000000
+      internalID: -6522661342970993814
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wild_West_Btn_1_19
+      rect:
+        serializedVersion: 2
+        x: 1045
+        y: 14
+        width: 214
+        height: 228
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6199b9b8ae409a290800000000000000
+      internalID: -7878760667696883434
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Wild_West_Btn_1_0: 5849005680127127857
+      Wild_West_Btn_1_1: -4827176154238511607
+      Wild_West_Btn_1_10: -5591140358438687528
+      Wild_West_Btn_1_11: -4419839580252707066
+      Wild_West_Btn_1_12: 4178176614958920256
+      Wild_West_Btn_1_13: 5573013055178435345
+      Wild_West_Btn_1_14: 4583407525278531183
+      Wild_West_Btn_1_15: -5777491609547524741
+      Wild_West_Btn_1_16: -1498488370150226682
+      Wild_West_Btn_1_17: 137144074509530370
+      Wild_West_Btn_1_18: -6522661342970993814
+      Wild_West_Btn_1_19: -7878760667696883434
+      Wild_West_Btn_1_2: 1626961510475438778
+      Wild_West_Btn_1_3: 5523480035090424382
+      Wild_West_Btn_1_4: 8415338864520048988
+      Wild_West_Btn_1_5: -8573383613644987752
+      Wild_West_Btn_1_6: 5372835035520986566
+      Wild_West_Btn_1_7: -3904906259659780012
+      Wild_West_Btn_1_8: 4583337992595656451
+      Wild_West_Btn_1_9: -468288794837633012
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
