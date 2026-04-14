@@ -142,12 +142,12 @@ TextureImporter:
       name: "Screenshot 2026-04-10 at 2.01.52\u202FPM_0"
       rect:
         serializedVersion: 2
-        x: 0
+        x: 16
         y: 0
-        width: 596
-        height: 998
+        width: 558
+        height: 992
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -164,7 +164,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: b00c1aec4a55546a0a51f2d1b84dff27
     internalID: 0
     vertices: []
     indices: 

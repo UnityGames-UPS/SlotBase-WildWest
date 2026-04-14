@@ -160,12 +160,12 @@ TextureImporter:
       name: Text_7_0
       rect:
         serializedVersion: 2
-        x: 8
-        y: 11
-        width: 305
-        height: 70
+        x: 0
+        y: 0
+        width: 821
+        height: 89
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -178,143 +178,11 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
-    - serializedVersion: 2
-      name: Text_7_1
-      rect:
-        serializedVersion: 2
-        x: 312
-        y: 12
-        width: 58
-        height: 68
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 32041a7dea8db7440800000000000000
-      internalID: 4934776062168088611
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Text_7_2
-      rect:
-        serializedVersion: 2
-        x: 360
-        y: 12
-        width: 58
-        height: 68
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 477a83049dbb3a8e0800000000000000
-      internalID: -1683295293946681484
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Text_7_3
-      rect:
-        serializedVersion: 2
-        x: 436
-        y: 11
-        width: 196
-        height: 70
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 95b7754385fc51bc0800000000000000
-      internalID: -3812913531757036711
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Text_7_4
-      rect:
-        serializedVersion: 2
-        x: 631
-        y: 12
-        width: 26
-        height: 68
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 7c7507a8183178130800000000000000
-      internalID: 3568842676808734663
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Text_7_5
-      rect:
-        serializedVersion: 2
-        x: 658
-        y: 11
-        width: 106
-        height: 70
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 1444202d2f83a3920800000000000000
-      internalID: 2970749519760868417
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Text_7_6
-      rect:
-        serializedVersion: 2
-        x: 763
-        y: 11
-        width: 48
-        height: 70
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 03df2de5f657ac6a0800000000000000
-      internalID: -6428196396925256400
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 057c18e7e91ed43f88308766aab4cf4d
     internalID: 0
     vertices: []
     indices: 

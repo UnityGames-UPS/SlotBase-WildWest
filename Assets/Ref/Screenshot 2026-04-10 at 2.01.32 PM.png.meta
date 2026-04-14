@@ -1,28 +1,10 @@
 fileFormatVersion: 2
-guid: 09ac1cfb014fb4818af59724151a03ca
+guid: 6661dd788ae4849ebb93f3ad060bd6f5
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2704860554182514419
-    second: Text_2_0
-  - first:
-      213: -4453167319410587071
-    second: Text_2_1
-  - first:
-      213: 19155914978333561
-    second: Text_2_2
-  - first:
-      213: 910778040112542063
-    second: Text_2_3
-  - first:
-      213: 3045258718802667891
-    second: Text_2_4
-  - first:
-      213: -6494921624506105047
-    second: Text_2_5
-  - first:
-      213: 8165568768729064389
-    second: Text_2_6
+      213: 1863011495261769638
+    second: "Screenshot 2026-04-10 at 2.01.32\u202FPM_0"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -157,13 +139,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Text_2_0
+      name: "Screenshot 2026-04-10 at 2.01.32\u202FPM_0"
       rect:
         serializedVersion: 2
-        x: 0
+        x: 11
         y: 0
-        width: 607
-        height: 68
+        width: 558
+        height: 992
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -172,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 3f6d303d758998520800000000000000
-      internalID: 2704860554182514419
+      spriteID: 6af0c83951fbad910800000000000000
+      internalID: 1863011495261769638
       vertices: []
       indices: 
       edges: []
@@ -182,7 +164,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 8b44d5a0e03eb463bac8c4c26337bd67
+    spriteID: 6871320966b9a4beaab44be12721375a
     internalID: 0
     vertices: []
     indices: 
@@ -192,13 +174,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Text_2_0: 2704860554182514419
-      Text_2_1: -4453167319410587071
-      Text_2_2: 19155914978333561
-      Text_2_3: 910778040112542063
-      Text_2_4: 3045258718802667891
-      Text_2_5: -6494921624506105047
-      Text_2_6: 8165568768729064389
+      "Screenshot 2026-04-10 at 2.01.32\u202FPM_0": 1863011495261769638
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

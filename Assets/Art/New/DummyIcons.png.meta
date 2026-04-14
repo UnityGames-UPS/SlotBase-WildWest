@@ -1,0 +1,914 @@
+fileFormatVersion: 2
+guid: 7a03a94eee5f540ffb6305b7b79b9335
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -6860072664755280763
+    second: DummyIcons_0
+  - first:
+      213: 8346796939134208883
+    second: DummyIcons_1
+  - first:
+      213: -4088219387745634338
+    second: DummyIcons_2
+  - first:
+      213: -5006130215832699141
+    second: DummyIcons_3
+  - first:
+      213: -657942907148848666
+    second: DummyIcons_4
+  - first:
+      213: 8748606568713601778
+    second: DummyIcons_5
+  - first:
+      213: 7694539351194386527
+    second: DummyIcons_6
+  - first:
+      213: -3229759934211653295
+    second: DummyIcons_7
+  - first:
+      213: -6747920257218007334
+    second: DummyIcons_8
+  - first:
+      213: -6950616768748858114
+    second: DummyIcons_9
+  - first:
+      213: 3328759257186870763
+    second: DummyIcons_10
+  - first:
+      213: 1987229190593679328
+    second: DummyIcons_11
+  - first:
+      213: 2444311901403543498
+    second: DummyIcons_12
+  - first:
+      213: -4110180036968225295
+    second: DummyIcons_13
+  - first:
+      213: 122169758724194342
+    second: DummyIcons_14
+  - first:
+      213: -3242662826537277931
+    second: DummyIcons_15
+  - first:
+      213: -2521641797393360701
+    second: DummyIcons_16
+  - first:
+      213: 3437137605803779080
+    second: DummyIcons_17
+  - first:
+      213: -7059714089215120145
+    second: DummyIcons_18
+  - first:
+      213: 7782003647678488843
+    second: DummyIcons_19
+  - first:
+      213: 1899536258518016798
+    second: DummyIcons_20
+  - first:
+      213: -5397154460310864831
+    second: DummyIcons_21
+  - first:
+      213: -5796025296966655307
+    second: DummyIcons_22
+  - first:
+      213: 4956211394569797527
+    second: DummyIcons_23
+  - first:
+      213: -5375287131670106689
+    second: DummyIcons_24
+  - first:
+      213: -2143786333374584434
+    second: DummyIcons_25
+  - first:
+      213: 8080677933661886813
+    second: DummyIcons_26
+  - first:
+      213: 8837785113923931230
+    second: DummyIcons_27
+  - first:
+      213: 3003351792847239412
+    second: DummyIcons_28
+  - first:
+      213: -5553170606327299320
+    second: DummyIcons_29
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: DummyIcons_0
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 1229
+        width: 198
+        height: 137
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 584e4e3f1402cc0a0800000000000000
+      internalID: -6860072664755280763
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_1
+      rect:
+        serializedVersion: 2
+        x: 202
+        y: 1229
+        width: 197
+        height: 137
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 37b8969c797c5d370800000000000000
+      internalID: 8346796939134208883
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_2
+      rect:
+        serializedVersion: 2
+        x: 402
+        y: 1253
+        width: 107
+        height: 114
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed77e8d802ab347c0800000000000000
+      internalID: -4088219387745634338
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_3
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 1089
+        width: 197
+        height: 137
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bfe31f1a717a68ab0800000000000000
+      internalID: -5006130215832699141
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_4
+      rect:
+        serializedVersion: 2
+        x: 199
+        y: 1093
+        width: 198
+        height: 134
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6e1b7e079648ed6f0800000000000000
+      internalID: -657942907148848666
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_5
+      rect:
+        serializedVersion: 2
+        x: 402
+        y: 1109
+        width: 105
+        height: 141
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2f2c2d7725b496970800000000000000
+      internalID: 8748606568713601778
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_6
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 949
+        width: 190
+        height: 137
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f50c432c5ce78ca60800000000000000
+      internalID: 7694539351194386527
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_7
+      rect:
+        serializedVersion: 2
+        x: 199
+        y: 933
+        width: 195
+        height: 158
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 151868ba3769d23d0800000000000000
+      internalID: -3229759934211653295
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_8
+      rect:
+        serializedVersion: 2
+        x: 400
+        y: 989
+        width: 103
+        height: 118
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: adeabdf27429a52a0800000000000000
+      internalID: -6747920257218007334
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_9
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 785
+        width: 187
+        height: 164
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ef4d9d0ffd27a8f90800000000000000
+      internalID: -6950616768748858114
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_10
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 773
+        width: 187
+        height: 162
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be5aa6b68e0223e20800000000000000
+      internalID: 3328759257186870763
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_11
+      rect:
+        serializedVersion: 2
+        x: 398
+        y: 841
+        width: 99
+        height: 145
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0ef8f988b6e049b10800000000000000
+      internalID: 1987229190593679328
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_12
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 643
+        width: 187
+        height: 142
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac7fa6b49b0fbe120800000000000000
+      internalID: 2444311901403543498
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_13
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 611
+        width: 180
+        height: 162
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1f56b957805b5f6c0800000000000000
+      internalID: -4110180036968225295
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_14
+      rect:
+        serializedVersion: 2
+        x: 381
+        y: 693
+        width: 130
+        height: 145
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6200d0f8fb802b100800000000000000
+      internalID: 122169758724194342
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_15
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 497
+        width: 180
+        height: 143
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 516a1e1f65fbff2d0800000000000000
+      internalID: -3242662826537277931
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_16
+      rect:
+        serializedVersion: 2
+        x: 183
+        y: 451
+        width: 178
+        height: 160
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3c8579f3524510dd0800000000000000
+      internalID: -2521641797393360701
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_17
+      rect:
+        serializedVersion: 2
+        x: 373
+        y: 549
+        width: 138
+        height: 142
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8042216117a23bf20800000000000000
+      internalID: 3437137605803779080
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_18
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 361
+        width: 178
+        height: 134
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fec2388907bd60e90800000000000000
+      internalID: -7059714089215120145
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_19
+      rect:
+        serializedVersion: 2
+        x: 182
+        y: 287
+        width: 175
+        height: 161
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b01aba4361b3ffb60800000000000000
+      internalID: 7782003647678488843
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_20
+      rect:
+        serializedVersion: 2
+        x: 364
+        y: 395
+        width: 143
+        height: 152
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e13e0f6b9228c5a10800000000000000
+      internalID: 1899536258518016798
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_21
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 225
+        width: 175
+        height: 134
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 14c714b1d947915b0800000000000000
+      internalID: -5397154460310864831
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_22
+      rect:
+        serializedVersion: 2
+        x: 180
+        y: 163
+        width: 169
+        height: 123
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5b2ef1973b1609fa0800000000000000
+      internalID: -5796025296966655307
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_23
+      rect:
+        serializedVersion: 2
+        x: 359
+        y: 225
+        width: 151
+        height: 168
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79f7315110008c440800000000000000
+      internalID: 4956211394569797527
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_24
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 127
+        width: 144
+        height: 96
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fbd231f45d42765b0800000000000000
+      internalID: -5375287131670106689
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_25
+      rect:
+        serializedVersion: 2
+        x: 147
+        y: 46
+        width: 138
+        height: 114
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e89eed420bdbf32e0800000000000000
+      internalID: -2143786333374584434
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_27
+      rect:
+        serializedVersion: 2
+        x: 351
+        y: 101
+        width: 144
+        height: 122
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e5ccbac8cbe16aa70800000000000000
+      internalID: 8837785113923931230
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_28
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 5
+        width: 132
+        height: 119
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f8313c0b8c0ea920800000000000000
+      internalID: 3003351792847239412
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DummyIcons_29
+      rect:
+        serializedVersion: 2
+        x: 289
+        y: 1
+        width: 118
+        height: 98
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 80388b861cc2fe2b0800000000000000
+      internalID: -5553170606327299320
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: d6712b18cc9a645ddb8c499b2700c315
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      DummyIcons_0: -6860072664755280763
+      DummyIcons_1: 8346796939134208883
+      DummyIcons_10: 3328759257186870763
+      DummyIcons_11: 1987229190593679328
+      DummyIcons_12: 2444311901403543498
+      DummyIcons_13: -4110180036968225295
+      DummyIcons_14: 122169758724194342
+      DummyIcons_15: -3242662826537277931
+      DummyIcons_16: -2521641797393360701
+      DummyIcons_17: 3437137605803779080
+      DummyIcons_18: -7059714089215120145
+      DummyIcons_19: 7782003647678488843
+      DummyIcons_2: -4088219387745634338
+      DummyIcons_20: 1899536258518016798
+      DummyIcons_21: -5397154460310864831
+      DummyIcons_22: -5796025296966655307
+      DummyIcons_23: 4956211394569797527
+      DummyIcons_24: -5375287131670106689
+      DummyIcons_25: -2143786333374584434
+      DummyIcons_26: 8080677933661886813
+      DummyIcons_27: 8837785113923931230
+      DummyIcons_28: 3003351792847239412
+      DummyIcons_29: -5553170606327299320
+      DummyIcons_3: -5006130215832699141
+      DummyIcons_4: -657942907148848666
+      DummyIcons_5: 8748606568713601778
+      DummyIcons_6: 7694539351194386527
+      DummyIcons_7: -3229759934211653295
+      DummyIcons_8: -6747920257218007334
+      DummyIcons_9: -6950616768748858114
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
