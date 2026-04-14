@@ -1,12 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-/// <summary>
-/// All game data models in one file
-/// </summary>
-namespace SlotGame
-{
-    #region Server Communication Models
+ #region Server Communication Models
 
     [Serializable]
     public class InitData
@@ -139,4 +134,4 @@ namespace SlotGame
     }
 
     #endregion
-}
+

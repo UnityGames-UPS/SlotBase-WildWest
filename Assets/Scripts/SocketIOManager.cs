@@ -7,12 +7,7 @@ using Best.SocketIO.Events;
 using Newtonsoft.Json;
 using System.Runtime.InteropServices;
 
-namespace SlotGame
-{
-    /// <summary>
-    /// Handles all server communication via Socket.IO
-    /// Demo mode with full debug logging for init, spin request, and results
-    /// </summary>
+
     public class SocketIOManager : MonoBehaviour
     {
         [Header("Configuration")]
@@ -26,19 +21,15 @@ namespace SlotGame
         [SerializeField] private GameManager gameManager;
         [SerializeField] private JSFunctCalls JSManager;
 
-        // Socket components
         private SocketManager socketManager;
         private Socket gameSocket;
 
-        // Auth data
         private string authToken;
         private string socketURL;
 
-        // Connection state
         internal bool isConnected;
         internal bool isInitialized;
 
-        // Ping/Pong
         private Coroutine pingCoroutine;
         private float lastPongTime;
         private bool waitingForPong;
@@ -46,7 +37,6 @@ namespace SlotGame
         private const int MAX_MISSED_PONGS = 5;
         private const float PING_INTERVAL = 2f;
 
-        // Reconnection tracking
         private bool hasEverConnected = false;
 
         #region Initialization
@@ -80,7 +70,7 @@ namespace SlotGame
 
         void ReceiveAuthToken(string jsonData)
         {
-            Debug.Log($"[SocketIO] Received auth data: {jsonData}");
+            Debug.Log($"[SocketIO] Auth data received");
             var authData = JsonUtility.FromJson<AuthData>(jsonData);
             authToken = authData.token;
             socketURL = authData.socketURL;
@@ -96,17 +86,14 @@ namespace SlotGame
 
         private IEnumerator InitializeDemoMode()
         {
-            Debug.Log("[SocketIO] 🎮 DEMO MODE - Simulating connection...");
+            Debug.Log("[SocketIO] DEMO MODE - Simulating connection");
             yield return new WaitForSeconds(0.5f);
 
             isConnected = true;
             isInitialized = true;
 
-            // Generate demo init data
             var initData = GenerateDemoInitData();
-            
-            // LOG INIT DATA
-            LogInitData(initData);
+            Debug.Log("[SocketIO] Init data generated");
             
             gameManager.OnInitDataReceived(initData);
 
@@ -120,8 +107,7 @@ namespace SlotGame
 
         internal void SendDemoSpinRequest(int betIndex, bool isFreeSpin)
         {
-            // LOG SPIN REQUEST
-            Debug.Log($"[SocketIO] 📤 SPIN REQUEST - BetIndex: {betIndex}, IsFreeSpin: {isFreeSpin}");
+            Debug.Log($"[SocketIO] SPIN REQUEST - BetIndex: {betIndex}, IsFreeSpin: {isFreeSpin}");
             StartCoroutine(SimulateDemoSpinResult(betIndex, isFreeSpin));
         }
 
@@ -130,9 +116,7 @@ namespace SlotGame
             yield return new WaitForSeconds(UnityEngine.Random.Range(0.3f, 0.8f));
 
             var result = GenerateDemoSpinResult(betIndex, isFreeSpin);
-            
-            // LOG SPIN RESULT
-            LogSpinResult(result);
+            Debug.Log($"[SocketIO] SPIN RESULT - Win: {result.winAmount:F2}");
             
             gameManager.OnSpinResultReceived(result);
         }
@@ -143,7 +127,7 @@ namespace SlotGame
             {
                 reelCount = 5,
                 rowCount = 4,
-                symbolCount = 11,
+                symbolCount = 16,
                 paylineCount = 40,
                 availableBets = new List<double> { 0.10, 0.20, 0.50, 1.00, 2.00, 5.00, 10.00, 20.00, 50.00 },
                 paylines = GenerateDemoPaylines(),
@@ -175,26 +159,35 @@ namespace SlotGame
                 }
             };
 
-            // Deduct bet if not free spin
             if (!isFreeSpin)
                 result.playerData.balance -= betAmount;
 
-            // 30% chance of win
-            if (UnityEngine.Random.value < 0.3f)
+            if (UnityEngine.Random.value < 0.35f)
             {
-                result.winAmount = betAmount * UnityEngine.Random.Range(2, 20);
-                result.winLines.Add(new WinLine
+                result.winAmount = betAmount * UnityEngine.Random.Range(2, 25);
+                
+                int numWinLines = UnityEngine.Random.Range(1, 4);
+                for (int i = 0; i < numWinLines; i++)
                 {
-                    lineId = UnityEngine.Random.Range(0, 40),
-                    symbolId = UnityEngine.Random.Range(2, 11),
-                    positions = new List<int> { 0, 1, 2 },
-                    winAmount = result.winAmount
-                });
+                    int lineLength = UnityEngine.Random.Range(3, 6);
+                    List<int> positions = new List<int>();
+                    for (int j = 0; j < lineLength; j++)
+                    {
+                        positions.Add(j * 4 + UnityEngine.Random.Range(0, 4));
+                    }
+                    
+                    result.winLines.Add(new WinLine
+                    {
+                        lineId = UnityEngine.Random.Range(0, 40),
+                        symbolId = UnityEngine.Random.Range(5, 16),
+                        positions = positions,
+                        winAmount = result.winAmount / numWinLines
+                    });
+                }
             }
 
             result.playerData.balance += result.winAmount;
 
-            // 5% chance of free spins
             if (!isFreeSpin && UnityEngine.Random.value < 0.05f)
             {
                 result.freeSpinData = new FreeSpinData
@@ -234,16 +227,21 @@ namespace SlotGame
             return new List<SymbolInfo>
             {
                 new SymbolInfo { id = 0, name = "Wild", multipliers = new List<double> { 100, 50, 25 }, isWild = true },
-                new SymbolInfo { id = 1, name = "Scatter", multipliers = new List<double> { 50, 20, 10 }, isScatter = true },
-                new SymbolInfo { id = 2, name = "Symbol_A", multipliers = new List<double> { 40, 15, 8 } },
-                new SymbolInfo { id = 3, name = "Symbol_B", multipliers = new List<double> { 30, 12, 6 } },
-                new SymbolInfo { id = 4, name = "Symbol_C", multipliers = new List<double> { 25, 10, 5 } },
-                new SymbolInfo { id = 5, name = "Symbol_D", multipliers = new List<double> { 20, 8, 4 } },
-                new SymbolInfo { id = 6, name = "Symbol_E", multipliers = new List<double> { 15, 6, 3 } },
-                new SymbolInfo { id = 7, name = "Symbol_F", multipliers = new List<double> { 10, 5, 2 } },
-                new SymbolInfo { id = 8, name = "Symbol_G", multipliers = new List<double> { 8, 4, 2 } },
-                new SymbolInfo { id = 9, name = "Symbol_H", multipliers = new List<double> { 6, 3, 1 } },
-                new SymbolInfo { id = 10, name = "Symbol_I", multipliers = new List<double> { 5, 2, 1 } }
+                new SymbolInfo { id = 1, name = "Wild_2x", multipliers = new List<double> { 200, 100, 50 }, isWild = true },
+                new SymbolInfo { id = 2, name = "Wild_3x", multipliers = new List<double> { 300, 150, 75 }, isWild = true },
+                new SymbolInfo { id = 3, name = "Wild_5x", multipliers = new List<double> { 500, 250, 125 }, isWild = true },
+                new SymbolInfo { id = 4, name = "Scatter", multipliers = new List<double> { 50, 20, 10 }, isScatter = true },
+                new SymbolInfo { id = 5, name = "Character_1", multipliers = new List<double> { 40, 15, 8 } },
+                new SymbolInfo { id = 6, name = "Character_2", multipliers = new List<double> { 35, 14, 7 } },
+                new SymbolInfo { id = 7, name = "Character_3", multipliers = new List<double> { 30, 12, 6 } },
+                new SymbolInfo { id = 8, name = "Character_4", multipliers = new List<double> { 25, 10, 5 } },
+                new SymbolInfo { id = 9, name = "Character_5", multipliers = new List<double> { 20, 8, 4 } },
+                new SymbolInfo { id = 10, name = "Character_6", multipliers = new List<double> { 15, 6, 3 } },
+                new SymbolInfo { id = 11, name = "Ace", multipliers = new List<double> { 10, 5, 2 } },
+                new SymbolInfo { id = 12, name = "King", multipliers = new List<double> { 8, 4, 2 } },
+                new SymbolInfo { id = 13, name = "Queen", multipliers = new List<double> { 6, 3, 1 } },
+                new SymbolInfo { id = 14, name = "Jack", multipliers = new List<double> { 5, 2, 1 } },
+                new SymbolInfo { id = 15, name = "Ten", multipliers = new List<double> { 4, 2, 1 } }
             };
         }
 
@@ -254,70 +252,12 @@ namespace SlotGame
             {
                 var column = new List<int>();
                 for (int row = 0; row < 4; row++)
-                    column.Add(UnityEngine.Random.Range(0, 11));
+                {
+                    column.Add(UnityEngine.Random.Range(5, 16));
+                }
                 matrix.Add(column);
             }
             return matrix;
-        }
-
-        #endregion
-
-        #region Debug Logging
-
-        private void LogInitData(InitData data)
-        {
-            Debug.Log("═══════════════════════════════════════════════");
-            Debug.Log("🎮 INIT DATA");
-            Debug.Log("═══════════════════════════════════════════════");
-            Debug.Log($"💰 Balance: {data.playerData.balance:F2}");
-            Debug.Log($"🎰 Bet Index: {data.playerData.currentBetIndex}");
-            Debug.Log($"📊 Available Bets: {string.Join(", ", data.gameConfig.availableBets)}");
-            
-            Debug.Log("\n📋 Initial Matrix:");
-            LogMatrix(data.initialMatrix);
-            
-            Debug.Log("═══════════════════════════════════════════════\n");
-        }
-
-        private void LogSpinResult(SpinResult result)
-        {
-            Debug.Log("═══════════════════════════════════════════════");
-            Debug.Log("🎯 SPIN RESULT");
-            Debug.Log("═══════════════════════════════════════════════");
-            Debug.Log($"💰 Balance: {result.playerData.balance:F2}");
-            Debug.Log($"🏆 Win Amount: {result.winAmount:F2}");
-            Debug.Log($"📊 Win Lines: {result.winLines.Count}");
-            
-            if (result.freeSpinData != null && result.freeSpinData.isTriggered)
-            {
-                Debug.Log($"🎁 FREE SPINS TRIGGERED! Awarded: {result.freeSpinData.spinsAwarded}");
-            }
-            
-            Debug.Log("\n📋 Result Matrix:");
-            LogMatrix(result.resultMatrix);
-            
-            Debug.Log("═══════════════════════════════════════════════\n");
-        }
-
-        private void LogMatrix(List<List<int>> matrix)
-        {
-            if (matrix == null || matrix.Count != 5)
-            {
-                Debug.LogWarning("Invalid matrix!");
-                return;
-            }
-
-            for (int row = 0; row < 4; row++)
-            {
-                string rowStr = "  [";
-                for (int col = 0; col < 5; col++)
-                {
-                    rowStr += matrix[col][row].ToString("D2");
-                    if (col < 4) rowStr += ", ";
-                }
-                rowStr += "]";
-                Debug.Log(rowStr);
-            }
         }
 
         #endregion
@@ -331,18 +271,17 @@ namespace SlotGame
 
             while (string.IsNullOrEmpty(authToken) && elapsed < timeout)
             {
-                Debug.Log("[SocketIO] Waiting for auth token...");
                 elapsed += Time.deltaTime;
                 yield return new WaitForSeconds(0.5f);
             }
 
             if (string.IsNullOrEmpty(authToken))
             {
-                Debug.LogError("[SocketIO] Auth timeout!");
+                Debug.LogError("[SocketIO] Auth timeout");
                 yield break;
             }
 
-            Debug.Log("[SocketIO] Auth received, setting up socket manager");
+            Debug.Log("[SocketIO] Auth received, setting up socket");
             SetupSocketManager();
         }
 
@@ -388,7 +327,7 @@ namespace SlotGame
 
         private void OnConnected(ConnectResponse resp)
         {
-            Debug.Log("[SocketIO] ✅ Connected!");
+            Debug.Log("[SocketIO] Connected successfully");
             isConnected = true;
             hasEverConnected = true;
             waitingForPong = false;
@@ -407,7 +346,7 @@ namespace SlotGame
 
         private void OnDisconnected()
         {
-            Debug.LogWarning("[SocketIO] ⚠️ Disconnected!");
+            Debug.LogWarning("[SocketIO] Disconnected");
             isConnected = false;
             StopPingRoutine();
             gameManager.OnDisconnected();
@@ -426,28 +365,21 @@ namespace SlotGame
 
         private void OnInitReceived(string jsonData)
         {
-            Debug.Log($"[SocketIO] Init data received");
+            Debug.Log("[SocketIO] Init data received");
             var initData = JsonConvert.DeserializeObject<InitData>(jsonData);
             isInitialized = true;
-            
-            LogInitData(initData);
-            
             gameManager.OnInitDataReceived(initData);
         }
 
         private void OnResultReceived(string jsonData)
         {
-            Debug.Log($"[SocketIO] Result received");
             var result = JsonConvert.DeserializeObject<SpinResult>(jsonData);
-            
-            LogSpinResult(result);
-            
+            Debug.Log($"[SocketIO] Result received - Win: {result.winAmount:F2}");
             gameManager.OnSpinResultReceived(result);
         }
 
         private void OnPongReceived(string data)
         {
-            Debug.Log("[SocketIO] ✅ Pong received");
             waitingForPong = false;
             missedPongs = 0;
             lastPongTime = Time.time;
@@ -455,7 +387,7 @@ namespace SlotGame
 
         private void OnAnotherDevice(string data)
         {
-            Debug.Log("[SocketIO] Another device login detected: " + data);
+            Debug.Log("[SocketIO] Another device login detected");
             gameManager.OnDisconnected();
         }
 
@@ -485,18 +417,16 @@ namespace SlotGame
                 if (waitingForPong)
                 {
                     missedPongs++;
-                    Debug.LogWarning($"[SocketIO] ⚠️ Pong missed #{missedPongs}/{MAX_MISSED_PONGS}");
                     
                     if (missedPongs >= MAX_MISSED_PONGS)
                     {
-                        Debug.LogError("[SocketIO] ❌ Connection lost - too many missed pongs!");
+                        Debug.LogError("[SocketIO] Connection lost - too many missed pongs");
                         OnDisconnected();
                         yield break;
                     }
                 }
 
                 waitingForPong = true;
-                Debug.Log("[SocketIO] 📤 Sending ping...");
                 gameSocket?.Emit("ping");
                 
                 yield return new WaitForSeconds(PING_INTERVAL);
@@ -517,7 +447,7 @@ namespace SlotGame
 
             if (!isConnected || gameSocket == null)
             {
-                Debug.LogWarning("[SocketIO] Cannot spin - not connected!");
+                Debug.LogWarning("[SocketIO] Cannot spin - not connected");
                 return;
             }
 
@@ -531,7 +461,7 @@ namespace SlotGame
             };
 
             string json = JsonUtility.ToJson(request);
-            Debug.Log($"[SocketIO] 📤 Sending spin request: {json}");
+            Debug.Log($"[SocketIO] Sending spin request - BetIndex: {betIndex}");
             gameSocket.Emit("request", json);
         }
 
@@ -541,7 +471,7 @@ namespace SlotGame
 
         internal void CloseSocket()
         {
-            Debug.Log("[SocketIO] Closing socket...");
+            Debug.Log("[SocketIO] Closing socket");
             StopPingRoutine();
             
             if (socketManager != null)
@@ -567,4 +497,3 @@ namespace SlotGame
 
         #endregion
     }
-}

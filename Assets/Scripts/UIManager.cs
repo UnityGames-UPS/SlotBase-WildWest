@@ -3,14 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
 
-namespace SlotGame
-{
-    /// <summary>
-    /// UI Manager - controls all UI elements
-    /// MODIFICATIONS:
-    /// - Auto play button shows selected rounds "Start Autoplay(x)"
-    /// - Turbo/Quick spin toggles work universally (not just autoplay)
-    /// </summary>
+
     public class UIManager : MonoBehaviour
     {
         [Header("References")]
@@ -71,11 +64,10 @@ namespace SlotGame
 
         private void InitializeUI()
         {
-            // Hide stop sign at start, show spin button
+        
             if (spinNormalImage) spinNormalImage.SetActive(true);
             if (spinStopImage) spinStopImage.SetActive(false);
             
-            // Hide panels
             if (autoPlayPanel) autoPlayPanel.SetActive(false);
             if (autoPlayCountDisplay) autoPlayCountDisplay.SetActive(false);
             if (freeSpinPanel) freeSpinPanel.SetActive(false);
@@ -85,7 +77,7 @@ namespace SlotGame
             // NEW: Update auto play button text with default rounds
             UpdateAutoPlayButtonText();
 
-            Debug.Log("[UIManager] ✅ UI Initialized - Spin button visible, Stop hidden");
+            Debug.Log("[UIManager]UI Initialized - Spin button visible, Stop hidden");
         }
 
         private void SetupButtons()
@@ -97,7 +89,6 @@ namespace SlotGame
             if (autoPlayCloseButton) autoPlayCloseButton.onClick.AddListener(CloseAutoPlayPanel);
             if (autoPlayStartButton) autoPlayStartButton.onClick.AddListener(StartAutoPlay);
             
-            // MODIFIED: Turbo/Quick toggles now work universally
             if (turboToggle) turboToggle.onValueChanged.AddListener(OnTurboToggle);
             if (quickSpinToggle) quickSpinToggle.onValueChanged.AddListener(OnQuickSpinToggle);
             
@@ -129,40 +120,43 @@ namespace SlotGame
             UpdateBalanceDisplay();
             UpdateWinDisplay(0);
             
-            Debug.Log("[UIManager] 🎮 Game initialized");
+            Debug.Log("[UIManager] Game initialized");
         }
 
         internal void OnSpinStarted()
         {
-            // Show stop button, hide spin button
             if (spinNormalImage) spinNormalImage.SetActive(false);
             if (spinStopImage) spinStopImage.SetActive(true);
 
             SetBetControlsEnabled(false);
+            
+            if (autoPlayOpenButton) autoPlayOpenButton.interactable = false;
+            
             UpdateWinDisplay(0);
         }
 
         internal void OnSpinStopping(SpinResult result)
         {
-            Debug.Log($"[UIManager] 🎯 Spin stopping - Win: {result.winAmount:F2}");
+            Debug.Log($"[UIManager]Spin stopping - Win: {result.winAmount:F2}");
         }
 
         internal void OnSpinCompleted(SpinResult result)
         {
-            // Show spin button, hide stop button
-            if (spinNormalImage) spinNormalImage.SetActive(true);
-            if (spinStopImage) spinStopImage.SetActive(false);
-
-            // Only enable bet controls if not auto playing and not in free spins
+            if (!gameManager.isAutoPlaying && !gameManager.isInFreeSpins)
+            {
+                if (spinNormalImage) spinNormalImage.SetActive(true);
+                if (spinStopImage) spinStopImage.SetActive(false);
+            }
             if (!gameManager.isAutoPlaying && !gameManager.isInFreeSpins)
             {
                 SetBetControlsEnabled(true);
+                if (autoPlayOpenButton) autoPlayOpenButton.interactable = true;
             }
 
             AnimateBalanceUpdate(result.playerData.balance);
             AnimateWinUpdate(result.winAmount);
             
-            Debug.Log($"[UIManager] ✅ Spin completed - Balance: {result.playerData.balance:F2}, Win: {result.winAmount:F2}");
+            Debug.Log($"[UIManager]Spin completed - Balance: {result.playerData.balance:F2}, Win: {result.winAmount:F2}");
         }
 
         #endregion
@@ -193,7 +187,6 @@ namespace SlotGame
 
         private void StartAutoPlay()
         {
-            // MODIFIED: Don't pass speed to StartAutoPlay, it uses current speed setting
             gameManager.StartAutoPlay(selectedRounds);
             CloseAutoPlayPanel();
         }
@@ -209,13 +202,9 @@ namespace SlotGame
                     btn.selectedIndicator.SetActive(isSelected);
             }
 
-            // NEW: Update button text when rounds change
             UpdateAutoPlayButtonText();
         }
 
-        /// <summary>
-        /// NEW: Update auto play button text to show selected rounds
-        /// </summary>
         private void UpdateAutoPlayButtonText()
         {
             if (autoPlayStartButtonText)
@@ -224,14 +213,11 @@ namespace SlotGame
             }
         }
 
-        /// <summary>
-        /// MODIFIED: Turbo toggle now works universally, not just for autoplay
-        /// </summary>
+
         private void OnTurboToggle(bool isOn)
         {
             if (isOn)
             {
-                // Disable quick spin if turbo is enabled
                 if (quickSpinToggle && quickSpinToggle.isOn)
                 {
                     quickSpinToggle.isOn = false;
@@ -240,22 +226,16 @@ namespace SlotGame
             }
             else
             {
-                // If turning off turbo and quick is also off, set to normal
                 if (!quickSpinToggle || !quickSpinToggle.isOn)
                 {
                     gameManager.SetSpinSpeed(SpinSpeed.Normal);
                 }
             }
         }
-
-        /// <summary>
-        /// MODIFIED: Quick spin toggle now works universally, not just for autoplay
-        /// </summary>
         private void OnQuickSpinToggle(bool isOn)
         {
             if (isOn)
             {
-                // Disable turbo if quick spin is enabled
                 if (turboToggle && turboToggle.isOn)
                 {
                     turboToggle.isOn = false;
@@ -264,7 +244,6 @@ namespace SlotGame
             }
             else
             {
-                // If turning off quick and turbo is also off, set to normal
                 if (!turboToggle || !turboToggle.isOn)
                 {
                     gameManager.SetSpinSpeed(SpinSpeed.Normal);
@@ -278,7 +257,7 @@ namespace SlotGame
 
         internal void OnAutoPlayStarted()
         {
-            Debug.Log("[UIManager] 🔁 Auto play started");
+            Debug.Log("[UIManager] Auto play started");
             
             if (autoPlayCountDisplay) 
             {
@@ -292,12 +271,15 @@ namespace SlotGame
 
         internal void OnAutoPlayStopped()
         {
-            Debug.Log("[UIManager] ⏹️ Auto play stopped");
+            Debug.Log("[UIManager] Auto play stopped");
             
             if (autoPlayCountDisplay) 
             {
                 autoPlayCountDisplay.SetActive(false);
             }
+
+            if (spinNormalImage) spinNormalImage.SetActive(true);
+            if (spinStopImage) spinStopImage.SetActive(false);
 
             SetBetControlsEnabled(true);
             if (autoPlayOpenButton) autoPlayOpenButton.interactable = true;
@@ -323,7 +305,7 @@ namespace SlotGame
 
         internal void OnFreeSpinsStarted(int spins)
         {
-            Debug.Log($"[UIManager] 🎁 Free spins started: {spins}");
+            Debug.Log($"[UIManager] Free spins started: {spins}");
             
             if (freeSpinPanel) freeSpinPanel.SetActive(true);
             UpdateFreeSpinCount();
@@ -332,9 +314,13 @@ namespace SlotGame
 
         internal void OnFreeSpinsEnded()
         {
-            Debug.Log("[UIManager] 🎁 Free spins ended");
+            Debug.Log("[UIManager]  Free spins ended");
             
             if (freeSpinPanel) freeSpinPanel.SetActive(false);
+            
+            if (spinNormalImage) spinNormalImage.SetActive(true);
+            if (spinStopImage) spinStopImage.SetActive(false);
+            
             SetBetControlsEnabled(true);
         }
 
@@ -416,13 +402,13 @@ namespace SlotGame
 
         internal void ShowLowBalancePopup()
         {
-            Debug.Log("[UIManager] ⚠️ Low balance");
+            Debug.Log("[UIManager] Low balance");
             if (lowBalancePopup) lowBalancePopup.SetActive(true);
         }
 
         internal void ShowDisconnectionPopup()
         {
-            Debug.Log("[UIManager] ⚠️ Disconnected");
+            Debug.Log("[UIManager] Disconnected");
             if (disconnectionPopup) disconnectionPopup.SetActive(true);
         }
 
@@ -446,4 +432,3 @@ namespace SlotGame
         public int rounds;
         public GameObject selectedIndicator;
     }
-}

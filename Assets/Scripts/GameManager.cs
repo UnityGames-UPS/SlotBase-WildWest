@@ -2,15 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SlotGame
-{
-    /// <summary>
-    /// Main game controller - handles all game logic
-    /// Controls: Slots, Bets, Auto Play, Free Spins
-    /// MODIFICATIONS:
-    /// - Turbo/Quick spin now universal (not just autoplay)
-    /// - Added win line animation trigger
-    /// </summary>
+
     public class GameManager : MonoBehaviour
     {
         [Header("References")]
@@ -23,29 +15,23 @@ namespace SlotGame
         [SerializeField] private float turboSpinDuration = 2.0f;
         [SerializeField] private float quickSpinCycleDuration = 1.0f;
 
-        // Game data
         internal GameConfig gameConfig;
         internal PlayerData playerData;
         internal SpinResult lastResult;
 
-        // Game state
         internal GameState currentState;
-        internal SpinSpeed currentSpinSpeed; // MODIFIED: Now universal, not just autoplay
+        internal SpinSpeed currentSpinSpeed; 
 
-        // Bet management
         internal int currentBetIndex;
         internal double currentBetAmount;
 
-        // Auto play
         internal bool isAutoPlaying;
         internal int autoPlayTotalRounds;
         internal int autoPlayRemainingRounds;
 
-        // Free spins
         internal bool isInFreeSpins;
         internal int freeSpinsRemaining;
 
-        // Spin control
         private Coroutine spinCoroutine;
         private bool stopRequested;
 
@@ -66,7 +52,6 @@ namespace SlotGame
             currentBetIndex = playerData.currentBetIndex;
             UpdateBetAmount();
 
-            // Set initial slot display
             if (initData.initialMatrix != null && slotView != null)
             {
                 slotView.SetInitialMatrix(initData.initialMatrix);
@@ -74,7 +59,6 @@ namespace SlotGame
 
             currentState = GameState.Idle;
             
-            // Update UI
             uiManager.OnGameInitialized();
         }
 
@@ -150,19 +134,15 @@ namespace SlotGame
             currentState = GameState.Spinning;
             stopRequested = false;
 
-            // Update UI
             uiManager.OnSpinStarted();
 
-            // Start visual slot spin
             if (slotView != null)
             {
                 slotView.StartSpin();
             }
 
-            // Send request to server
             socketManager.SendSpinRequest(currentBetIndex, isInFreeSpins);
 
-            // Start spin animation
             if (spinCoroutine != null)
                 StopCoroutine(spinCoroutine);
             spinCoroutine = StartCoroutine(SpinRoutine());
@@ -173,44 +153,46 @@ namespace SlotGame
             float spinDuration = GetSpinDuration();
             float elapsed = 0f;
 
-            // Spin until duration complete or stop requested
             while (elapsed < spinDuration && !stopRequested)
             {
                 elapsed += Time.deltaTime;
                 yield return null;
             }
 
-            // Wait for result if not received yet
             while (lastResult == null)
             {
                 yield return null;
             }
 
-            // Stop spinning
             currentState = GameState.Stopping;
             
-            // Stop slot visuals based on speed mode
             if (slotView != null && lastResult.resultMatrix != null)
             {
                 if (currentSpinSpeed == SpinSpeed.QuickSpin || stopRequested)
                 {
-                    // Instant stop
                     slotView.QuickStop(lastResult.resultMatrix);
                     yield return new WaitForSeconds(0.3f);
                 }
                 else
                 {
-                    // Normal/Turbo - sequential stop
                     slotView.StopSpin(lastResult.resultMatrix);
-                    // Wait for all reels to stop (5 reels × 0.2s delay + 0.5s elastic = 1.5s)
-                    yield return new WaitForSeconds(1.5f);
+                    yield return new WaitForSeconds(1.8f);
                 }
             }
 
-            // Let UI handle result display
-            uiManager.OnSpinStopping(lastResult);
+            if (lastResult.winAmount > 0 && lastResult.winLines != null && lastResult.winLines.Count > 0)
+            {
+                slotView.ShowWinLineAnimation(lastResult.winLines);
+                yield return new WaitForSeconds(0.3f);
+                uiManager.OnSpinStopping(lastResult);
+                yield return new WaitForSeconds(1.5f);
+            }
+            else
+            {
+                uiManager.OnSpinStopping(lastResult);
+                yield return new WaitForSeconds(0.3f);
+            }
 
-            // Process result
             ProcessSpinResult();
         }
 
@@ -233,57 +215,41 @@ namespace SlotGame
 
         private void ProcessSpinResult()
         {
-            // Update player data
             playerData = lastResult.playerData;
             
-            // Update UI with result
             uiManager.OnSpinCompleted(lastResult);
 
-            // NEW: Show win animations if there are wins
-            if (lastResult.winAmount > 0 && lastResult.winLines != null && lastResult.winLines.Count > 0)
-            {
-                slotView.ShowWinLineAnimation(lastResult.winLines);
-            }
 
-            // Check for free spins FIRST
             if (lastResult.freeSpinData != null && lastResult.freeSpinData.isTriggered)
             {
                 StartFreeSpins(lastResult.freeSpinData.spinsAwarded);
-                // Clear result and return - free spins will handle next spin
                 lastResult = null;
                 return;
             }
 
-            // Clear result
             lastResult = null;
 
-            // Handle auto play continuation
             if (isAutoPlaying && !isInFreeSpins)
             {
                 autoPlayRemainingRounds--;
                 
-                // Update counter display
                 uiManager.UpdateAutoPlayCount();
 
                 if (autoPlayRemainingRounds <= 0)
                 {
-                    // Stop auto play
                     StopAutoPlay();
                     currentState = GameState.Idle;
                 }
                 else
                 {
-                    // Continue auto play
                     currentState = GameState.Idle;
                     StartCoroutine(DelayedAutoSpin());
                 }
             }
             else if (isInFreeSpins)
             {
-                // Handle free spin continuation
                 freeSpinsRemaining--;
                 
-                // Update free spin counter
                 uiManager.UpdateFreeSpinCount();
 
                 if (freeSpinsRemaining <= 0)
@@ -292,21 +258,19 @@ namespace SlotGame
                 }
                 else
                 {
-                    // Continue free spins
                     currentState = GameState.Idle;
                     StartCoroutine(DelayedAutoSpin());
                 }
             }
             else
             {
-                // Normal spin complete
                 currentState = GameState.Idle;
             }
         }
 
         private IEnumerator DelayedAutoSpin()
         {
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(1.2f);
             RequestSpin();
         }
 
@@ -314,9 +278,6 @@ namespace SlotGame
 
         #region Spin Speed Control - NEW: Universal control
 
-        /// <summary>
-        /// NEW: Set spin speed universally (not just for autoplay)
-        /// </summary>
         internal void SetSpinSpeed(SpinSpeed speed)
         {
             currentSpinSpeed = speed;
@@ -334,7 +295,6 @@ namespace SlotGame
             isAutoPlaying = true;
             autoPlayTotalRounds = rounds;
             autoPlayRemainingRounds = rounds;
-            // MODIFIED: Don't change speed here, use current speed setting
 
             Debug.Log($"[GameManager] Auto play started: {rounds} rounds, {currentSpinSpeed} speed");
 
@@ -348,7 +308,6 @@ namespace SlotGame
             
             isAutoPlaying = false;
             autoPlayRemainingRounds = 0;
-            // MODIFIED: Don't reset speed to Normal, keep user's speed preference
             
             uiManager.OnAutoPlayStopped();
         }
@@ -364,7 +323,6 @@ namespace SlotGame
             isInFreeSpins = true;
             freeSpinsRemaining = spins;
 
-            // Stop auto play if running
             if (isAutoPlaying)
             {
                 StopAutoPlay();
@@ -372,10 +330,8 @@ namespace SlotGame
 
             uiManager.OnFreeSpinsStarted(spins);
 
-            // Set state back to idle for free spin to start
             currentState = GameState.Idle;
 
-            // Auto start first free spin after delay
             StartCoroutine(DelayedAutoSpin());
         }
 
@@ -399,7 +355,6 @@ namespace SlotGame
         {
             Debug.LogWarning("[GameManager] Disconnected!");
             
-            // Stop any active spins/auto play
             if (spinCoroutine != null)
             {
                 StopCoroutine(spinCoroutine);
@@ -443,4 +398,3 @@ namespace SlotGame
 
         #endregion
     }
-}
