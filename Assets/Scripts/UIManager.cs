@@ -7,7 +7,9 @@ namespace SlotGame
 {
     /// <summary>
     /// UI Manager - controls all UI elements
-    /// Stop sign hidden at start, shown only during spin
+    /// MODIFICATIONS:
+    /// - Auto play button shows selected rounds "Start Autoplay(x)"
+    /// - Turbo/Quick spin toggles work universally (not just autoplay)
     /// </summary>
     public class UIManager : MonoBehaviour
     {
@@ -33,6 +35,7 @@ namespace SlotGame
         [SerializeField] private Button autoPlayOpenButton;
         [SerializeField] private Button autoPlayCloseButton;
         [SerializeField] private Button autoPlayStartButton;
+        [SerializeField] private TMP_Text autoPlayStartButtonText; // NEW: Text component for button
         
         [Header("Auto Play Settings")]
         [SerializeField] private Toggle turboToggle;
@@ -68,7 +71,7 @@ namespace SlotGame
 
         private void InitializeUI()
         {
-            // CRITICAL: Hide stop sign at start, show spin button
+            // Hide stop sign at start, show spin button
             if (spinNormalImage) spinNormalImage.SetActive(true);
             if (spinStopImage) spinStopImage.SetActive(false);
             
@@ -78,6 +81,9 @@ namespace SlotGame
             if (freeSpinPanel) freeSpinPanel.SetActive(false);
             if (lowBalancePopup) lowBalancePopup.SetActive(false);
             if (disconnectionPopup) disconnectionPopup.SetActive(false);
+
+            // NEW: Update auto play button text with default rounds
+            UpdateAutoPlayButtonText();
 
             Debug.Log("[UIManager] ✅ UI Initialized - Spin button visible, Stop hidden");
         }
@@ -90,8 +96,11 @@ namespace SlotGame
             if (autoPlayOpenButton) autoPlayOpenButton.onClick.AddListener(OpenAutoPlayPanel);
             if (autoPlayCloseButton) autoPlayCloseButton.onClick.AddListener(CloseAutoPlayPanel);
             if (autoPlayStartButton) autoPlayStartButton.onClick.AddListener(StartAutoPlay);
+            
+            // MODIFIED: Turbo/Quick toggles now work universally
             if (turboToggle) turboToggle.onValueChanged.AddListener(OnTurboToggle);
             if (quickSpinToggle) quickSpinToggle.onValueChanged.AddListener(OnQuickSpinToggle);
+            
             if (lowBalanceCloseButton) lowBalanceCloseButton.onClick.AddListener(() => lowBalancePopup.SetActive(false));
             if (disconnectionCloseButton) disconnectionCloseButton.onClick.AddListener(() => gameManager.ExitGame());
         }
@@ -184,14 +193,8 @@ namespace SlotGame
 
         private void StartAutoPlay()
         {
-            SpinSpeed speed = SpinSpeed.Normal;
-            
-            if (turboToggle && turboToggle.isOn)
-                speed = SpinSpeed.Turbo;
-            else if (quickSpinToggle && quickSpinToggle.isOn)
-                speed = SpinSpeed.QuickSpin;
-
-            gameManager.StartAutoPlay(selectedRounds, speed);
+            // MODIFIED: Don't pass speed to StartAutoPlay, it uses current speed setting
+            gameManager.StartAutoPlay(selectedRounds);
             CloseAutoPlayPanel();
         }
 
@@ -205,21 +208,67 @@ namespace SlotGame
                 if (btn.selectedIndicator)
                     btn.selectedIndicator.SetActive(isSelected);
             }
+
+            // NEW: Update button text when rounds change
+            UpdateAutoPlayButtonText();
         }
 
-        private void OnTurboToggle(bool isOn)
+        /// <summary>
+        /// NEW: Update auto play button text to show selected rounds
+        /// </summary>
+        private void UpdateAutoPlayButtonText()
         {
-            if (isOn && quickSpinToggle && quickSpinToggle.isOn)
+            if (autoPlayStartButtonText)
             {
-                quickSpinToggle.isOn = false;
+                autoPlayStartButtonText.text = $"Start Autoplay({selectedRounds})";
             }
         }
 
+        /// <summary>
+        /// MODIFIED: Turbo toggle now works universally, not just for autoplay
+        /// </summary>
+        private void OnTurboToggle(bool isOn)
+        {
+            if (isOn)
+            {
+                // Disable quick spin if turbo is enabled
+                if (quickSpinToggle && quickSpinToggle.isOn)
+                {
+                    quickSpinToggle.isOn = false;
+                }
+                gameManager.SetSpinSpeed(SpinSpeed.Turbo);
+            }
+            else
+            {
+                // If turning off turbo and quick is also off, set to normal
+                if (!quickSpinToggle || !quickSpinToggle.isOn)
+                {
+                    gameManager.SetSpinSpeed(SpinSpeed.Normal);
+                }
+            }
+        }
+
+        /// <summary>
+        /// MODIFIED: Quick spin toggle now works universally, not just for autoplay
+        /// </summary>
         private void OnQuickSpinToggle(bool isOn)
         {
-            if (isOn && turboToggle && turboToggle.isOn)
+            if (isOn)
             {
-                turboToggle.isOn = false;
+                // Disable turbo if quick spin is enabled
+                if (turboToggle && turboToggle.isOn)
+                {
+                    turboToggle.isOn = false;
+                }
+                gameManager.SetSpinSpeed(SpinSpeed.QuickSpin);
+            }
+            else
+            {
+                // If turning off quick and turbo is also off, set to normal
+                if (!turboToggle || !turboToggle.isOn)
+                {
+                    gameManager.SetSpinSpeed(SpinSpeed.Normal);
+                }
             }
         }
 

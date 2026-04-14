@@ -10,6 +10,9 @@ namespace SlotGame
     /// Handles all slot visuals - smooth cyclic icon animation
     /// 5 reels × 4 rows = 20 visible symbols
     /// Icons cycle seamlessly, no empty space visible
+    /// MODIFICATIONS:
+    /// - Added win line pop animation
+    /// - Smoother elastic stopping animation
     /// </summary>
     public class SlotView : MonoBehaviour
     {
@@ -30,12 +33,18 @@ namespace SlotGame
         [SerializeField] private float spinSpeed = 0.05f; // Time per symbol movement (lower = faster)
         [SerializeField] private float reelStopDelay = 0.2f; // Delay between reel stops
 
+        [Header("Win Animation Settings - NEW")]
+        [SerializeField] private float winPopScale = 1.3f; // Scale multiplier for win pop
+        [SerializeField] private float winPopDuration = 0.4f; // Duration of single pop
+        [SerializeField] private int winPopRepeat = 3; // Number of times to repeat animation
+
         // Reel positioning
         private float middlePosition = 0f; // Middle position where 4 icons are visible
         private float cycleDistance; // Distance to move before cycling back
         
         // Tween tracking
         private List<Tween> spinTweens = new List<Tween>();
+        private List<Tween> winTweens = new List<Tween>(); // NEW: Track win animations
         
         // Current display matrix
         internal List<List<int>> currentDisplayMatrix;
@@ -277,7 +286,7 @@ namespace SlotGame
         }
 
         /// <summary>
-        /// Smooth stop with elastic bounce - no jerky snap
+        /// MODIFIED: Smoother elastic stop animation
         /// </summary>
         private IEnumerator StopSingleReel(int columnIndex, List<int> targetSymbols)
         {
@@ -295,28 +304,26 @@ namespace SlotGame
             // Set target symbols
             SetReelSymbols(columnIndex, targetSymbols, false);
 
-            // Get current position
-            float currentY = slotTransform.localPosition.y;
-
-            // Smooth transition to middle position with bounce
-            // First move slightly down, then bounce back to middle
+            // MODIFIED: Smoother stopping animation
+            // Create a more polished sequence with better easing
             Sequence stopSequence = DOTween.Sequence();
             
-            // Quick settle down
+            // Phase 1: Quick deceleration (simulate inertia)
             stopSequence.Append(
-                slotTransform.DOLocalMoveY(middlePosition - 30f, 0.15f)
-                    .SetEase(Ease.OutCubic)
+                slotTransform.DOLocalMoveY(middlePosition - 40f, 0.12f)
+                    .SetEase(Ease.OutQuad)
             );
             
-            // Elastic bounce to final position
+            // Phase 2: Smoother elastic bounce to final position
+            // MODIFIED: Better elastic parameters for smoother feel
             stopSequence.Append(
-                slotTransform.DOLocalMoveY(middlePosition, 0.35f)
-                    .SetEase(Ease.OutElastic, 0.8f, 0.5f)
+                slotTransform.DOLocalMoveY(middlePosition, 0.45f)
+                    .SetEase(Ease.OutBack, 1.2f) // OutBack gives smooth bounce without harsh spring
             );
 
             spinTweens[columnIndex] = stopSequence;
             
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.57f); // Total animation time
         }
 
         #endregion
@@ -346,6 +353,127 @@ namespace SlotGame
             }
 
             isSpinning = false;
+        }
+
+        #endregion
+
+        #region Win Line Animation - NEW
+
+        /// <summary>
+        /// NEW: Show pop animation for winning symbols
+        /// </summary>
+        internal void ShowWinLineAnimation(List<WinLine> winLines)
+        {
+            if (winLines == null || winLines.Count == 0) return;
+
+            Debug.Log($"[SlotView] 🎉 Showing {winLines.Count} win line animations");
+
+            // Clear any existing win animations
+            KillWinTweens();
+
+            // Collect all winning positions to animate
+            HashSet<Vector2Int> winningPositions = new HashSet<Vector2Int>();
+            
+            foreach (var winLine in winLines)
+            {
+                if (winLine.positions == null) continue;
+
+                // Convert linear positions to column,row coordinates
+                foreach (int position in winLine.positions)
+                {
+                    int col = position / 4; // Integer division gives column (0-4)
+                    int row = position % 4; // Modulo gives row (0-3)
+                    
+                    if (col >= 0 && col < 5 && row >= 0 && row < 4)
+                    {
+                        winningPositions.Add(new Vector2Int(col, row));
+                    }
+                }
+            }
+
+            // Animate each winning symbol
+            foreach (var pos in winningPositions)
+            {
+                AnimateWinSymbol(pos.x, pos.y);
+            }
+        }
+
+        /// <summary>
+        /// NEW: Animate a single winning symbol with pop effect
+        /// </summary>
+        private void AnimateWinSymbol(int column, int row)
+        {
+            if (column >= reelImagesList.Count) return;
+
+            var reel = reelImagesList[column];
+            if (reel.images == null || reel.images.Count < 10) return;
+
+            // Get the image at the visible position (indices 6-9 for rows 0-3)
+            int imageIndex = 6 + row;
+            if (imageIndex >= reel.images.Count) return;
+
+            Image symbolImage = reel.images[imageIndex];
+            if (symbolImage == null) return;
+
+            // Reset scale
+            symbolImage.transform.localScale = Vector3.one;
+
+            // Create pulsing pop animation
+            Sequence winSequence = DOTween.Sequence();
+
+            for (int i = 0; i < winPopRepeat; i++)
+            {
+                // Pop out
+                winSequence.Append(
+                    symbolImage.transform.DOScale(winPopScale, winPopDuration / 2)
+                        .SetEase(Ease.OutBack, 1.5f)
+                );
+                
+                // Pop back
+                winSequence.Append(
+                    symbolImage.transform.DOScale(1f, winPopDuration / 2)
+                        .SetEase(Ease.InBack, 1.5f)
+                );
+
+                // Small delay between pops (except on last one)
+                if (i < winPopRepeat - 1)
+                {
+                    winSequence.AppendInterval(0.1f);
+                }
+            }
+
+            // Ensure scale is reset at the end
+            winSequence.OnComplete(() => {
+                if (symbolImage != null)
+                    symbolImage.transform.localScale = Vector3.one;
+            });
+
+            winTweens.Add(winSequence);
+        }
+
+        /// <summary>
+        /// NEW: Kill all win animation tweens
+        /// </summary>
+        private void KillWinTweens()
+        {
+            foreach (var tween in winTweens)
+            {
+                tween?.Kill();
+            }
+            winTweens.Clear();
+
+            // Reset all symbol scales
+            foreach (var reel in reelImagesList)
+            {
+                if (reel.images != null)
+                {
+                    foreach (var image in reel.images)
+                    {
+                        if (image != null)
+                            image.transform.localScale = Vector3.one;
+                    }
+                }
+            }
         }
 
         #endregion
@@ -389,6 +517,8 @@ namespace SlotGame
                 tween?.Kill();
             }
             spinTweens.Clear();
+
+            KillWinTweens(); // Also kill win animations
         }
 
         #endregion

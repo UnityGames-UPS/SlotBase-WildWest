@@ -7,7 +7,9 @@ namespace SlotGame
     /// <summary>
     /// Main game controller - handles all game logic
     /// Controls: Slots, Bets, Auto Play, Free Spins
-    /// FIXED: AutoPlay counter hiding issue
+    /// MODIFICATIONS:
+    /// - Turbo/Quick spin now universal (not just autoplay)
+    /// - Added win line animation trigger
     /// </summary>
     public class GameManager : MonoBehaviour
     {
@@ -28,7 +30,7 @@ namespace SlotGame
 
         // Game state
         internal GameState currentState;
-        internal SpinSpeed currentSpinSpeed;
+        internal SpinSpeed currentSpinSpeed; // MODIFIED: Now universal, not just autoplay
 
         // Bet management
         internal int currentBetIndex;
@@ -237,6 +239,12 @@ namespace SlotGame
             // Update UI with result
             uiManager.OnSpinCompleted(lastResult);
 
+            // NEW: Show win animations if there are wins
+            if (lastResult.winAmount > 0 && lastResult.winLines != null && lastResult.winLines.Count > 0)
+            {
+                slotView.ShowWinLineAnimation(lastResult.winLines);
+            }
+
             // Check for free spins FIRST
             if (lastResult.freeSpinData != null && lastResult.freeSpinData.isTriggered)
             {
@@ -252,7 +260,6 @@ namespace SlotGame
             // Handle auto play continuation
             if (isAutoPlaying && !isInFreeSpins)
             {
-                // CRITICAL FIX: Decrement AFTER updating UI, BEFORE checking if should stop
                 autoPlayRemainingRounds--;
                 
                 // Update counter display
@@ -260,7 +267,7 @@ namespace SlotGame
 
                 if (autoPlayRemainingRounds <= 0)
                 {
-                    // Stop auto play - counter will be hidden in StopAutoPlay()
+                    // Stop auto play
                     StopAutoPlay();
                     currentState = GameState.Idle;
                 }
@@ -305,18 +312,31 @@ namespace SlotGame
 
         #endregion
 
+        #region Spin Speed Control - NEW: Universal control
+
+        /// <summary>
+        /// NEW: Set spin speed universally (not just for autoplay)
+        /// </summary>
+        internal void SetSpinSpeed(SpinSpeed speed)
+        {
+            currentSpinSpeed = speed;
+            Debug.Log($"[GameManager] Spin speed changed to: {speed}");
+        }
+
+        #endregion
+
         #region Auto Play
 
-        internal void StartAutoPlay(int rounds, SpinSpeed speed)
+        internal void StartAutoPlay(int rounds)
         {
             if (currentState != GameState.Idle) return;
 
             isAutoPlaying = true;
             autoPlayTotalRounds = rounds;
             autoPlayRemainingRounds = rounds;
-            currentSpinSpeed = speed;
+            // MODIFIED: Don't change speed here, use current speed setting
 
-            Debug.Log($"[GameManager] Auto play started: {rounds} rounds, {speed} speed");
+            Debug.Log($"[GameManager] Auto play started: {rounds} rounds, {currentSpinSpeed} speed");
 
             uiManager.OnAutoPlayStarted();
             RequestSpin();
@@ -328,7 +348,7 @@ namespace SlotGame
             
             isAutoPlaying = false;
             autoPlayRemainingRounds = 0;
-            currentSpinSpeed = SpinSpeed.Normal;
+            // MODIFIED: Don't reset speed to Normal, keep user's speed preference
             
             uiManager.OnAutoPlayStopped();
         }
