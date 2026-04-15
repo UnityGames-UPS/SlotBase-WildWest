@@ -120,7 +120,7 @@ using DG.Tweening;
             UpdateBalanceDisplay();
             UpdateWinDisplay(0);
             
-            Debug.Log("[UIManager] Game initialized");
+            Debug.Log("[UIManager] 🎮 Game initialized");
         }
 
         internal void OnSpinStarted()
@@ -322,6 +322,7 @@ using DG.Tweening;
             if (spinStopImage) spinStopImage.SetActive(false);
             
             SetBetControlsEnabled(true);
+            if (autoPlayOpenButton) autoPlayOpenButton.interactable = true;
         }
 
         internal void UpdateFreeSpinCount()

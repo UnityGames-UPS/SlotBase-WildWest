@@ -172,27 +172,48 @@ using UnityEngine;
                 {
                     slotView.QuickStop(lastResult.resultMatrix);
                     yield return new WaitForSeconds(0.3f);
+                    OnReelsStoppedComplete();
                 }
                 else
                 {
-                    slotView.StopSpin(lastResult.resultMatrix);
-                    yield return new WaitForSeconds(1.8f);
+                    slotView.StopSpin(lastResult.resultMatrix, OnReelsStoppedComplete);
                 }
-            }
-
-            if (lastResult.winAmount > 0 && lastResult.winLines != null && lastResult.winLines.Count > 0)
-            {
-                slotView.ShowWinLineAnimation(lastResult.winLines);
-                yield return new WaitForSeconds(0.3f);
-                uiManager.OnSpinStopping(lastResult);
-                yield return new WaitForSeconds(1.5f);
             }
             else
             {
-                uiManager.OnSpinStopping(lastResult);
-                yield return new WaitForSeconds(0.3f);
+                OnReelsStoppedComplete();
             }
+        }
 
+        private void OnReelsStoppedComplete()
+        {
+            if (lastResult.winAmount > 0 && lastResult.winLines != null && lastResult.winLines.Count > 0)
+            {
+                slotView.ShowWinLineAnimation(lastResult.winLines, OnWinAnimationComplete);
+            }
+            else
+            {
+                OnWinAnimationComplete();
+            }
+        }
+
+        private void OnWinAnimationComplete()
+        {
+            uiManager.OnSpinStopping(lastResult);
+            
+            if (isAutoPlaying || isInFreeSpins)
+            {
+                StartCoroutine(DelayBeforeNextRound());
+            }
+            else
+            {
+                ProcessSpinResult();
+            }
+        }
+
+        private IEnumerator DelayBeforeNextRound()
+        {
+            yield return new WaitForSeconds(0.5f);
             ProcessSpinResult();
         }
 
@@ -219,7 +240,6 @@ using UnityEngine;
             
             uiManager.OnSpinCompleted(lastResult);
 
-
             if (lastResult.freeSpinData != null && lastResult.freeSpinData.isTriggered)
             {
                 StartFreeSpins(lastResult.freeSpinData.spinsAwarded);
@@ -243,7 +263,7 @@ using UnityEngine;
                 else
                 {
                     currentState = GameState.Idle;
-                    StartCoroutine(DelayedAutoSpin());
+                    RequestSpin();
                 }
             }
             else if (isInFreeSpins)
@@ -259,19 +279,13 @@ using UnityEngine;
                 else
                 {
                     currentState = GameState.Idle;
-                    StartCoroutine(DelayedAutoSpin());
+                    RequestSpin();
                 }
             }
             else
             {
                 currentState = GameState.Idle;
             }
-        }
-
-        private IEnumerator DelayedAutoSpin()
-        {
-            yield return new WaitForSeconds(1.2f);
-            RequestSpin();
         }
 
         #endregion
@@ -332,7 +346,13 @@ using UnityEngine;
 
             currentState = GameState.Idle;
 
-            StartCoroutine(DelayedAutoSpin());
+            StartCoroutine(DelayBeforeFreeSpinStart());
+        }
+
+        private IEnumerator DelayBeforeFreeSpinStart()
+        {
+            yield return new WaitForSeconds(0.5f);
+            RequestSpin();
         }
 
         private void EndFreeSpins()

@@ -263,7 +263,7 @@ using DG.Tweening;
             reel.images[0].sprite = GetSymbolSprite(Random.Range(0, 16));
         }
 
-        internal void StopSpin(List<List<int>> resultMatrix)
+        internal void StopSpin(List<List<int>> resultMatrix, System.Action onComplete)
         {
             if (!isSpinning)
             {
@@ -272,10 +272,10 @@ using DG.Tweening;
             }
 
             LogMatrix("RESULT", resultMatrix);
-            StartCoroutine(StopSpinSequence(resultMatrix));
+            StartCoroutine(StopSpinSequence(resultMatrix, onComplete));
         }
 
-        private IEnumerator StopSpinSequence(List<List<int>> resultMatrix)
+        private IEnumerator StopSpinSequence(List<List<int>> resultMatrix, System.Action onComplete)
         {
             currentDisplayMatrix = resultMatrix;
 
@@ -291,6 +291,8 @@ using DG.Tweening;
 
             isSpinning = false;
             Debug.Log("[SlotView]  All reels stopped");
+            
+            onComplete?.Invoke();
         }
 
         private IEnumerator StopSingleReel(int columnIndex, List<int> targetSymbols)
@@ -362,9 +364,13 @@ using DG.Tweening;
 
         #region Win Line Animation - NEW
 
-        internal void ShowWinLineAnimation(List<WinLine> winLines)
+        internal void ShowWinLineAnimation(List<WinLine> winLines, System.Action onComplete)
         {
-            if (winLines == null || winLines.Count == 0) return;
+            if (winLines == null || winLines.Count == 0)
+            {
+                onComplete?.Invoke();
+                return;
+            }
 
             Debug.Log($"[SlotView]  Showing {winLines.Count} win line animations");
 
@@ -388,10 +394,20 @@ using DG.Tweening;
                 }
             }
 
+            float totalDuration = (winPopDuration * winPopRepeat) + (0.1f * (winPopRepeat - 1));
+            
             foreach (var pos in winningPositions)
             {
                 AnimateWinSymbol(pos.x, pos.y);
             }
+
+            StartCoroutine(WaitForWinAnimationComplete(totalDuration, onComplete));
+        }
+
+        private IEnumerator WaitForWinAnimationComplete(float duration, System.Action onComplete)
+        {
+            yield return new WaitForSeconds(duration);
+            onComplete?.Invoke();
         }
 
         private void AnimateWinSymbol(int column, int row)
