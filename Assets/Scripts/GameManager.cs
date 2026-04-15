@@ -13,7 +13,7 @@ using UnityEngine;
         [Header("Spin Settings")]
         [SerializeField] private float normalSpinDuration = 3.5f;
         [SerializeField] private float turboSpinDuration = 2.0f;
-        [SerializeField] private float quickSpinCycleDuration = 1.0f;
+        [SerializeField] private float quickSpinCycleDuration = 0.8f; // Increased from 1.0f to ensure all reels complete cycles
 
         internal GameConfig gameConfig;
         internal PlayerData playerData;
@@ -171,7 +171,12 @@ using UnityEngine;
                 if (currentSpinSpeed == SpinSpeed.QuickSpin || stopRequested)
                 {
                     slotView.QuickStop(lastResult.resultMatrix);
-                    yield return new WaitForSeconds(0.3f);
+                    
+                    // Wait for quick stop animations to complete
+                    // QuickStop now has staggered animations, so we need to wait
+                    float quickStopWaitTime = 0.5f; // Enough time for all reels with stagger
+                    yield return new WaitForSeconds(quickStopWaitTime);
+                    
                     OnReelsStoppedComplete();
                 }
                 else
@@ -213,7 +218,9 @@ using UnityEngine;
 
         private IEnumerator DelayBeforeNextRound()
         {
-            yield return new WaitForSeconds(0.5f);
+            // Shorter delay for auto/free spins to maintain flow
+            float delayTime = currentSpinSpeed == SpinSpeed.QuickSpin ? 0.3f : 0.5f;
+            yield return new WaitForSeconds(delayTime);
             ProcessSpinResult();
         }
 
@@ -290,7 +297,7 @@ using UnityEngine;
 
         #endregion
 
-        #region Spin Speed Control - NEW: Universal control
+        #region Spin Speed Control
 
         internal void SetSpinSpeed(SpinSpeed speed)
         {

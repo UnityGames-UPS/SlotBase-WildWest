@@ -1570,6 +1570,8 @@ MonoBehaviour:
   lowBalanceCloseButton: {fileID: 0}
   disconnectionPopup: {fileID: 0}
   disconnectionCloseButton: {fileID: 0}
+  winCountDuration: 0.25
+  balanceCountDuration: 1
 --- !u!4 &180954096
 Transform:
   m_ObjectHideFlags: 0
@@ -6925,9 +6927,9 @@ MonoBehaviour:
   socketManager: {fileID: 416965697}
   uiManager: {fileID: 180954095}
   slotView: {fileID: 1931227598}
-  normalSpinDuration: 3.5
-  turboSpinDuration: 2
-  quickSpinCycleDuration: 1
+  normalSpinDuration: 2
+  turboSpinDuration: 1.2
+  quickSpinCycleDuration: 0.8
 --- !u!4 &855426823
 Transform:
   m_ObjectHideFlags: 0
@@ -15521,8 +15523,23 @@ MonoBehaviour:
     - {fileID: 1715622530}
     - {fileID: 76714053}
   symbolHeight: 151.6275
-  spinSpeed: 0.05
-  reelStopDelay: 0.2
+  spinSpeed: 0.04
+  reelStartStagger: 0.04
+  reelStopStagger: 0.04
+  anticipationUpDistance: 30
+  anticipationUpDuration: 0.15
+  dropDownDistance: 15
+  dropDownDuration: 0.12
+  settleBounceDuration: 0
+  stopOvershootDistance: 45
+  stopOvershootDuration: 0.15
+  stopBounceBackDistance: 5
+  stopBounceBackDuration: 0.2
+  stopSettleDuration: 0.25
+  quickStopStagger: 0.06
+  quickStopOvershoot: 20
+  quickStopDuration: 0.2
+  minSpinCyclesBeforeStop: 3
   winPopScale: 1.3
   winPopDuration: 0.4
   winPopRepeat: 3

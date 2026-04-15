@@ -28,7 +28,7 @@ using DG.Tweening;
         [SerializeField] private Button autoPlayOpenButton;
         [SerializeField] private Button autoPlayCloseButton;
         [SerializeField] private Button autoPlayStartButton;
-        [SerializeField] private TMP_Text autoPlayStartButtonText; // NEW: Text component for button
+        [SerializeField] private TMP_Text autoPlayStartButtonText;
         
         [Header("Auto Play Settings")]
         [SerializeField] private Toggle turboToggle;
@@ -48,6 +48,10 @@ using DG.Tweening;
         [SerializeField] private Button lowBalanceCloseButton;
         [SerializeField] private GameObject disconnectionPopup;
         [SerializeField] private Button disconnectionCloseButton;
+
+        [Header("Animation Settings")]
+        [SerializeField] private float winCountDuration = 0.25f; // Fast win count animation (0.2-0.3 sec)
+        [SerializeField] private float balanceCountDuration = 1.0f; // Balance update can be slower
 
         private int selectedRounds = 10;
         private Tween balanceTween;
@@ -74,10 +78,9 @@ using DG.Tweening;
             if (lowBalancePopup) lowBalancePopup.SetActive(false);
             if (disconnectionPopup) disconnectionPopup.SetActive(false);
 
-            // NEW: Update auto play button text with default rounds
             UpdateAutoPlayButtonText();
 
-            Debug.Log("[UIManager]UI Initialized - Spin button visible, Stop hidden");
+            Debug.Log("[UIManager] UI Initialized - Spin button visible, Stop hidden");
         }
 
         private void SetupButtons()
@@ -132,12 +135,19 @@ using DG.Tweening;
             
             if (autoPlayOpenButton) autoPlayOpenButton.interactable = false;
             
+            // Reset win display immediately
             UpdateWinDisplay(0);
         }
 
         internal void OnSpinStopping(SpinResult result)
         {
-            Debug.Log($"[UIManager]Spin stopping - Win: {result.winAmount:F2}");
+            Debug.Log($"[UIManager] Spin stopping - Win: {result.winAmount:F2}");
+            
+            // Start win animation IMMEDIATELY when reels stop (synced with win symbol pop)
+            if (result.winAmount > 0)
+            {
+                AnimateWinUpdate(result.winAmount);
+            }
         }
 
         internal void OnSpinCompleted(SpinResult result)
@@ -153,10 +163,10 @@ using DG.Tweening;
                 if (autoPlayOpenButton) autoPlayOpenButton.interactable = true;
             }
 
+            // Update balance with smooth animation
             AnimateBalanceUpdate(result.playerData.balance);
-            AnimateWinUpdate(result.winAmount);
             
-            Debug.Log($"[UIManager]Spin completed - Balance: {result.playerData.balance:F2}, Win: {result.winAmount:F2}");
+            Debug.Log($"[UIManager] Spin completed - Balance: {result.playerData.balance:F2}, Win: {result.winAmount:F2}");
         }
 
         #endregion
@@ -314,7 +324,7 @@ using DG.Tweening;
 
         internal void OnFreeSpinsEnded()
         {
-            Debug.Log("[UIManager]  Free spins ended");
+            Debug.Log("[UIManager] Free spins ended");
             
             if (freeSpinPanel) freeSpinPanel.SetActive(false);
             
@@ -368,8 +378,8 @@ using DG.Tweening;
                         balanceText.text = x.ToString("F2");
                 },
                 newBalance,
-                1f
-            );
+                balanceCountDuration
+            ).SetEase(Ease.OutCubic);
         }
 
         private void AnimateWinUpdate(double winAmount)
@@ -378,12 +388,19 @@ using DG.Tweening;
 
             if (winAmount > 0)
             {
+                // Fast counting animation (0.2-0.3 seconds) synchronized with win symbol pop
                 winTween = DOTween.To(
                     () => 0.0,
                     x => UpdateWinDisplay(x),
                     winAmount,
-                    1.5f
-                );
+                    winCountDuration // 0.25 seconds by default
+                )
+                .SetEase(Ease.OutCubic) // Smooth easing
+                .OnComplete(() => {
+                    // Ensure final value is exact
+                    UpdateWinDisplay(winAmount);
+                    Debug.Log($"[UIManager] Win count animation completed: {winAmount:F2}");
+                });
             }
             else
             {

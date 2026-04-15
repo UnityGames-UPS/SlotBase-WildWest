@@ -21,9 +21,30 @@ using DG.Tweening;
         [Header("Spin Settings")]
         [SerializeField] private float symbolHeight = 100f; 
         [SerializeField] private float spinSpeed = 0.05f; 
-        [SerializeField] private float reelStopDelay = 0.2f; 
+        [SerializeField] private float reelStartStagger = 0.08f; // Stagger between reel starts
+        [SerializeField] private float reelStopStagger = 0.15f; // Stagger between reel stops
 
-        [Header("Win Animation Settings - NEW")]
+        [Header("Animation Settings - Casino Style")]
+        [SerializeField] private float anticipationUpDistance = 30f; // How far up reels go before dropping
+        [SerializeField] private float anticipationUpDuration = 0.15f;
+        [SerializeField] private float dropDownDistance = 15f; // Brief drop before settling
+        [SerializeField] private float dropDownDuration = 0.12f;
+        [SerializeField] private float settleBounceDuration = 0.18f;
+        
+        [Header("Stop Animation Settings")]
+        [SerializeField] private float stopOvershootDistance = 50f; // How far past center on stop
+        [SerializeField] private float stopOvershootDuration = 0.15f;
+        [SerializeField] private float stopBounceBackDistance = 15f; // Bounce back distance
+        [SerializeField] private float stopBounceBackDuration = 0.25f;
+        [SerializeField] private float stopSettleDuration = 0.35f;
+
+        [Header("Quick Spin Settings")]
+        [SerializeField] private float quickStopStagger = 0.06f; // Faster stagger for quick stop
+        [SerializeField] private float quickStopOvershoot = 20f; // Smaller overshoot
+        [SerializeField] private float quickStopDuration = 0.2f; // Total quick stop time per reel
+        [SerializeField] private int minSpinCyclesBeforeStop = 3; // Minimum full cycles before allowing stop
+
+        [Header("Win Animation Settings")]
         [SerializeField] private float winPopScale = 1.3f; 
         [SerializeField] private float winPopDuration = 0.4f; 
         [SerializeField] private int winPopRepeat = 3; 
@@ -35,6 +56,7 @@ using DG.Tweening;
 
         private List<Tween> spinTweens = new List<Tween>();
         private List<Tween> winTweens = new List<Tween>(); 
+        private List<int> reelCycleCount = new List<int>(); // Track cycles per reel
         
 
         internal List<List<int>> currentDisplayMatrix;
@@ -58,6 +80,7 @@ using DG.Tweening;
             for (int col = 0; col < 5; col++)
             {
                 currentDisplayMatrix.Add(new List<int> { 0, 0, 0, 0 });
+                reelCycleCount.Add(0);
             }
 
             Debug.Log($"[SlotView] Initialized - Symbol Height: {symbolHeight}, Cycle Distance: {cycleDistance}");
@@ -147,7 +170,7 @@ using DG.Tweening;
 
         #endregion
 
-        #region Spin Animation - Cyclic Icons
+        #region Spin Animation - Smooth Casino Style
 
         internal void StartSpin()
         {
@@ -160,12 +183,19 @@ using DG.Tweening;
             isSpinning = true;
             KillAllTweens();
 
-            for (int col = 0; col < 5; col++)
+            // Reset cycle counters
+            for (int i = 0; i < reelCycleCount.Count; i++)
             {
-                StartReelCycleWithDelay(col, col * 0.15f); 
+                reelCycleCount[i] = 0;
             }
 
-            Debug.Log("[SlotView]  All reels spinning with staggered start");
+            // Start each reel with stagger delay
+            for (int col = 0; col < 5; col++)
+            {
+                StartReelCycleWithDelay(col, col * reelStartStagger); 
+            }
+
+            Debug.Log("[SlotView] All reels spinning with smooth staggered start");
         }
 
         private void StartReelCycleWithDelay(int columnIndex, float delay)
@@ -176,23 +206,27 @@ using DG.Tweening;
 
             Sequence startSequence = DOTween.Sequence();
 
+            // Wait for stagger delay
             if (delay > 0)
             {
                 startSequence.AppendInterval(delay);
             }
 
+            // Casino-style anticipation: Go up first
             startSequence.Append(
-                slotTransform.DOLocalMoveY(middlePosition + 25f, 0.15f)
+                slotTransform.DOLocalMoveY(middlePosition + anticipationUpDistance, anticipationUpDuration)
                     .SetEase(Ease.OutCubic)
             );
 
+            // Drop down with momentum
             startSequence.Append(
-                slotTransform.DOLocalMoveY(middlePosition - 10f, 0.12f)
+                slotTransform.DOLocalMoveY(middlePosition - dropDownDistance, dropDownDuration)
                     .SetEase(Ease.InCubic)
             );
 
+            // Settle with subtle bounce
             startSequence.Append(
-                slotTransform.DOLocalMoveY(middlePosition, 0.18f)
+                slotTransform.DOLocalMoveY(middlePosition, settleBounceDuration)
                     .SetEase(Ease.OutBounce)
             );
 
@@ -233,6 +267,13 @@ using DG.Tweening;
                 {
                     CycleReelSymbols(columnIndex);
                     slotTransform.localPosition = new Vector3(slotTransform.localPosition.x, middlePosition, 0);
+                    
+                    // Increment cycle count
+                    if (columnIndex < reelCycleCount.Count)
+                    {
+                        reelCycleCount[columnIndex]++;
+                    }
+                    
                     StartReelCycle(columnIndex);
                 }
             });
@@ -272,63 +313,100 @@ using DG.Tweening;
             }
 
             LogMatrix("RESULT", resultMatrix);
-            StartCoroutine(StopSpinSequence(resultMatrix, onComplete));
+            StartCoroutine(StopSpinSequence(resultMatrix, onComplete, false));
         }
 
-        private IEnumerator StopSpinSequence(List<List<int>> resultMatrix, System.Action onComplete)
+        private IEnumerator StopSpinSequence(List<List<int>> resultMatrix, System.Action onComplete, bool isQuickMode)
         {
             currentDisplayMatrix = resultMatrix;
 
+            // Stop reels with reverse stagger (last reel stops first for casino feel)
             for (int col = 0; col < 5; col++)
             {
-                yield return StartCoroutine(StopSingleReel(col, resultMatrix[col]));
+                // Wait until reel has completed minimum cycles (important for quick/auto modes)
+                while (reelCycleCount[col] < minSpinCyclesBeforeStop)
+                {
+                    yield return null;
+                }
+                
+                yield return StartCoroutine(StopSingleReel(col, resultMatrix[col], isQuickMode));
                 
                 if (col < 4)
                 {
-                    yield return new WaitForSeconds(reelStopDelay);
+                    float staggerDelay = isQuickMode ? quickStopStagger : reelStopStagger;
+                    yield return new WaitForSeconds(staggerDelay);
                 }
             }
 
             isSpinning = false;
-            Debug.Log("[SlotView]  All reels stopped");
+            Debug.Log("[SlotView] All reels stopped smoothly");
             
             onComplete?.Invoke();
         }
 
-        private IEnumerator StopSingleReel(int columnIndex, List<int> targetSymbols)
+        private IEnumerator StopSingleReel(int columnIndex, List<int> targetSymbols, bool isQuickMode)
         {
             if (columnIndex >= spinTweens.Count || columnIndex >= reelTransforms.Length)
                 yield break;
 
             Transform slotTransform = reelTransforms[columnIndex];
 
+            // Kill current spin animation
             if (spinTweens[columnIndex] != null)
             {
                 spinTweens[columnIndex].Kill();
             }
 
+            // Set the target symbols
             SetReelSymbols(columnIndex, targetSymbols, false);
 
-            Sequence stopSequence = DOTween.Sequence();
-            
-            stopSequence.Append(
-                slotTransform.DOLocalMoveY(middlePosition - 50f, 0.15f)
-                    .SetEase(Ease.InCubic)
-            );
-            
-            stopSequence.Append(
-                slotTransform.DOLocalMoveY(middlePosition + 15f, 0.25f)
-                    .SetEase(Ease.OutCubic)
-            );
+            if (isQuickMode)
+            {
+                // Quick stop with minimal animation
+                Sequence quickStopSequence = DOTween.Sequence();
+                
+                quickStopSequence.Append(
+                    slotTransform.DOLocalMoveY(middlePosition - quickStopOvershoot, quickStopDuration * 0.3f)
+                        .SetEase(Ease.InCubic)
+                );
+                
+                quickStopSequence.Append(
+                    slotTransform.DOLocalMoveY(middlePosition, quickStopDuration * 0.7f)
+                        .SetEase(Ease.OutBack, 1.2f)
+                );
 
-            stopSequence.Append(
-                slotTransform.DOLocalMoveY(middlePosition, 0.35f)
-                    .SetEase(Ease.OutBounce)
-            );
+                spinTweens[columnIndex] = quickStopSequence;
+                
+                yield return new WaitForSeconds(quickStopDuration);
+            }
+            else
+            {
+                // Full casino-style stop animation (reverse of start)
+                Sequence stopSequence = DOTween.Sequence();
+                
+                // Overshoot downward (momentum)
+                stopSequence.Append(
+                    slotTransform.DOLocalMoveY(middlePosition - stopOvershootDistance, stopOvershootDuration)
+                        .SetEase(Ease.InCubic)
+                );
+                
+                // Bounce back up past center
+                stopSequence.Append(
+                    slotTransform.DOLocalMoveY(middlePosition + stopBounceBackDistance, stopBounceBackDuration)
+                        .SetEase(Ease.OutCubic)
+                );
 
-            spinTweens[columnIndex] = stopSequence;
-            
-            yield return new WaitForSeconds(0.75f); 
+                // Settle to final position with bounce
+                stopSequence.Append(
+                    slotTransform.DOLocalMoveY(middlePosition, stopSettleDuration)
+                        .SetEase(Ease.OutBounce)
+                );
+
+                spinTweens[columnIndex] = stopSequence;
+                
+                float totalStopTime = stopOvershootDuration + stopBounceBackDuration + stopSettleDuration;
+                yield return new WaitForSeconds(totalStopTime);
+            }
         }
 
         #endregion
@@ -337,32 +415,35 @@ using DG.Tweening;
 
         internal void QuickStop(List<List<int>> resultMatrix)
         {
-            Debug.Log("[SlotView]  Quick stop");
+            Debug.Log("[SlotView] Quick stop with fast animation");
             LogMatrix("QUICK_RESULT", resultMatrix);
 
-            KillAllTweens();
-            currentDisplayMatrix = resultMatrix;
-
-            // Instant stop - no animation
-            for (int col = 0; col < 5; col++)
+            if (!isSpinning)
             {
-                if (col < reelTransforms.Length)
+                // Already stopped, just set symbols
+                currentDisplayMatrix = resultMatrix;
+                for (int col = 0; col < 5; col++)
                 {
-                    SetReelSymbols(col, resultMatrix[col], false);
-                    reelTransforms[col].localPosition = new Vector3(
-                        reelTransforms[col].localPosition.x, 
-                        middlePosition, 
-                        0
-                    );
+                    if (col < reelTransforms.Length)
+                    {
+                        SetReelSymbols(col, resultMatrix[col], false);
+                        reelTransforms[col].localPosition = new Vector3(
+                            reelTransforms[col].localPosition.x, 
+                            middlePosition, 
+                            0
+                        );
+                    }
                 }
+                return;
             }
 
-            isSpinning = false;
+            // Use quick stop sequence with animations
+            StartCoroutine(StopSpinSequence(resultMatrix, null, true));
         }
 
         #endregion
 
-        #region Win Line Animation - NEW
+        #region Win Line Animation
 
         internal void ShowWinLineAnimation(List<WinLine> winLines, System.Action onComplete)
         {
@@ -372,7 +453,7 @@ using DG.Tweening;
                 return;
             }
 
-            Debug.Log($"[SlotView]  Showing {winLines.Count} win line animations");
+            Debug.Log($"[SlotView] Showing {winLines.Count} win line animations");
 
             KillWinTweens();
 
