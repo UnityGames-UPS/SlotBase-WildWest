@@ -22,7 +22,7 @@ using DG.Tweening;
         [SerializeField] private float symbolHeight = 100f; 
         [SerializeField] private float spinSpeed = 0.05f; 
         [SerializeField] private float reelStartStagger = 0.08f; // Stagger between reel starts
-        [SerializeField] private float reelStopStagger = 0.15f; // Stagger between reel stops
+        [SerializeField] private float reelStopStagger = 0.12f; // Stagger between reel stops (same cycle)
 
         [Header("Animation Settings - Casino Style")]
         [SerializeField] private float anticipationUpDistance = 30f; // How far up reels go before dropping
@@ -44,6 +44,11 @@ using DG.Tweening;
         [SerializeField] private float quickStopDuration = 0.2f; // Total quick stop time per reel
         [SerializeField] private int minSpinCyclesBeforeStop = 3; // Minimum full cycles before allowing stop
 
+        [Header("Scatter Anticipation Settings")]
+        [SerializeField] private int scatterSymbolId = 4; // ID of scatter symbol
+        [SerializeField] private float anticipationExtraSpins = 3f; // Extra cycles for 5th reel
+        [SerializeField] private float anticipationSpeedMultiplier = 1.5f; // Speed up factor for 5th reel
+
         [Header("Win Animation Settings")]
         [SerializeField] private float winPopScale = 1.3f; 
         [SerializeField] private float winPopDuration = 0.4f; 
@@ -62,6 +67,7 @@ using DG.Tweening;
         internal List<List<int>> currentDisplayMatrix;
 
         private bool isSpinning;
+        private bool scatterAnticipationActive = false;
 
         #region Initialization
 
@@ -170,7 +176,7 @@ using DG.Tweening;
 
         #endregion
 
-        #region Spin Animation - Smooth Casino Style
+        #region Spin Animation - SMOOTH SPINNING (OLD) + SCATTER ANTICIPATION (NEW)
 
         internal void StartSpin()
         {
@@ -181,6 +187,7 @@ using DG.Tweening;
             }
 
             isSpinning = true;
+            scatterAnticipationActive = false;
             KillAllTweens();
 
             // Reset cycle counters
@@ -245,35 +252,48 @@ using DG.Tweening;
                 spinTweens[columnIndex] = startSequence;
         }
 
-
+        // 🔥 MERGED: Smooth cycling from OLD + Speed control from NEW
         private void StartReelCycle(int columnIndex)
         {
             if (columnIndex >= reelTransforms.Length) return;
+            if (!isSpinning) return;
 
             Transform slotTransform = reelTransforms[columnIndex];
-            var reel = reelImagesList[columnIndex];
 
+            // Reset to middle position for clean loop (FROM OLD VERSION)
             slotTransform.localPosition = new Vector3(slotTransform.localPosition.x, middlePosition, 0);
 
+            // Apply anticipation speed boost for 5th reel if scatters detected (FROM NEW VERSION)
+            float currentSpeed = spinSpeed;
+            if (scatterAnticipationActive && columnIndex == 4)
+            {
+                currentSpeed = spinSpeed / anticipationSpeedMultiplier;
+            }
+
+            // Move down one cycle distance
             Sequence cycleSequence = DOTween.Sequence();
             
             cycleSequence.Append(
-                slotTransform.DOLocalMoveY(middlePosition - cycleDistance, spinSpeed)
+                slotTransform.DOLocalMoveY(middlePosition - cycleDistance, currentSpeed)
                     .SetEase(Ease.Linear)
             );
             
             cycleSequence.OnComplete(() => {
                 if (isSpinning)
                 {
+                    // 🔥 CRITICAL: Cycle sprites physically (FROM OLD VERSION - THIS WAS MISSING IN NEW!)
                     CycleReelSymbols(columnIndex);
+                    
+                    // Reset position for next cycle
                     slotTransform.localPosition = new Vector3(slotTransform.localPosition.x, middlePosition, 0);
                     
-                    // Increment cycle count
+                    // Increment cycle count (FROM NEW VERSION)
                     if (columnIndex < reelCycleCount.Count)
                     {
                         reelCycleCount[columnIndex]++;
                     }
                     
+                    // Continue spinning
                     StartReelCycle(columnIndex);
                 }
             });
@@ -286,83 +306,164 @@ using DG.Tweening;
                 spinTweens[columnIndex] = cycleSequence;
         }
 
+        // 🔥 FROM OLD VERSION - This method was MISSING in new version!
         private void CycleReelSymbols(int columnIndex)
         {
             var reel = reelImagesList[columnIndex];
             if (reel.images == null || reel.images.Count != 16) return;
 
-  
+            // Shift all sprites down by one position
             Sprite bottomSprite = reel.images[15].sprite;
             
-
             for (int i = 15; i > 0; i--)
             {
                 reel.images[i].sprite = reel.images[i - 1].sprite;
             }
             
-
+            // Add new random sprite at top
             reel.images[0].sprite = GetSymbolSprite(Random.Range(0, 16));
         }
 
+        #endregion
+
+        #region Stop Spin - All Reels Stop in Same Cycle (FROM NEW VERSION)
+
         internal void StopSpin(List<List<int>> resultMatrix, System.Action onComplete)
         {
+            Debug.Log("[SlotView] Stop spin with casino animation");
+            LogMatrix("RESULT", resultMatrix);
+
             if (!isSpinning)
             {
-                Debug.LogWarning("[SlotView] Not spinning!");
+                Debug.LogWarning("[SlotView] Not spinning, setting symbols directly");
+                currentDisplayMatrix = resultMatrix;
+                for (int col = 0; col < 5; col++)
+                {
+                    SetReelSymbols(col, resultMatrix[col], false);
+                }
+                onComplete?.Invoke();
                 return;
             }
 
-            LogMatrix("RESULT", resultMatrix);
             StartCoroutine(StopSpinSequence(resultMatrix, onComplete, false));
         }
 
-        private IEnumerator StopSpinSequence(List<List<int>> resultMatrix, System.Action onComplete, bool isQuickMode)
+        private IEnumerator StopSpinSequence(List<List<int>> resultMatrix, System.Action onComplete, bool isQuickStop)
         {
             currentDisplayMatrix = resultMatrix;
 
-            // Stop reels with reverse stagger (last reel stops first for casino feel)
-            for (int col = 0; col < 5; col++)
+            // 🔥 SCATTER ANTICIPATION DETECTION (FROM NEW VERSION)
+            int scatterCount = 0;
+            for (int col = 0; col < 4; col++)
             {
-                // Wait until reel has completed minimum cycles (important for quick/auto modes)
-                while (reelCycleCount[col] < minSpinCyclesBeforeStop)
+                for (int row = 0; row < resultMatrix[col].Count; row++)
                 {
-                    yield return null;
-                }
-                
-                yield return StartCoroutine(StopSingleReel(col, resultMatrix[col], isQuickMode));
-                
-                if (col < 4)
-                {
-                    float staggerDelay = isQuickMode ? quickStopStagger : reelStopStagger;
-                    yield return new WaitForSeconds(staggerDelay);
+                    if (resultMatrix[col][row] == scatterSymbolId)
+                    {
+                        scatterCount++;
+                        break; // Only count one scatter per reel
+                    }
                 }
             }
 
+            // Activate scatter anticipation if 2 scatters found
+            if (scatterCount >= 2 && !isQuickStop)
+            {
+                scatterAnticipationActive = true;
+                Debug.Log("[SlotView] 🎰 SCATTER ANTICIPATION ACTIVATED! 2 scatters detected!");
+            }
+
+            // Wait for minimum cycles on all reels
+            while (true)
+            {
+                bool allReelsReady = true;
+                for (int col = 0; col < 5; col++)
+                {
+                    // For 5th reel with anticipation, require extra cycles
+                    int requiredCycles = minSpinCyclesBeforeStop;
+                    if (scatterAnticipationActive && col == 4)
+                    {
+                        requiredCycles += Mathf.RoundToInt(anticipationExtraSpins);
+                    }
+
+                    if (reelCycleCount[col] < requiredCycles)
+                    {
+                        allReelsReady = false;
+                        break;
+                    }
+                }
+
+                if (allReelsReady) break;
+                yield return null;
+            }
+
+            // Stop all reels in the SAME cycle with staggered timing
+            float stagger = isQuickStop ? quickStopStagger : reelStopStagger;
+
+            for (int col = 0; col < 5; col++)
+            {
+                // Calculate delay for this reel
+                float delay = col * stagger;
+                
+                // Start the stop animation for this reel
+                StartCoroutine(StopSingleReel(col, resultMatrix[col], delay, isQuickStop));
+            }
+
+            // Wait for all reels to complete stopping
+            float longestStopTime;
+            if (isQuickStop)
+            {
+                longestStopTime = (4 * stagger) + quickStopDuration;
+            }
+            else
+            {
+                longestStopTime = (4 * stagger) + stopOvershootDuration + stopBounceBackDuration + stopSettleDuration;
+            }
+
+            yield return new WaitForSeconds(longestStopTime);
+
             isSpinning = false;
-            Debug.Log("[SlotView] All reels stopped smoothly");
+            scatterAnticipationActive = false;
             
+            Debug.Log("[SlotView] All reels stopped");
             onComplete?.Invoke();
         }
 
-        private IEnumerator StopSingleReel(int columnIndex, List<int> targetSymbols, bool isQuickMode)
+        private IEnumerator StopSingleReel(int columnIndex, List<int> targetSymbols, float delay, bool isQuickStop)
         {
-            if (columnIndex >= spinTweens.Count || columnIndex >= reelTransforms.Length)
-                yield break;
+            // Wait for stagger delay
+            if (delay > 0)
+            {
+                yield return new WaitForSeconds(delay);
+            }
 
-            Transform slotTransform = reelTransforms[columnIndex];
-
-            // Kill current spin animation
-            if (spinTweens[columnIndex] != null)
+            // Kill current cycling animation
+            if (columnIndex < spinTweens.Count && spinTweens[columnIndex] != null)
             {
                 spinTweens[columnIndex].Kill();
             }
 
-            // Set the target symbols
+            Transform slotTransform = reelTransforms[columnIndex];
+
+            // Set final symbols
             SetReelSymbols(columnIndex, targetSymbols, false);
 
-            if (isQuickMode)
+            // Align to middle position
+            float currentY = slotTransform.localPosition.y;
+            float targetY = middlePosition;
+            float offset = (currentY - targetY) % cycleDistance;
+            if (offset < 0) offset += cycleDistance;
+
+            slotTransform.localPosition = new Vector3(
+                slotTransform.localPosition.x,
+                targetY + offset,
+                0
+            );
+
+            // Apply stop animation
+            if (isQuickStop)
             {
-                // Quick stop with minimal animation
+                // Quick stop animation
                 Sequence quickStopSequence = DOTween.Sequence();
                 
                 quickStopSequence.Append(
@@ -376,12 +477,10 @@ using DG.Tweening;
                 );
 
                 spinTweens[columnIndex] = quickStopSequence;
-                
-                yield return new WaitForSeconds(quickStopDuration);
             }
             else
             {
-                // Full casino-style stop animation (reverse of start)
+                // Full casino-style stop animation
                 Sequence stopSequence = DOTween.Sequence();
                 
                 // Overshoot downward (momentum)
@@ -403,9 +502,6 @@ using DG.Tweening;
                 );
 
                 spinTweens[columnIndex] = stopSequence;
-                
-                float totalStopTime = stopOvershootDuration + stopBounceBackDuration + stopSettleDuration;
-                yield return new WaitForSeconds(totalStopTime);
             }
         }
 

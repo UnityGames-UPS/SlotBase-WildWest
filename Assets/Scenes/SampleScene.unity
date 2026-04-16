@@ -3067,6 +3067,8 @@ MonoBehaviour:
   testSocketURL: https://devrealtime.dingdinghouse.com/
   nameSpace: playground
   gameID: SL-NEW
+  scatterSymbolId: 4
+  scattersRequiredForFreeSpin: 3
   gameManager: {fileID: 855426822}
   JSManager: {fileID: 545483263}
 --- !u!4 &416965698
@@ -15525,7 +15527,7 @@ MonoBehaviour:
   symbolHeight: 151.6275
   spinSpeed: 0.04
   reelStartStagger: 0.04
-  reelStopStagger: 0.04
+  reelStopStagger: 0.35
   anticipationUpDistance: 30
   anticipationUpDuration: 0.15
   dropDownDistance: 15
@@ -15540,6 +15542,9 @@ MonoBehaviour:
   quickStopOvershoot: 20
   quickStopDuration: 0.2
   minSpinCyclesBeforeStop: 3
+  scatterSymbolId: 4
+  anticipationExtraSpins: 3
+  anticipationSpeedMultiplier: 1.5
   winPopScale: 1.3
   winPopDuration: 0.4
   winPopRepeat: 3

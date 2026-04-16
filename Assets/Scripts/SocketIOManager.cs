@@ -17,6 +17,10 @@ using System.Runtime.InteropServices;
         [SerializeField] private string nameSpace = "playground";
         [SerializeField] private string gameID = "SL-NEW";
 
+        [Header("Scatter Configuration")]
+        [SerializeField] private int scatterSymbolId = 4; // Scatter symbol ID
+        [SerializeField] private int scattersRequiredForFreeSpin = 3; // Must have exactly 3 scatters
+
         [Header("References")]
         [SerializeField] private GameManager gameManager;
         [SerializeField] private JSFunctCalls JSManager;
@@ -162,7 +166,11 @@ using System.Runtime.InteropServices;
             if (!isFreeSpin)
                 result.playerData.balance -= betAmount;
 
-            if (UnityEngine.Random.value < 0.35f)
+            // Count scatters in result matrix
+            int scatterCount = CountScattersInMatrix(result.resultMatrix);
+
+            // Generate win if random chance (but not if we have scatters for free spin)
+            if (UnityEngine.Random.value < 0.35f && scatterCount < scattersRequiredForFreeSpin)
             {
                 result.winAmount = betAmount * UnityEngine.Random.Range(2, 25);
                 
@@ -188,17 +196,98 @@ using System.Runtime.InteropServices;
 
             result.playerData.balance += result.winAmount;
 
-            if (!isFreeSpin && UnityEngine.Random.value < 0.05f)
+            // Free spins ONLY trigger with exactly 3 scatters
+            if (!isFreeSpin && scatterCount >= scattersRequiredForFreeSpin)
             {
+                // Force exactly 3 scatters if more were randomly generated
+                if (scatterCount > scattersRequiredForFreeSpin)
+                {
+                    result.resultMatrix = GenerateMatrixWithExactScatters(scattersRequiredForFreeSpin);
+                }
+
                 result.freeSpinData = new FreeSpinData
                 {
                     isTriggered = true,
-                    spinsAwarded = UnityEngine.Random.Range(5, 15),
+                    spinsAwarded = UnityEngine.Random.Range(8, 16),
                     remainingSpins = 0
                 };
+
+                // Add scatter win
+                result.scatterData = new ScatterData
+                {
+                    isTriggered = true,
+                    scatterCount = scattersRequiredForFreeSpin,
+                    winAmount = betAmount * 5.0 // Example scatter win multiplier
+                };
+
+                result.winAmount += result.scatterData.winAmount;
+                result.playerData.balance += result.scatterData.winAmount;
+
+                Debug.Log($"[SocketIO] 🎰 FREE SPINS TRIGGERED! {scattersRequiredForFreeSpin} Scatters - Awarded {result.freeSpinData.spinsAwarded} free spins");
             }
 
             return result;
+        }
+
+        private int CountScattersInMatrix(List<List<int>> matrix)
+        {
+            int count = 0;
+            foreach (var column in matrix)
+            {
+                foreach (var symbolId in column)
+                {
+                    if (symbolId == scatterSymbolId)
+                    {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }
+
+        private List<List<int>> GenerateMatrixWithExactScatters(int scatterCount)
+        {
+            var matrix = GenerateRandomMatrix();
+            
+            // Remove all scatters first
+            for (int col = 0; col < matrix.Count; col++)
+            {
+                for (int row = 0; row < matrix[col].Count; row++)
+                {
+                    if (matrix[col][row] == scatterSymbolId)
+                    {
+                        matrix[col][row] = UnityEngine.Random.Range(5, 16); // Replace with regular symbol
+                    }
+                }
+            }
+
+            // Add exactly the required number of scatters
+            List<Vector2Int> availablePositions = new List<Vector2Int>();
+            for (int col = 0; col < 5; col++)
+            {
+                for (int row = 0; row < 4; row++)
+                {
+                    availablePositions.Add(new Vector2Int(col, row));
+                }
+            }
+
+            // Shuffle positions
+            for (int i = availablePositions.Count - 1; i > 0; i--)
+            {
+                int randomIndex = UnityEngine.Random.Range(0, i + 1);
+                var temp = availablePositions[i];
+                availablePositions[i] = availablePositions[randomIndex];
+                availablePositions[randomIndex] = temp;
+            }
+
+            // Place scatters
+            for (int i = 0; i < scatterCount && i < availablePositions.Count; i++)
+            {
+                var pos = availablePositions[i];
+                matrix[pos.x][pos.y] = scatterSymbolId;
+            }
+
+            return matrix;
         }
 
         private List<List<int>> GenerateDemoPaylines()
@@ -253,7 +342,17 @@ using System.Runtime.InteropServices;
                 var column = new List<int>();
                 for (int row = 0; row < 4; row++)
                 {
-                    column.Add(UnityEngine.Random.Range(5, 16));
+                    // Generate mostly regular symbols (5-15), occasional scatter (4)
+                    int symbolId;
+                    if (UnityEngine.Random.value < 0.05f) // 5% chance for scatter
+                    {
+                        symbolId = scatterSymbolId;
+                    }
+                    else
+                    {
+                        symbolId = UnityEngine.Random.Range(5, 16);
+                    }
+                    column.Add(symbolId);
                 }
                 matrix.Add(column);
             }
