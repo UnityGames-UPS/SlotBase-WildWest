@@ -1,0 +1,624 @@
+fileFormatVersion: 2
+guid: cea9331ae90d94036b0392c650309b92
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 2567056882382164984
+    second: clik sparkel_00014_0
+  - first:
+      213: 2142840428416381523
+    second: clik sparkel_00014_1
+  - first:
+      213: 7556196441748115050
+    second: clik sparkel_00014_2
+  - first:
+      213: 3240262089753706718
+    second: clik sparkel_00014_3
+  - first:
+      213: 1225042778666955880
+    second: clik sparkel_00014_4
+  - first:
+      213: 5233432012333848682
+    second: clik sparkel_00014_5
+  - first:
+      213: 5162749549846766167
+    second: clik sparkel_00014_6
+  - first:
+      213: 5283343849232697794
+    second: clik sparkel_00014_7
+  - first:
+      213: -5344835772905996812
+    second: clik sparkel_00014_8
+  - first:
+      213: 7367988904610146992
+    second: clik sparkel_00014_9
+  - first:
+      213: 3453004655084659598
+    second: clik sparkel_00014_10
+  - first:
+      213: 8409299590331655896
+    second: clik sparkel_00014_11
+  - first:
+      213: 6310734643899056532
+    second: clik sparkel_00014_12
+  - first:
+      213: -3252691824192345007
+    second: clik sparkel_00014_13
+  - first:
+      213: -2406488477894278669
+    second: clik sparkel_00014_14
+  - first:
+      213: 3952053174406452696
+    second: clik sparkel_00014_15
+  - first:
+      213: -7622532368329162103
+    second: clik sparkel_00014_16
+  - first:
+      213: -1316015502907402060
+    second: clik sparkel_00014_17
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: clik sparkel_00014_0
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 273
+        width: 15
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f35c9832a400a320800000000000000
+      internalID: 2567056882382164984
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: clik sparkel_00014_1
+      rect:
+        serializedVersion: 2
+        x: 217
+        y: 268
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 352ba123406ecbd10800000000000000
+      internalID: 2142840428416381523
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: clik sparkel_00014_2
+      rect:
+        serializedVersion: 2
+        x: 293
+        y: 261
+        width: 19
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a6e877b11a00dd860800000000000000
+      internalID: 7556196441748115050
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: clik sparkel_00014_3
+      rect:
+        serializedVersion: 2
+        x: 155
+        y: 239
+        width: 16
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed04fe6f339b7fc20800000000000000
+      internalID: 3240262089753706718
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: clik sparkel_00014_4
+      rect:
+        serializedVersion: 2
+        x: 201
+        y: 235
+        width: 22
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 864f919aae9300110800000000000000
+      internalID: 1225042778666955880
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: clik sparkel_00014_5
+      rect:
+        serializedVersion: 2
+        x: 382
+        y: 227
+        width: 19
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a681153ffa2e0a840800000000000000
+      internalID: 5233432012333848682
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: clik sparkel_00014_6
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 232
+        width: 22
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 752ace6bc55c5a740800000000000000
+      internalID: 5162749549846766167
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: clik sparkel_00014_7
+      rect:
+        serializedVersion: 2
+        x: 454
+        y: 234
+        width: 26
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2c982cf0d35325940800000000000000
+      internalID: 5283343849232697794
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: clik sparkel_00014_8
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 225
+        width: 12
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4fd3325ce2453d5b0800000000000000
+      internalID: -5344835772905996812
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: clik sparkel_00014_9
+      rect:
+        serializedVersion: 2
+        x: 166
+        y: 135
+        width: 279
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0baae481fda504660800000000000000
+      internalID: 7367988904610146992
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: clik sparkel_00014_10
+      rect:
+        serializedVersion: 2
+        x: 230
+        y: 212
+        width: 15
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e83671260798bef20800000000000000
+      internalID: 3453004655084659598
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: clik sparkel_00014_11
+      rect:
+        serializedVersion: 2
+        x: 443
+        y: 157
+        width: 74
+        height: 75
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8d66e8b4c65d3b470800000000000000
+      internalID: 8409299590331655896
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: clik sparkel_00014_12
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 119
+        width: 24
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 491ca5119bb349750800000000000000
+      internalID: 6310734643899056532
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: clik sparkel_00014_13
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 119
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 15ca237f40e1cd2d0800000000000000
+      internalID: -3252691824192345007
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: clik sparkel_00014_14
+      rect:
+        serializedVersion: 2
+        x: 404
+        y: 133
+        width: 31
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f18a0fba7f6a9ed0800000000000000
+      internalID: -2406488477894278669
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: clik sparkel_00014_15
+      rect:
+        serializedVersion: 2
+        x: 500
+        y: 114
+        width: 19
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8d593f95c6388d630800000000000000
+      internalID: 3952053174406452696
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: clik sparkel_00014_16
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 101
+        width: 20
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 982c2d86233573690800000000000000
+      internalID: -7622532368329162103
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: clik sparkel_00014_17
+      rect:
+        serializedVersion: 2
+        x: 262
+        y: 118
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4b81c466fd29cbde0800000000000000
+      internalID: -1316015502907402060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      clik sparkel_00014_0: 2567056882382164984
+      clik sparkel_00014_1: 2142840428416381523
+      clik sparkel_00014_10: 3453004655084659598
+      clik sparkel_00014_11: 8409299590331655896
+      clik sparkel_00014_12: 6310734643899056532
+      clik sparkel_00014_13: -3252691824192345007
+      clik sparkel_00014_14: -2406488477894278669
+      clik sparkel_00014_15: 3952053174406452696
+      clik sparkel_00014_16: -7622532368329162103
+      clik sparkel_00014_17: -1316015502907402060
+      clik sparkel_00014_2: 7556196441748115050
+      clik sparkel_00014_3: 3240262089753706718
+      clik sparkel_00014_4: 1225042778666955880
+      clik sparkel_00014_5: 5233432012333848682
+      clik sparkel_00014_6: 5162749549846766167
+      clik sparkel_00014_7: 5283343849232697794
+      clik sparkel_00014_8: -5344835772905996812
+      clik sparkel_00014_9: 7367988904610146992
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

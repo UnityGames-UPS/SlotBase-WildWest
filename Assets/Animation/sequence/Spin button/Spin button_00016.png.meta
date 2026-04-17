@@ -1,0 +1,1508 @@
+fileFormatVersion: 2
+guid: 3a881462e9e5642598cc54f9f575e500
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 3002137727913319912
+    second: Spin button_00016_0
+  - first:
+      213: 7093444812016548266
+    second: Spin button_00016_1
+  - first:
+      213: -2402706366988711243
+    second: Spin button_00016_2
+  - first:
+      213: -2768987341207529366
+    second: Spin button_00016_3
+  - first:
+      213: 3253708587886868062
+    second: Spin button_00016_4
+  - first:
+      213: 8534761098395272967
+    second: Spin button_00016_5
+  - first:
+      213: 6282237904761816821
+    second: Spin button_00016_6
+  - first:
+      213: -7209147678739672728
+    second: Spin button_00016_7
+  - first:
+      213: -8142183718446012227
+    second: Spin button_00016_8
+  - first:
+      213: -8513335878033352949
+    second: Spin button_00016_9
+  - first:
+      213: 8370526984627008060
+    second: Spin button_00016_10
+  - first:
+      213: -545639990841752036
+    second: Spin button_00016_11
+  - first:
+      213: -2824253352882767200
+    second: Spin button_00016_12
+  - first:
+      213: 1740687757223478143
+    second: Spin button_00016_13
+  - first:
+      213: 5746562152434743779
+    second: Spin button_00016_14
+  - first:
+      213: -6538437429583257097
+    second: Spin button_00016_15
+  - first:
+      213: 1342620958912178880
+    second: Spin button_00016_16
+  - first:
+      213: 6990070680304232510
+    second: Spin button_00016_17
+  - first:
+      213: -2197122388433365371
+    second: Spin button_00016_18
+  - first:
+      213: -6536694795373159124
+    second: Spin button_00016_19
+  - first:
+      213: 7511868680234836435
+    second: Spin button_00016_20
+  - first:
+      213: -8473823771911411466
+    second: Spin button_00016_21
+  - first:
+      213: 6954486620842271312
+    second: Spin button_00016_22
+  - first:
+      213: 1880272807924769638
+    second: Spin button_00016_23
+  - first:
+      213: 6315718641174818405
+    second: Spin button_00016_24
+  - first:
+      213: -1700219483288482217
+    second: Spin button_00016_25
+  - first:
+      213: -7577276853404543863
+    second: Spin button_00016_26
+  - first:
+      213: -8322271470954432237
+    second: Spin button_00016_27
+  - first:
+      213: 4774156674794470122
+    second: Spin button_00016_28
+  - first:
+      213: -1199609781092584761
+    second: Spin button_00016_29
+  - first:
+      213: 4632800013783592511
+    second: Spin button_00016_30
+  - first:
+      213: 6525624215643213137
+    second: Spin button_00016_31
+  - first:
+      213: 1615488316705976813
+    second: Spin button_00016_32
+  - first:
+      213: 9107770820372532906
+    second: Spin button_00016_33
+  - first:
+      213: 2556789513074718797
+    second: Spin button_00016_34
+  - first:
+      213: 6640399774910077281
+    second: Spin button_00016_35
+  - first:
+      213: -3041050104163697214
+    second: Spin button_00016_36
+  - first:
+      213: -909695018366953915
+    second: Spin button_00016_37
+  - first:
+      213: -5678648557057836624
+    second: Spin button_00016_38
+  - first:
+      213: 8804599368613983695
+    second: Spin button_00016_39
+  - first:
+      213: -4127862350986350422
+    second: Spin button_00016_40
+  - first:
+      213: 7953053605999625904
+    second: Spin button_00016_41
+  - first:
+      213: -5457094828802966453
+    second: Spin button_00016_42
+  - first:
+      213: 5617084022719161152
+    second: Spin button_00016_43
+  - first:
+      213: 4519655608631040946
+    second: Spin button_00016_44
+  - first:
+      213: 3593278502242714474
+    second: Spin button_00016_45
+  - first:
+      213: 7887036961284597314
+    second: Spin button_00016_46
+  - first:
+      213: -2009470514938117488
+    second: Spin button_00016_47
+  - first:
+      213: 131710698774672887
+    second: Spin button_00016_48
+  - first:
+      213: -6717220468428570970
+    second: Spin button_00016_49
+  - first:
+      213: -420331315104008255
+    second: Spin button_00016_50
+  - first:
+      213: 5318923375151205935
+    second: Spin button_00016_51
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Spin button_00016_0
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 0
+        width: 656
+        height: 331
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8ed52178b5cb9a920800000000000000
+      internalID: 3002137727913319912
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_1
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 326
+        width: 7
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aa9751e497af07260800000000000000
+      internalID: 7093444812016548266
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_2
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 300
+        width: 39
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ba81101a4fd7aed0800000000000000
+      internalID: -2402706366988711243
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_3
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 291
+        width: 18
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a6895c31fa49299d0800000000000000
+      internalID: -2768987341207529366
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_4
+      rect:
+        serializedVersion: 2
+        x: 6
+        y: 313
+        width: 14
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e5672a7c8be772d20800000000000000
+      internalID: 3253708587886868062
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_5
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 297
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7074ca8ffff817670800000000000000
+      internalID: 8534761098395272967
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_6
+      rect:
+        serializedVersion: 2
+        x: 21
+        y: 298
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5f682d3f61efe2750800000000000000
+      internalID: 6282237904761816821
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_7
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 283
+        width: 13
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 861d363c166f3fb90800000000000000
+      internalID: -7209147678739672728
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_8
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 272
+        width: 16
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: db86e061c07210f80800000000000000
+      internalID: -8142183718446012227
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_9
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 284
+        width: 22
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b07db30ef1e8ad980800000000000000
+      internalID: -8513335878033352949
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_10
+      rect:
+        serializedVersion: 2
+        x: 6
+        y: 261
+        width: 10
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c32b38d81f51a2470800000000000000
+      internalID: 8370526984627008060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_11
+      rect:
+        serializedVersion: 2
+        x: 13
+        y: 269
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1641aab15f7d68f0800000000000000
+      internalID: -545639990841752036
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_12
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 263
+        width: 14
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0aa77b10a8c3ec8d0800000000000000
+      internalID: -2824253352882767200
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_13
+      rect:
+        serializedVersion: 2
+        x: 6
+        y: 233
+        width: 16
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f734d2aea4a282810800000000000000
+      internalID: 1740687757223478143
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_14
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 250
+        width: 17
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3e9b39fb4d3efbf40800000000000000
+      internalID: 5746562152434743779
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_15
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 230
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f16297cccdc245a0800000000000000
+      internalID: -6538437429583257097
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_16
+      rect:
+        serializedVersion: 2
+        x: 21
+        y: 237
+        width: 11
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0ca64fb06a2f1a210800000000000000
+      internalID: 1342620958912178880
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_17
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 203
+        width: 29
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e38286eaf38b10160800000000000000
+      internalID: 6990070680304232510
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_18
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 196
+        width: 12
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5861f5d14d04281e0800000000000000
+      internalID: -2197122388433365371
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_19
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 188
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c2d53ac67bef845a0800000000000000
+      internalID: -6536694795373159124
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_20
+      rect:
+        serializedVersion: 2
+        x: 12
+        y: 195
+        width: 10
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3d1a7ccd3c48f3860800000000000000
+      internalID: 7511868680234836435
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_21
+      rect:
+        serializedVersion: 2
+        x: 15
+        y: 192
+        width: 9
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6f8a5f9fc2ee66a80800000000000000
+      internalID: -8473823771911411466
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_22
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 170
+        width: 29
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 052a2863cbc438060800000000000000
+      internalID: 6954486620842271312
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_23
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 139
+        width: 39
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 663ae2d1822181a10800000000000000
+      internalID: 1880272807924769638
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_24
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 155
+        width: 10
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 56ea98c54a0f5a750800000000000000
+      internalID: 6315718641174818405
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_25
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 145
+        width: 11
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 75e446a536b9768e0800000000000000
+      internalID: -1700219483288482217
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_26
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 134
+        width: 9
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 984580419da18d690800000000000000
+      internalID: -7577276853404543863
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_27
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 134
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 319b461c03a518c80800000000000000
+      internalID: -8322271470954432237
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_28
+      rect:
+        serializedVersion: 2
+        x: 18
+        y: 137
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aea3f2f7336314240800000000000000
+      internalID: 4774156674794470122
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_29
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 130
+        width: 10
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7c274e882412a5fe0800000000000000
+      internalID: -1199609781092584761
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_30
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 122
+        width: 28
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f3eeef021130b4040800000000000000
+      internalID: 4632800013783592511
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_31
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 108
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 15dc91f56acaf8a50800000000000000
+      internalID: 6525624215643213137
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_32
+      rect:
+        serializedVersion: 2
+        x: 20
+        y: 114
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: de1bd08901e5b6610800000000000000
+      internalID: 1615488316705976813
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_33
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 89
+        width: 10
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aae09fb5e4d456e70800000000000000
+      internalID: 9107770820372532906
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_34
+      rect:
+        serializedVersion: 2
+        x: 15
+        y: 102
+        width: 13
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d483344048a8b7320800000000000000
+      internalID: 2556789513074718797
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_35
+      rect:
+        serializedVersion: 2
+        x: 20
+        y: 81
+        width: 28
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1695916b960772c50800000000000000
+      internalID: 6640399774910077281
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_36
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 86
+        width: 9
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2cd782dda050cc5d0800000000000000
+      internalID: -3041050104163697214
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_37
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 74
+        width: 10
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5469b48533d1063f0800000000000000
+      internalID: -909695018366953915
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_38
+      rect:
+        serializedVersion: 2
+        x: 21
+        y: 65
+        width: 21
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b9784069336131b0800000000000000
+      internalID: -5678648557057836624
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_39
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 37
+        width: 9
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc57ddb1a78303a70800000000000000
+      internalID: 8804599368613983695
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_40
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 42
+        width: 23
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aa0ffb7ef03e6b6c0800000000000000
+      internalID: -4127862350986350422
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_41
+      rect:
+        serializedVersion: 2
+        x: 19
+        y: 24
+        width: 37
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b64f391e1cee5e60800000000000000
+      internalID: 7953053605999625904
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_42
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 34
+        width: 10
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4cf3978a218444b0800000000000000
+      internalID: -5457094828802966453
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_43
+      rect:
+        serializedVersion: 2
+        x: 13
+        y: 32
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 043a2b77824e3fd40800000000000000
+      internalID: 5617084022719161152
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_44
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 15
+        width: 9
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2bb1e8374da09be30800000000000000
+      internalID: 4519655608631040946
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_45
+      rect:
+        serializedVersion: 2
+        x: 12
+        y: 9
+        width: 7
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a63893182c3edd130800000000000000
+      internalID: 3593278502242714474
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_46
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 20
+        width: 8
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 246aeb73452647d60800000000000000
+      internalID: 7887036961284597314
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_47
+      rect:
+        serializedVersion: 2
+        x: 18
+        y: 16
+        width: 13
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0920e7a963dec14e0800000000000000
+      internalID: -2009470514938117488
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_48
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 0
+        width: 18
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f53595ce2ee3d100800000000000000
+      internalID: 131710698774672887
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_49
+      rect:
+        serializedVersion: 2
+        x: 70
+        y: 0
+        width: 6
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6aef455c293a7c2a0800000000000000
+      internalID: -6717220468428570970
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_50
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 0
+        width: 8
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1c7b04b55eeaa2af0800000000000000
+      internalID: -420331315104008255
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spin button_00016_51
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 0
+        width: 21
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f2ec86bf0ac90d940800000000000000
+      internalID: 5318923375151205935
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Spin button_00016_0: 3002137727913319912
+      Spin button_00016_1: 7093444812016548266
+      Spin button_00016_10: 8370526984627008060
+      Spin button_00016_11: -545639990841752036
+      Spin button_00016_12: -2824253352882767200
+      Spin button_00016_13: 1740687757223478143
+      Spin button_00016_14: 5746562152434743779
+      Spin button_00016_15: -6538437429583257097
+      Spin button_00016_16: 1342620958912178880
+      Spin button_00016_17: 6990070680304232510
+      Spin button_00016_18: -2197122388433365371
+      Spin button_00016_19: -6536694795373159124
+      Spin button_00016_2: -2402706366988711243
+      Spin button_00016_20: 7511868680234836435
+      Spin button_00016_21: -8473823771911411466
+      Spin button_00016_22: 6954486620842271312
+      Spin button_00016_23: 1880272807924769638
+      Spin button_00016_24: 6315718641174818405
+      Spin button_00016_25: -1700219483288482217
+      Spin button_00016_26: -7577276853404543863
+      Spin button_00016_27: -8322271470954432237
+      Spin button_00016_28: 4774156674794470122
+      Spin button_00016_29: -1199609781092584761
+      Spin button_00016_3: -2768987341207529366
+      Spin button_00016_30: 4632800013783592511
+      Spin button_00016_31: 6525624215643213137
+      Spin button_00016_32: 1615488316705976813
+      Spin button_00016_33: 9107770820372532906
+      Spin button_00016_34: 2556789513074718797
+      Spin button_00016_35: 6640399774910077281
+      Spin button_00016_36: -3041050104163697214
+      Spin button_00016_37: -909695018366953915
+      Spin button_00016_38: -5678648557057836624
+      Spin button_00016_39: 8804599368613983695
+      Spin button_00016_4: 3253708587886868062
+      Spin button_00016_40: -4127862350986350422
+      Spin button_00016_41: 7953053605999625904
+      Spin button_00016_42: -5457094828802966453
+      Spin button_00016_43: 5617084022719161152
+      Spin button_00016_44: 4519655608631040946
+      Spin button_00016_45: 3593278502242714474
+      Spin button_00016_46: 7887036961284597314
+      Spin button_00016_47: -2009470514938117488
+      Spin button_00016_48: 131710698774672887
+      Spin button_00016_49: -6717220468428570970
+      Spin button_00016_5: 8534761098395272967
+      Spin button_00016_50: -420331315104008255
+      Spin button_00016_51: 5318923375151205935
+      Spin button_00016_6: 6282237904761816821
+      Spin button_00016_7: -7209147678739672728
+      Spin button_00016_8: -8142183718446012227
+      Spin button_00016_9: -8513335878033352949
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
