@@ -610,7 +610,7 @@ public class UIManager : MonoBehaviour
     private void UpdateAutoPlayButtonText()
     {
         if (autoPlayStartButtonText)
-            autoPlayStartButtonText.text = $"START {selectedRounds}";
+            autoPlayStartButtonText.text = $"START AUTOPLAY({selectedRounds})";
     }
 
     private void OpenAutoPlayPanel()
@@ -676,7 +676,13 @@ public class UIManager : MonoBehaviour
     internal void OnAutoPlayStopped()
     {
         if (autoPlayCountDisplay) autoPlayCountDisplay.SetActive(false);
-        SetBetControlsEnabled(true);
+        
+        // Reset spin button visual
+        if (spinNormalImage) spinNormalImage.SetActive(true);
+        if (spinStopImage) spinStopImage.SetActive(false);
+        
+        // Re-enable controls
+        SetBetControlsEnabled(true);    
         SetAutoPlayButtonEnabled(true);
         
         Debug.Log("[UIManager] Auto play stopped");
@@ -685,7 +691,7 @@ public class UIManager : MonoBehaviour
     internal void UpdateAutoPlayCount()
     {
         if (autoPlayCountText)
-            autoPlayCountText.text = $"{gameManager.autoPlayRemainingRounds}/{gameManager.autoPlayTotalRounds}";
+            autoPlayCountText.text = $"{gameManager.autoPlayRemainingRounds}";
     }
 
     #endregion
@@ -712,6 +718,10 @@ public class UIManager : MonoBehaviour
         
         if (freeSpinPanel) freeSpinPanel.SetActive(false);
         
+        // Reset spin button visual (controls will be enabled when popup closes)
+        if (spinNormalImage) spinNormalImage.SetActive(true);
+        if (spinStopImage) spinStopImage.SetActive(false);
+        
         // Show end popup with total win
         ShowFreeSpinEndPopup(totalFreeSpinWin, totalFreeSpinsAwarded);
     }
@@ -728,18 +738,29 @@ public class UIManager : MonoBehaviour
 
     private void ShowFreeSpinStartPopup(int spins)
     {
-        if (!freeSpinStartPopup) return;
+        if (!freeSpinStartPopup || !freeSpinStartPopupRect) return;
 
-        freeSpinStartPopup.SetActive(true);
-        
         // Set the spin count display
         SetTwoDigitDisplay(freeSpinStartCountTens, freeSpinStartCountOnes, spins);
-        
-        // Animate popup
-        if (freeSpinStartPopupRect)
-        {
-            AnimatePopupOpen(freeSpinStartPopupRect);
-        }
+
+        // Enable popup
+        freeSpinStartPopup.SetActive(true);
+
+        // Set initial position (high Y position)
+        freeSpinStartPopupRect.anchoredPosition = new Vector2(
+            freeSpinStartPopupRect.anchoredPosition.x,
+            popupAppearY
+        );
+
+        // Reset scale
+        freeSpinStartPopupRect.localScale = Vector3.one;
+
+        // Animate drop with bounce
+        freeSpinStartPopupRect.DOAnchorPosY(popupFinalY, popupDropDuration)
+            .SetEase(Ease.OutBounce)
+            .OnComplete(() => {
+                Debug.Log("[UIManager] Free spin start popup animation complete");
+            });
         
         Debug.Log($"[UIManager] Free spin start popup shown: {spins} spins");
     }
@@ -751,8 +772,11 @@ public class UIManager : MonoBehaviour
         AnimatePopupClose(freeSpinStartPopupRect, () => {
             freeSpinStartPopup.SetActive(false);
             
-            // Notify GameManager to start first free spin
-            gameManager.StartFirstFreeSpin();
+            // Only start free spin if actually in free spins mode (not during test)
+            if (gameManager && gameManager.isInFreeSpins)
+            {
+                gameManager.StartFirstFreeSpin();
+            }
         });
         
         Debug.Log("[UIManager] Free spin start popup closed");
@@ -764,21 +788,32 @@ public class UIManager : MonoBehaviour
 
     private void ShowFreeSpinEndPopup(double totalWin, int totalSpins)
     {
-        if (!freeSpinEndPopup) return;
+        if (!freeSpinEndPopup || !freeSpinEndPopupRect) return;
 
-        freeSpinEndPopup.SetActive(true);
-        
         // Set the total spins count
         SetTwoDigitDisplay(freeSpinEndCountTens, freeSpinEndCountOnes, totalSpins);
         
         // Set the win amount with proper decimal handling and spacing
         SetWinAmountDisplay(totalWin);
-        
-        // Animate popup
-        if (freeSpinEndPopupRect)
-        {
-            AnimatePopupOpen(freeSpinEndPopupRect);
-        }
+
+        // Enable popup
+        freeSpinEndPopup.SetActive(true);
+
+        // Set initial position (high Y position)
+        freeSpinEndPopupRect.anchoredPosition = new Vector2(
+            freeSpinEndPopupRect.anchoredPosition.x,
+            popupAppearY
+        );
+
+        // Reset scale
+        freeSpinEndPopupRect.localScale = Vector3.one;
+
+        // Animate drop with bounce
+        freeSpinEndPopupRect.DOAnchorPosY(popupFinalY, popupDropDuration)
+            .SetEase(Ease.OutBounce)
+            .OnComplete(() => {
+                Debug.Log("[UIManager] Free spin end popup animation complete");
+            });
         
         Debug.Log($"[UIManager] Free spin end popup shown: {totalWin:F2} total win, {totalSpins} spins");
     }
@@ -789,6 +824,12 @@ public class UIManager : MonoBehaviour
 
         AnimatePopupClose(freeSpinEndPopupRect, () => {
             freeSpinEndPopup.SetActive(false);
+            
+            // Re-enable all controls after free spin end popup closes
+            SetBetControlsEnabled(true);
+            SetAutoPlayButtonEnabled(true);
+            
+            Debug.Log("[UIManager] Controls re-enabled after free spin end popup close");
         });
         
         Debug.Log("[UIManager] Free spin end popup closed");
