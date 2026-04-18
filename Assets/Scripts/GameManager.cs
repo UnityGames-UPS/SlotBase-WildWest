@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour
 
     internal bool isInFreeSpins;
     internal int freeSpinsRemaining;
-    internal bool waitingForFreeSpinStart; // New flag for popup handling
+    internal bool waitingForFreeSpinStart; // Flag for popup handling
 
     private Coroutine spinCoroutine;
     private bool stopRequested;
@@ -200,6 +200,9 @@ public class GameManager : MonoBehaviour
     {
         if (lastResult.winAmount > 0 && lastResult.winLines != null && lastResult.winLines.Count > 0)
         {
+            // Disable controls during win animation
+            uiManager.DisableControlsDuringWinAnimation();
+            
             slotView.ShowWinLineAnimation(lastResult.winLines, OnWinAnimationComplete);
         }
         else
@@ -210,6 +213,9 @@ public class GameManager : MonoBehaviour
 
     private void OnWinAnimationComplete()
     {
+        // Re-enable controls after win animation
+        uiManager.EnableControlsAfterWinAnimation();
+        
         uiManager.OnSpinStopping(lastResult);
         
         if (isAutoPlaying || isInFreeSpins)
