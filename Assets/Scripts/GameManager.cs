@@ -289,7 +289,8 @@ public class GameManager : MonoBehaviour
         {
             freeSpinsRemaining--;
             
-            uiManager.UpdateFreeSpinCount();
+            // Update free spin count display on game screen
+            uiManager.UpdateFreeSpinCount(freeSpinsRemaining);
 
             if (freeSpinsRemaining <= 0)
             {
@@ -373,11 +374,11 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Called by UIManager when free spin start popup is closed
+    /// Called by UIManager when free spin start popup is closed AND intro animation finishes
     /// </summary>
     internal void StartFirstFreeSpin()
     {
-        Debug.Log("[GameManager] Starting first free spin after popup close");
+        Debug.Log("[GameManager] Starting first free spin after popup close and intro animation");
         waitingForFreeSpinStart = false;
         
         StartCoroutine(DelayBeforeFirstFreeSpin());

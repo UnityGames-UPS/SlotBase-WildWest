@@ -1931,6 +1931,7 @@ MonoBehaviour:
   loadingBarFill: {fileID: 663378949}
   loadingBarEndMarker: {fileID: 216417673}
   introAnimationObject: {fileID: 576755426}
+  freeSpinIntroAnimation: {fileID: 924586410}
   gameScreen: {fileID: 450624318}
   minStops: 2
   maxStops: 3
@@ -1940,6 +1941,8 @@ MonoBehaviour:
   maxStopDuration: 0.5
   loadingSpeed: 0.3
   introAnimDuration: 3
+  normalSpinBackground: {fileID: 1558342514}
+  freeSpinBackground: {fileID: 1731400180}
   betAmountText: {fileID: 1926019871}
   betPlusButton: {fileID: 1357116360}
   betMinusButton: {fileID: 83142719}
@@ -1961,7 +1964,7 @@ MonoBehaviour:
   autoPlayStartButton: {fileID: 1918353443}
   autoPlayStartButtonText: {fileID: 1170052273}
   turboToggle: {fileID: 316102123}
-  quickSpinToggle: {fileID: 0}
+  quickSpinToggle: {fileID: 712463322}
   roundButtons:
   - button: {fileID: 1391375362}
     rounds: 10
@@ -1986,8 +1989,22 @@ MonoBehaviour:
     selectedIndicator: {fileID: 1126421845}
   autoPlayCountDisplay: {fileID: 974324681}
   autoPlayCountText: {fileID: 1299954255}
-  freeSpinPanel: {fileID: 2023518508}
-  freeSpinCountText: {fileID: 0}
+  freeSpinCountContainer: {fileID: 439413647}
+  freeSpinCountTens: {fileID: 1147529917}
+  freeSpinCountOnes: {fileID: 1452922762}
+  freeSpinNumberSprites:
+  - {fileID: 4168655336244868903, guid: e70fbd4fb3dcb4d85ba827910a309105, type: 3}
+  - {fileID: -2571846992066442345, guid: e70fbd4fb3dcb4d85ba827910a309105, type: 3}
+  - {fileID: -7815427665568035038, guid: e70fbd4fb3dcb4d85ba827910a309105, type: 3}
+  - {fileID: 4900148777116220303, guid: e70fbd4fb3dcb4d85ba827910a309105, type: 3}
+  - {fileID: -8199192235263446852, guid: e70fbd4fb3dcb4d85ba827910a309105, type: 3}
+  - {fileID: -7485843555755798510, guid: e70fbd4fb3dcb4d85ba827910a309105, type: 3}
+  - {fileID: 3138299583284571469, guid: e70fbd4fb3dcb4d85ba827910a309105, type: 3}
+  - {fileID: -7833360389170396994, guid: e70fbd4fb3dcb4d85ba827910a309105, type: 3}
+  - {fileID: -4352696296600289760, guid: e70fbd4fb3dcb4d85ba827910a309105, type: 3}
+  - {fileID: 416819014701252929, guid: e70fbd4fb3dcb4d85ba827910a309105, type: 3}
+  lastSpinLeftObject: {fileID: 854045173}
+  buyFreeSpinObject: {fileID: 0}
   freeSpinStartPopup: {fileID: 1211758336}
   freeSpinStartPopupRect: {fileID: 1695407033}
   freeSpinStartPopImage: {fileID: 1695407035}
@@ -2030,6 +2047,7 @@ MonoBehaviour:
   popupFinalY: 165
   popupDropDuration: 0.8
   popupBounceCount: 2
+  freeSpinIntroDuration: 3.5
   testFreeSpinButton: {fileID: 2023518510}
 --- !u!4 &180954096
 Transform:
@@ -11246,8 +11264,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 24.94725, y: -35}
-  m_SizeDelta: {x: 49.8945, y: 70}
+  m_AnchoredPosition: {x: 20.941559, y: -27.5}
+  m_SizeDelta: {x: 41.883118, y: 55}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1147529917
 MonoBehaviour:
@@ -14565,8 +14583,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 70.34175, y: -35}
-  m_SizeDelta: {x: 40.8945, y: 70}
+  m_AnchoredPosition: {x: 58.44156, y: -27.5}
+  m_SizeDelta: {x: 33.116882, y: 55}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1452922762
 MonoBehaviour:
@@ -15910,7 +15928,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0.395, y: -27.83772}
-  m_SizeDelta: {x: 90.789, y: 70}
+  m_SizeDelta: {x: 75, y: 55}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1650574993
 MonoBehaviour:
