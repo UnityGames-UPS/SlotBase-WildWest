@@ -142,10 +142,10 @@ TextureImporter:
       name: light_00011_0
       rect:
         serializedVersion: 2
-        x: 83
-        y: 386
-        width: 1671
-        height: 184
+        x: 85
+        y: 388
+        width: 1666
+        height: 180
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -164,7 +164,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 

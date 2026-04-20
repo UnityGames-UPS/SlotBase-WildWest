@@ -1,0 +1,936 @@
+fileFormatVersion: 2
+guid: f1904fd35cabc461d8ba8f7438e9850f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 6183432918128294322
+    second: Glow 1_0
+  - first:
+      213: 3458496531998538078
+    second: Glow 1_1
+  - first:
+      213: -5355930275375210353
+    second: Glow 1_2
+  - first:
+      213: 2662039252523162521
+    second: Glow 1_3
+  - first:
+      213: -6757369595762048462
+    second: Glow 1_4
+  - first:
+      213: -6111849805940577542
+    second: Glow 1_5
+  - first:
+      213: -431045572735126357
+    second: Glow 1_6
+  - first:
+      213: -7573408496712081140
+    second: Glow 1_7
+  - first:
+      213: 8359830450494961329
+    second: Glow 1_8
+  - first:
+      213: 4056603214016270713
+    second: Glow 1_9
+  - first:
+      213: 3701403497168460780
+    second: Glow 1_10
+  - first:
+      213: -3266023611315250571
+    second: Glow 1_11
+  - first:
+      213: 2032162231916009566
+    second: Glow 1_12
+  - first:
+      213: -8010459253450106082
+    second: Glow 1_13
+  - first:
+      213: -899991669762186432
+    second: Glow 1_14
+  - first:
+      213: 6032470595708236019
+    second: Glow 1_15
+  - first:
+      213: 7949788929578290442
+    second: Glow 1_16
+  - first:
+      213: 4960155913145314033
+    second: Glow 1_17
+  - first:
+      213: 3106162661125027949
+    second: Glow 1_18
+  - first:
+      213: -8803544081074209439
+    second: Glow 1_19
+  - first:
+      213: -2952595519598404129
+    second: Glow 1_20
+  - first:
+      213: -1529127355327797160
+    second: Glow 1_21
+  - first:
+      213: -3488477263952076248
+    second: Glow 1_22
+  - first:
+      213: -242662665038542764
+    second: Glow 1_23
+  - first:
+      213: -2078262483174503099
+    second: Glow 1_24
+  - first:
+      213: -8073721338232515605
+    second: Glow 1_25
+  - first:
+      213: 267516083109321191
+    second: Glow 1_26
+  - first:
+      213: -3093248512150785230
+    second: Glow 1_27
+  - first:
+      213: 6205332348465529638
+    second: Glow 1_28
+  - first:
+      213: 6402045958067401690
+    second: Glow 1_29
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Glow 1_0
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 1807
+        width: 155
+        height: 112
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b97e715a77ffc550800000000000000
+      internalID: 6183432918128294322
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_1
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 1809
+        width: 154
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e5971be954c0fff20800000000000000
+      internalID: 3458496531998538078
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_2
+      rect:
+        serializedVersion: 2
+        x: 325
+        y: 1809
+        width: 154
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f80208e9ac9eba5b0800000000000000
+      internalID: -5355930275375210353
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_3
+      rect:
+        serializedVersion: 2
+        x: 326
+        y: 1705
+        width: 153
+        height: 104
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99b1ac8989671f420800000000000000
+      internalID: 2662039252523162521
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_4
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 1700
+        width: 151
+        height: 106
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 232049c97200932a0800000000000000
+      internalID: -6757369595762048462
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_5
+      rect:
+        serializedVersion: 2
+        x: 173
+        y: 1702
+        width: 151
+        height: 106
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: afa2f54cbf85e2ba0800000000000000
+      internalID: -6111849805940577542
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_6
+      rect:
+        serializedVersion: 2
+        x: 326
+        y: 1596
+        width: 153
+        height: 109
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ba43e1bd55e940af0800000000000000
+      internalID: -431045572735126357
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_7
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 1588
+        width: 151
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c012d8e0919d5e690800000000000000
+      internalID: -7573408496712081140
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_8
+      rect:
+        serializedVersion: 2
+        x: 167
+        y: 1485
+        width: 153
+        height: 108
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1b6fe30a085140470800000000000000
+      internalID: 8359830450494961329
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_9
+      rect:
+        serializedVersion: 2
+        x: 169
+        y: 1593
+        width: 153
+        height: 108
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 971d52e5123fb4830800000000000000
+      internalID: 4056603214016270713
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_10
+      rect:
+        serializedVersion: 2
+        x: 323
+        y: 1484
+        width: 151
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ceb5d1baed60e5330800000000000000
+      internalID: 3701403497168460780
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_11
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 1479
+        width: 151
+        height: 108
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 57a148364d0cca2d0800000000000000
+      internalID: -3266023611315250571
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_12
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 1371
+        width: 151
+        height: 108
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e58915778c0b33c10800000000000000
+      internalID: 2032162231916009566
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_13
+      rect:
+        serializedVersion: 2
+        x: 167
+        y: 1378
+        width: 153
+        height: 107
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e1b9d5e00c125d090800000000000000
+      internalID: -8010459253450106082
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_14
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 1377
+        width: 151
+        height: 106
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 043a30f38569283f0800000000000000
+      internalID: -899991669762186432
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_15
+      rect:
+        serializedVersion: 2
+        x: 15
+        y: 1267
+        width: 151
+        height: 104
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f0bd2f9b04a7b350800000000000000
+      internalID: 6032470595708236019
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_16
+      rect:
+        serializedVersion: 2
+        x: 167
+        y: 1274
+        width: 151
+        height: 104
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a0dc8d269e2535e60800000000000000
+      internalID: 7949788929578290442
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_17
+      rect:
+        serializedVersion: 2
+        x: 319
+        y: 1275
+        width: 151
+        height: 103
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1fa6491e58306d440800000000000000
+      internalID: 4960155913145314033
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_18
+      rect:
+        serializedVersion: 2
+        x: 15
+        y: 1161
+        width: 151
+        height: 105
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d6870feab7e4b1b20800000000000000
+      internalID: 3106162661125027949
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_19
+      rect:
+        serializedVersion: 2
+        x: 167
+        y: 1167
+        width: 151
+        height: 107
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 16d341b2d4783d580800000000000000
+      internalID: -8803544081074209439
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_20
+      rect:
+        serializedVersion: 2
+        x: 318
+        y: 1063
+        width: 151
+        height: 105
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fdd5de8b4064607d0800000000000000
+      internalID: -2952595519598404129
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_21
+      rect:
+        serializedVersion: 2
+        x: 319
+        y: 1168
+        width: 151
+        height: 106
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 858aa51a5c277cae0800000000000000
+      internalID: -1529127355327797160
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_22
+      rect:
+        serializedVersion: 2
+        x: 15
+        y: 1051
+        width: 151
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8222c134960769fc0800000000000000
+      internalID: -3488477263952076248
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_23
+      rect:
+        serializedVersion: 2
+        x: 166
+        y: 1056
+        width: 151
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 458c0228793e1acf0800000000000000
+      internalID: -242662665038542764
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_24
+      rect:
+        serializedVersion: 2
+        x: 316
+        y: 952
+        width: 151
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 54dcc5c58478823e0800000000000000
+      internalID: -2078262483174503099
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_25
+      rect:
+        serializedVersion: 2
+        x: 15
+        y: 945
+        width: 151
+        height: 106
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be3d823283164ff80800000000000000
+      internalID: -8073721338232515605
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_26
+      rect:
+        serializedVersion: 2
+        x: 165
+        y: 947
+        width: 151
+        height: 108
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e95f61d57866b300800000000000000
+      internalID: 267516083109321191
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_27
+      rect:
+        serializedVersion: 2
+        x: 165
+        y: 841
+        width: 151
+        height: 106
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2333f3fedd29215d0800000000000000
+      internalID: -3093248512150785230
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_28
+      rect:
+        serializedVersion: 2
+        x: 315
+        y: 846
+        width: 151
+        height: 106
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6234787c4e4cd1650800000000000000
+      internalID: 6205332348465529638
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Glow 1_29
+      rect:
+        serializedVersion: 2
+        x: 15
+        y: 840
+        width: 151
+        height: 105
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad3355e11e2a8d850800000000000000
+      internalID: 6402045958067401690
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Glow 1_0: 6183432918128294322
+      Glow 1_1: 3458496531998538078
+      Glow 1_10: 3701403497168460780
+      Glow 1_11: -3266023611315250571
+      Glow 1_12: 2032162231916009566
+      Glow 1_13: -8010459253450106082
+      Glow 1_14: -899991669762186432
+      Glow 1_15: 6032470595708236019
+      Glow 1_16: 7949788929578290442
+      Glow 1_17: 4960155913145314033
+      Glow 1_18: 3106162661125027949
+      Glow 1_19: -8803544081074209439
+      Glow 1_2: -5355930275375210353
+      Glow 1_20: -2952595519598404129
+      Glow 1_21: -1529127355327797160
+      Glow 1_22: -3488477263952076248
+      Glow 1_23: -242662665038542764
+      Glow 1_24: -2078262483174503099
+      Glow 1_25: -8073721338232515605
+      Glow 1_26: 267516083109321191
+      Glow 1_27: -3093248512150785230
+      Glow 1_28: 6205332348465529638
+      Glow 1_29: 6402045958067401690
+      Glow 1_3: 2662039252523162521
+      Glow 1_4: -6757369595762048462
+      Glow 1_5: -6111849805940577542
+      Glow 1_6: -431045572735126357
+      Glow 1_7: -7573408496712081140
+      Glow 1_8: 8359830450494961329
+      Glow 1_9: 4056603214016270713
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
