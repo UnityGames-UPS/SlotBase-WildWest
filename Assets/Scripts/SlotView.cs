@@ -291,68 +291,71 @@ public class SlotView : MonoBehaviour
 
         startSequence.Play();
 
-        if (columnIndex < spinTweens.Count)
-        {
-            spinTweens[columnIndex] = startSequence;
-        }
-        else
-        {
+        if (spinTweens.Count <= columnIndex)
             spinTweens.Add(startSequence);
-        }
+        else
+            spinTweens[columnIndex] = startSequence;
     }
 
     private void StartReelCycle(int columnIndex)
     {
         if (columnIndex >= reelTransforms.Length) return;
+        if (!isSpinning) return;
 
         Transform slotTransform = reelTransforms[columnIndex];
-        float currentSpeed = spinSpeed;
 
-        if (scatterAnticipationActive)
+        slotTransform.localPosition = new Vector3(slotTransform.localPosition.x, middlePosition, 0);
+
+        float currentSpeed = spinSpeed;
+        if (scatterAnticipationActive && columnIndex == 4)
         {
             currentSpeed = spinSpeed / anticipationSpeedMultiplier;
         }
 
-        Tween cycleTween = slotTransform.DOLocalMoveY(
-            slotTransform.localPosition.y - cycleDistance,
-            currentSpeed
-        )
-        .SetEase(Ease.Linear)
-        .SetLoops(-1, LoopType.Restart)
-        .OnStepComplete(() => {
-            reelCycleCount[columnIndex]++;
+        Sequence cycleSequence = DOTween.Sequence();
 
-            float currentY = slotTransform.localPosition.y;
-            slotTransform.localPosition = new Vector3(
-                slotTransform.localPosition.x,
-                currentY + cycleDistance,
-                0
-            );
+        cycleSequence.Append(
+            slotTransform.DOLocalMoveY(middlePosition - cycleDistance, currentSpeed)
+                .SetEase(Ease.Linear)
+        );
 
-            RefreshCyclingSymbols(columnIndex);
+        cycleSequence.OnComplete(() => {
+            if (isSpinning)
+            {
+                CycleReelSymbols(columnIndex);
+
+                slotTransform.localPosition = new Vector3(slotTransform.localPosition.x, middlePosition, 0);
+
+                if (columnIndex < reelCycleCount.Count)
+                {
+                    reelCycleCount[columnIndex]++;
+                }
+
+                StartReelCycle(columnIndex);
+            }
         });
 
-        if (columnIndex < spinTweens.Count)
-        {
-            spinTweens[columnIndex] = cycleTween;
-        }
+        cycleSequence.Play();
+
+        if (spinTweens.Count <= columnIndex)
+            spinTweens.Add(cycleSequence);
         else
-        {
-            spinTweens.Add(cycleTween);
-        }
+            spinTweens[columnIndex] = cycleSequence;
     }
 
-    private void RefreshCyclingSymbols(int columnIndex)
+    private void CycleReelSymbols(int columnIndex)
     {
-        if (columnIndex >= reelImagesList.Count) return;
-
         var reel = reelImagesList[columnIndex];
+        if (reel.images == null || reel.images.Count != 16) return;
 
-        for (int i = 0; i < 16; i++)
+        Sprite bottomSprite = reel.images[15].sprite;
+
+        for (int i = 15; i > 0; i--)
         {
-            int randomSymbolId = Random.Range(0, 11);
-            reel.images[i].sprite = GetSymbolSprite(randomSymbolId);
+            reel.images[i].sprite = reel.images[i - 1].sprite;
         }
+
+        reel.images[0].sprite = GetSymbolSprite(Random.Range(0, 16));
     }
 
     #endregion
@@ -361,19 +364,15 @@ public class SlotView : MonoBehaviour
 
     internal void StopSpin(List<List<int>> resultMatrix, System.Action onComplete)
     {
-        if (resultMatrix == null || resultMatrix.Count != 5)
+        if (!isSpinning)
         {
-            Debug.LogError($"StopSpin: Invalid resultMatrix count {resultMatrix?.Count}, expected 5 columns");
-            return;
-        }
-
-        for (int i = 0; i < resultMatrix.Count; i++)
-        {
-            if (resultMatrix[i] == null || resultMatrix[i].Count != 4)
+            currentDisplayMatrix = resultMatrix;
+            for (int col = 0; col < 5; col++)
             {
-                Debug.LogError($"StopSpin: Column {i} has invalid count {resultMatrix[i]?.Count}, expected 4 rows");
-                return;
+                SetReelSymbols(col, resultMatrix[col], false);
             }
+            onComplete?.Invoke();
+            return;
         }
 
         StartCoroutine(StopSpinSequence(resultMatrix, onComplete, false));
@@ -383,22 +382,65 @@ public class SlotView : MonoBehaviour
     {
         currentDisplayMatrix = resultMatrix;
 
-        for (int col = 0; col < 5; col++)
+        int scatterCount = 0;
+        for (int col = 0; col < 4; col++)
         {
-            float delay = col * (isQuickStop ? quickStopStagger : reelStopStagger);
-
-            while (reelCycleCount[col] < minSpinCyclesBeforeStop)
+            for (int row = 0; row < resultMatrix[col].Count; row++)
             {
-                yield return null;
+                if (resultMatrix[col][row] == scatterSymbolId)
+                {
+                    scatterCount++;
+                    break;
+                }
+            }
+        }
+
+        if (scatterCount >= 2 && !isQuickStop)
+        {
+            scatterAnticipationActive = true;
+        }
+
+        while (true)
+        {
+            bool allReelsReady = true;
+            for (int col = 0; col < 5; col++)
+            {
+                int requiredCycles = minSpinCyclesBeforeStop;
+                if (scatterAnticipationActive && col == 4)
+                {
+                    requiredCycles += Mathf.RoundToInt(anticipationExtraSpins);
+                }
+
+                if (reelCycleCount[col] < requiredCycles)
+                {
+                    allReelsReady = false;
+                    break;
+                }
             }
 
+            if (allReelsReady) break;
+            yield return null;
+        }
+
+        float stagger = isQuickStop ? quickStopStagger : reelStopStagger;
+
+        for (int col = 0; col < 5; col++)
+        {
+            float delay = col * stagger;
             StartCoroutine(StopSingleReel(col, resultMatrix[col], delay, isQuickStop));
         }
 
-        float totalStopTime = 5 * (isQuickStop ? quickStopStagger : reelStopStagger) +
-                             (isQuickStop ? quickStopDuration : stopSettleDuration);
+        float longestStopTime;
+        if (isQuickStop)
+        {
+            longestStopTime = (4 * stagger) + quickStopDuration;
+        }
+        else
+        {
+            longestStopTime = (4 * stagger) + stopOvershootDuration + stopBounceBackDuration + stopSettleDuration;
+        }
 
-        yield return new WaitForSeconds(totalStopTime + 0.1f);
+        yield return new WaitForSeconds(longestStopTime);
 
         isSpinning = false;
         scatterAnticipationActive = false;
@@ -478,21 +520,6 @@ public class SlotView : MonoBehaviour
 
     internal void QuickStop(List<List<int>> resultMatrix)
     {
-        if (resultMatrix == null || resultMatrix.Count != 5)
-        {
-            Debug.LogError($"QuickStop: Invalid resultMatrix count {resultMatrix?.Count}, expected 5 columns");
-            return;
-        }
-
-        for (int i = 0; i < resultMatrix.Count; i++)
-        {
-            if (resultMatrix[i] == null || resultMatrix[i].Count != 4)
-            {
-                Debug.LogError($"QuickStop: Column {i} has invalid count {resultMatrix[i]?.Count}, expected 4 rows");
-                return;
-            }
-        }
-
         if (!isSpinning)
         {
             currentDisplayMatrix = resultMatrix;
@@ -515,6 +542,7 @@ public class SlotView : MonoBehaviour
     }
 
     #endregion
+
 
     #region Win Line Animation
 
