@@ -112,6 +112,13 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button lowBalanceCloseButton;
     [SerializeField] private GameObject disconnectionPopup;
     [SerializeField] private Button disconnectionCloseButton;
+     
+[Header("Connection Popups")]
+[SerializeField] private GameObject reconnectionPopup;
+[SerializeField] private GameObject anotherDevicePopup;
+[SerializeField] private Button anotherDeviceCloseButton;
+ 
+[SerializeField] private SocketIOManager socketManager;
 
     [Header("Animation Settings")]
     [SerializeField] private float winCountDuration = 0.25f;
@@ -181,6 +188,9 @@ public class UIManager : MonoBehaviour
         // Initialize free spin popups
         if (freeSpinStartPopup) freeSpinStartPopup.SetActive(false);
         if (freeSpinEndPopup) freeSpinEndPopup.SetActive(false);
+
+         if (reconnectionPopup) reconnectionPopup.SetActive(false);
+    if (anotherDevicePopup) anotherDevicePopup.SetActive(false);
 
         UpdateAutoPlayButtonText();
 
@@ -358,6 +368,18 @@ public class UIManager : MonoBehaviour
         });
 
         if (testFreeSpinButton) testFreeSpinButton.onClick.AddListener(TestFreeSpinPopups);
+        // Connection popup buttons
+    if (disconnectionCloseButton)
+    {
+        disconnectionCloseButton.onClick.RemoveAllListeners();
+        disconnectionCloseButton.onClick.AddListener(OnExitButtonPressed);
+    }
+    
+    if (anotherDeviceCloseButton)
+    {
+        anotherDeviceCloseButton.onClick.RemoveAllListeners();
+        anotherDeviceCloseButton.onClick.AddListener(OnExitButtonPressed);
+    }
     }
 
     private void SetupAutoPlayPanel()
@@ -1245,6 +1267,89 @@ public class UIManager : MonoBehaviour
     }
 
     #endregion
+    #region Connection Popup Management
+ 
+/// <summary>
+/// Show reconnection popup when 2 pongs are missed (warning state)
+/// </summary>
+internal void ReconnectionPopup()
+{
+    Debug.Log("[UIManager] Showing reconnection popup");
+    
+    if (reconnectionPopup != null)
+    {
+        reconnectionPopup.SetActive(true);
+    }
+}
+ 
+/// <summary>
+/// Show disconnection popup when 5 pongs are missed (disconnect state)
+/// Auto-closes reconnection popup if showing
+/// </summary>
+internal void DisconnectionPopup()
+{
+    Debug.Log("[UIManager] Showing disconnection popup");
+    
+    // Close reconnection popup if it's showing
+    if (reconnectionPopup != null)
+    {
+        reconnectionPopup.SetActive(false);
+    }
+    
+    if (disconnectionPopup != null)
+    {
+        disconnectionPopup.SetActive(true);
+    }
+}
+ 
+/// <summary>
+/// Check and close connection-related popups when connection recovers
+/// Called from SocketIOManager when pong is received after missed pongs
+/// </summary>
+internal void CheckAndClosePopups()
+{
+    Debug.Log("[UIManager] Checking and closing connection popups");
+    
+    if (reconnectionPopup != null && reconnectionPopup.activeSelf)
+    {
+        Debug.Log("[UIManager] Closing reconnection popup - connection restored");
+        reconnectionPopup.SetActive(false);
+    }
+    
+    if (disconnectionPopup != null && disconnectionPopup.activeSelf)
+    {
+        Debug.Log("[UIManager] Closing disconnection popup - connection restored");
+        disconnectionPopup.SetActive(false);
+    }
+}
+ 
+/// <summary>
+/// Show another device popup when user logs in from another device
+/// </summary>
+internal void AnotherDevicePopup()
+{
+    Debug.Log("[UIManager] Showing another device popup");
+    
+    if (anotherDevicePopup != null)
+    {
+        anotherDevicePopup.SetActive(true);
+    }
+}
+ 
+/// <summary>
+/// Exit game and return to platform
+/// </summary>
+private void OnExitButtonPressed()
+{
+    Debug.Log("[UIManager] Exit button pressed");
+    
+    if (gameManager != null)
+    {
+        gameManager.ExitGame();
+    }
+}
+ 
+#endregion
 }
 
 [System.Serializable]

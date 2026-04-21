@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour
 
     internal bool isInFreeSpins;
     internal int freeSpinsRemaining;
-    internal bool waitingForFreeSpinStart; // Flag for popup handling
+    internal bool waitingForFreeSpinStart;
 
     private Coroutine spinCoroutine;
     private bool stopRequested;
@@ -44,18 +44,16 @@ public class GameManager : MonoBehaviour
         waitingForFreeSpinStart = false;
     }
 
-    internal void OnInitDataReceived(InitData initData)
+    internal void OnInitDataReceived(GameConfig config, PlayerData player, List<List<int>> initialMatrix)
     {
-        Debug.Log("[GameManager] Init data received");
-
-        gameConfig = initData.gameConfig;
-        playerData = initData.playerData;
+        gameConfig = config;
+        playerData = player;
         currentBetIndex = playerData.currentBetIndex;
         UpdateBetAmount();
 
-        if (initData.initialMatrix != null && slotView != null)
+        if (initialMatrix != null && slotView != null)
         {
-            slotView.SetInitialMatrix(initData.initialMatrix);
+            slotView.SetInitialMatrix(initialMatrix);
         }
 
         currentState = GameState.Idle;
@@ -102,17 +100,11 @@ public class GameManager : MonoBehaviour
 
     internal void RequestSpin()
     {
-        // Don't allow spin if waiting for free spin popup to close
-        if (waitingForFreeSpinStart) 
-        {
-            Debug.Log("[GameManager] Waiting for free spin popup to close");
-            return;
-        }
+        if (waitingForFreeSpinStart) return;
 
         if (currentState != GameState.Idle) return;
         if (!socketManager.isConnected && !socketManager.useDemoMode) return;
 
-        // Check balance
         if (!isInFreeSpins && playerData.balance < currentBetAmount)
         {
             uiManager.ShowLowBalancePopup();
@@ -200,7 +192,6 @@ public class GameManager : MonoBehaviour
     {
         if (lastResult.winAmount > 0 && lastResult.winLines != null && lastResult.winLines.Count > 0)
         {
-            // Disable controls during win animation
             uiManager.DisableControlsDuringWinAnimation();
             
             slotView.ShowWinLineAnimation(lastResult.winLines, OnWinAnimationComplete);
@@ -213,7 +204,6 @@ public class GameManager : MonoBehaviour
 
     private void OnWinAnimationComplete()
     {
-        // Re-enable controls after win animation
         uiManager.EnableControlsAfterWinAnimation();
         
         uiManager.OnSpinStopping(lastResult);
@@ -248,7 +238,6 @@ public class GameManager : MonoBehaviour
 
     internal void OnSpinResultReceived(SpinResult result)
     {
-        Debug.Log($"[GameManager] Result received - Win: {result.winAmount:F2}");
         lastResult = result;
     }
 
@@ -258,7 +247,6 @@ public class GameManager : MonoBehaviour
         
         uiManager.OnSpinCompleted(lastResult);
 
-        // Check if free spins are triggered
         if (lastResult.freeSpinData != null && lastResult.freeSpinData.isTriggered)
         {
             StartFreeSpins(lastResult.freeSpinData.spinsAwarded);
@@ -289,7 +277,6 @@ public class GameManager : MonoBehaviour
         {
             freeSpinsRemaining--;
             
-            // Update free spin count display on game screen
             uiManager.UpdateFreeSpinCount(freeSpinsRemaining);
 
             if (freeSpinsRemaining <= 0)
@@ -299,7 +286,6 @@ public class GameManager : MonoBehaviour
             else
             {
                 currentState = GameState.Idle;
-                // Continue free spins automatically
                 StartCoroutine(DelayBeforeNextFreeSpin());
             }
         }
@@ -316,7 +302,6 @@ public class GameManager : MonoBehaviour
     internal void SetSpinSpeed(SpinSpeed speed)
     {
         currentSpinSpeed = speed;
-        Debug.Log($"[GameManager] Spin speed changed to: {speed}");
     }
 
     #endregion
@@ -331,16 +316,12 @@ public class GameManager : MonoBehaviour
         autoPlayTotalRounds = rounds;
         autoPlayRemainingRounds = rounds;
 
-        Debug.Log($"[GameManager] Auto play started: {rounds} rounds, {currentSpinSpeed} speed");
-
         uiManager.OnAutoPlayStarted();
         RequestSpin();
     }
 
     internal void StopAutoPlay()
     {
-        Debug.Log("[GameManager] Stopping auto play");
-        
         isAutoPlaying = false;
         autoPlayRemainingRounds = 0;
         
@@ -353,32 +334,22 @@ public class GameManager : MonoBehaviour
 
     private void StartFreeSpins(int spins)
     {
-        Debug.Log($"[GameManager] Starting {spins} free spins");
-        
         isInFreeSpins = true;
         freeSpinsRemaining = spins;
-        waitingForFreeSpinStart = true; // Block spins until popup is closed
+        waitingForFreeSpinStart = true;
 
         if (isAutoPlaying)
         {
             StopAutoPlay();
         }
 
-        // UIManager will show the popup
         uiManager.OnFreeSpinsStarted(spins);
 
         currentState = GameState.Idle;
-
-        // Don't auto-start first spin - wait for popup close
-        // The UIManager's close button will call StartFirstFreeSpin()
     }
 
-    /// <summary>
-    /// Called by UIManager when free spin start popup is closed AND intro animation finishes
-    /// </summary>
     internal void StartFirstFreeSpin()
     {
-        Debug.Log("[GameManager] Starting first free spin after popup close and intro animation");
         waitingForFreeSpinStart = false;
         
         StartCoroutine(DelayBeforeFirstFreeSpin());
@@ -398,12 +369,9 @@ public class GameManager : MonoBehaviour
 
     private void EndFreeSpins()
     {
-        Debug.Log("[GameManager] Free spins ended");
-        
         isInFreeSpins = false;
         freeSpinsRemaining = 0;
         
-        // UIManager will show end popup
         uiManager.OnFreeSpinsEnded();
         
         currentState = GameState.Idle;
@@ -415,8 +383,6 @@ public class GameManager : MonoBehaviour
 
     internal void OnDisconnected()
     {
-        Debug.LogWarning("[GameManager] Disconnected!");
-        
         if (spinCoroutine != null)
         {
             StopCoroutine(spinCoroutine);
@@ -434,7 +400,6 @@ public class GameManager : MonoBehaviour
 
     internal void ExitGame()
     {
-        Debug.Log("[GameManager] Exiting game");
         socketManager.CloseSocket();
         
 #if UNITY_EDITOR
