@@ -116,12 +116,12 @@ public class SocketIOManager : MonoBehaviour
         {
             yield return null;
         }
-        
+
         while (socketURL == null)
         {
             yield return null;
         }
-        
+
         SetupSocketManager();
     }
 
@@ -162,7 +162,7 @@ public class SocketIOManager : MonoBehaviour
         gameSocket.On<ConnectResponse>(SocketIOEventTypes.Connect, OnConnected);
         gameSocket.On(SocketIOEventTypes.Disconnect, OnDisconnected);
         gameSocket.On<Error>(SocketIOEventTypes.Error, OnError);
-        
+
         gameSocket.On<string>("game:init", OnInitReceived);
         gameSocket.On<string>("result", OnResultReceived);
         gameSocket.On<bool>("socketState", OnSocketState);
@@ -233,10 +233,10 @@ public class SocketIOManager : MonoBehaviour
         try
         {
             var initData = JsonConvert.DeserializeObject<InitData>(jsonData);
-            
-            var gameConfig = ConvertServerDataToGameConfig(initData);
-            var playerData = ConvertServerPlayerToPlayerData(initData.player);
-            
+
+            var gameConfig = InitDataConverter.ConvertToGameConfig(initData);
+            var playerData = InitDataConverter.ConvertToPlayerData(initData.player);
+
             List<List<int>> initialMatrix = GenerateRandomMatrix();
 
             isInitialized = true;
@@ -257,124 +257,69 @@ public class SocketIOManager : MonoBehaviour
         }
     }
 
-    private GameConfig ConvertServerDataToGameConfig(InitData serverData)
-    {
-        var config = new GameConfig
-        {
-            reelCount = 5,
-            rowCount = 4,
-            symbolCount = serverData.uiData.paylines.symbols.Count,
-            paylineCount = serverData.gameData.totalLines,
-            paylines = serverData.gameData.lines,
-            availableBets = serverData.gameData.bets,
-            symbols = new List<SymbolInfo>(),
-            wildSymbolId = 11,
-            wildMultipliers = new List<int> { 1, 2, 3, 5 },
-            scatterSymbolId = 12
-        };
-
-        foreach (var serverSymbol in serverData.uiData.paylines.symbols)
-        {
-            var symbolInfo = new SymbolInfo
-            {
-                id = serverSymbol.id,
-                name = serverSymbol.name,
-                multipliers = serverSymbol.multiplier ?? new List<double>(),
-                isWild = serverSymbol.name.ToLower() == "wild",
-                isScatter = serverSymbol.name.ToLower() == "scatter",
-                wildMultiplier = 1
-            };
-
-            config.symbols.Add(symbolInfo);
-
-            if (symbolInfo.isWild)
-            {
-                config.wildSymbolId = symbolInfo.id;
-            }
-            if (symbolInfo.isScatter)
-            {
-                config.scatterSymbolId = symbolInfo.id;
-            }
-        }
-
-        return config;
-    }
-
-    private PlayerData ConvertServerPlayerToPlayerData(ServerPlayer serverPlayer)
-    {
-        return new PlayerData
-        {
-            balance = serverPlayer.balance,
-            currentBetIndex = 0
-        };
-    }
-
     private void OnResultReceived(string jsonData)
     {
-        Debug.Log($"[SocketIO] Result received" + jsonData);
+        Debug.Log("[SocketIO] Result received" + jsonData);
 
         try
         {
             var serverResponse = JsonConvert.DeserializeObject<ServerSpinResponse>(jsonData);
-            
+
+            if (!serverResponse.success)
+            {
+                Debug.LogError("[SocketIO] Server returned unsuccessful spin result");
+                return;
+            }
+
+            // CRITICAL FIX: Use converter with proper balance calculation
             double currentBalance = gameManager.playerData.balance;
             double betAmount = gameManager.currentBetAmount;
-            
-            var result = InitDataConverter.ConvertServerResponseToSpinResult(
-                serverResponse, 
-                currentBalance, 
-                betAmount
+            GameConfig gameConfig = gameManager.gameConfig;
+
+            SpinResult result = InitDataConverter.ConvertServerResponseToSpinResult(
+                serverResponse,
+                currentBalance,
+                betAmount,
+                gameConfig
             );
-            
-            result.playerData.currentBetIndex = gameManager.currentBetIndex;
+
+            Debug.Log($"[SocketIO] Converted result - Matrix: {result.resultMatrix.Count} cols, Win: {result.winAmount}, Balance: {result.playerData.balance}");
 
             gameManager.OnSpinResultReceived(result);
         }
         catch (Exception e)
         {
-            Debug.LogError($"[SocketIO] Failed to parse result data: {e.Message}");
+            Debug.LogError($"[SocketIO] Failed to parse result: {e.Message}\nStack: {e.StackTrace}");
         }
-    }
-
-    private void OnPongReceived(string data)
-    {
-        waitingForPong = false;
-        missedPongs = 0;
-        lastPongTime = Time.time;
     }
 
     private void OnSocketState(bool state)
     {
+        Debug.Log($"[SocketIO] Socket state: {state}");
     }
 
-    private void OnInternalError(string data)
+    private void OnInternalError(string errorData)
     {
-        Debug.LogError($"[SocketIO] Internal error: {data}");
+        Debug.LogError($"[SocketIO] Internal error: {errorData}");
     }
 
-    private void OnAlert(string data)
+    private void OnAlert(string alertData)
     {
-        Debug.LogWarning($"[SocketIO] Alert: {data}");
+        Debug.LogWarning($"[SocketIO] Alert: {alertData}");
     }
 
     private void OnAnotherDevice(string data)
     {
-        Debug.LogWarning("[SocketIO] Another device login detected");
-
+        Debug.LogWarning("[SocketIO] Another device connected");
         if (uiManager != null)
         {
-            uiManager.AnotherDevicePopup();
-        }
-
-        if (gameManager != null)
-        {
-            gameManager.OnDisconnected();
+          //  uiManager.ShowAnotherDevicePopup();
         }
     }
 
     #endregion
 
-    #region Ping/Pong Heartbeat
+    #region Ping/Pong Health Check
 
     private void StartPingRoutine()
     {
@@ -395,40 +340,41 @@ public class SocketIOManager : MonoBehaviour
     {
         while (isConnected)
         {
-            if (missedPongs == 0 && uiManager != null)
+            yield return new WaitForSeconds(PING_INTERVAL);
+
+            if (uiManager != null)
             {
                 uiManager.CheckAndClosePopups();
             }
 
             if (waitingForPong)
             {
-                missedPongs++;
+                float timeSinceLastPong = Time.time - lastPongTime;
 
-                if (missedPongs == 2 && uiManager != null)
+                if (timeSinceLastPong >= PONG_TIMEOUT)
                 {
-                    uiManager.ReconnectionPopup();
-                }
+                    missedPongs++;
+                    Debug.LogWarning($"[SocketIO] Missed pong {missedPongs}/{MAX_MISSED_PONGS}");
 
-                if (missedPongs >= MAX_MISSED_PONGS)
-                {
-                    isConnected = false;
-
-                    if (uiManager != null)
+                    if (missedPongs >= MAX_MISSED_PONGS)
                     {
-                        uiManager.DisconnectionPopup();
+                        Debug.LogError("[SocketIO] Connection unhealthy - too many missed pongs");
+                        OnDisconnected();
+                        yield break;
                     }
-
-                    yield break;
                 }
             }
 
             waitingForPong = true;
-            lastPongTime = Time.time;
-
-            gameSocket?.Emit("ping");
-
-            yield return new WaitForSeconds(PING_INTERVAL);
+            gameSocket.Emit("ping");
         }
+    }
+
+    private void OnPongReceived(string data)
+    {
+        waitingForPong = false;
+        missedPongs = 0;
+        lastPongTime = Time.time;
     }
 
     #endregion
@@ -443,13 +389,9 @@ public class SocketIOManager : MonoBehaviour
             return;
         }
 
-        if (!isConnected || gameSocket == null)
-        {
-            return;
-        }
-
         var request = new SpinRequest
         {
+            type = "SPIN",
             payload = new SpinPayload
             {
                 betIndex = betIndex,
@@ -518,6 +460,9 @@ public class SocketIOManager : MonoBehaviour
             paylines = GenerateDemoPaylines(),
             symbols = GenerateDemoSymbols(),
             wildSymbolId = 11,
+            wild2xSymbolId = 13,
+            wild3xSymbolId = 14,
+            wild5xSymbolId = 15,
             wildMultipliers = new List<int> { 1, 2, 3, 5 },
             scatterSymbolId = 12
         };
@@ -619,7 +564,7 @@ public class SocketIOManager : MonoBehaviour
     private List<List<int>> GenerateMatrixWithExactScatters(int scatterCount)
     {
         var matrix = GenerateRandomMatrix();
-        
+
         for (int col = 0; col < 5; col++)
         {
             for (int row = 0; row < 4; row++)

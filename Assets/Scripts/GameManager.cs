@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour
     internal SpinResult lastResult;
 
     internal GameState currentState;
-    internal SpinSpeed currentSpinSpeed; 
+    internal SpinSpeed currentSpinSpeed;
 
     internal int currentBetIndex;
     internal double currentBetAmount;
@@ -57,7 +57,7 @@ public class GameManager : MonoBehaviour
         }
 
         currentState = GameState.Idle;
-        
+
         uiManager.OnGameInitialized();
     }
 
@@ -165,16 +165,16 @@ public class GameManager : MonoBehaviour
         }
 
         currentState = GameState.Stopping;
-        
+
         if (slotView != null && lastResult.resultMatrix != null)
         {
             if (currentSpinSpeed == SpinSpeed.QuickSpin || stopRequested)
             {
                 slotView.QuickStop(lastResult.resultMatrix);
-                
+
                 float quickStopWaitTime = 0.5f;
                 yield return new WaitForSeconds(quickStopWaitTime);
-                
+
                 OnReelsStoppedComplete();
             }
             else
@@ -193,7 +193,7 @@ public class GameManager : MonoBehaviour
         if (lastResult.winAmount > 0 && lastResult.winLines != null && lastResult.winLines.Count > 0)
         {
             uiManager.DisableControlsDuringWinAnimation();
-            
+
             slotView.ShowWinLineAnimation(lastResult.winLines, OnWinAnimationComplete);
         }
         else
@@ -205,9 +205,9 @@ public class GameManager : MonoBehaviour
     private void OnWinAnimationComplete()
     {
         uiManager.EnableControlsAfterWinAnimation();
-        
+
         uiManager.OnSpinStopping(lastResult);
-        
+
         if (isAutoPlaying || isInFreeSpins)
         {
             StartCoroutine(DelayBeforeNextRound());
@@ -244,7 +244,7 @@ public class GameManager : MonoBehaviour
     private void ProcessSpinResult()
     {
         playerData = lastResult.playerData;
-        
+
         uiManager.OnSpinCompleted(lastResult);
 
         if (lastResult.freeSpinData != null && lastResult.freeSpinData.isTriggered)
@@ -259,7 +259,7 @@ public class GameManager : MonoBehaviour
         if (isAutoPlaying && !isInFreeSpins)
         {
             autoPlayRemainingRounds--;
-            
+
             uiManager.UpdateAutoPlayCount();
 
             if (autoPlayRemainingRounds <= 0)
@@ -276,7 +276,7 @@ public class GameManager : MonoBehaviour
         else if (isInFreeSpins)
         {
             freeSpinsRemaining--;
-            
+
             uiManager.UpdateFreeSpinCount(freeSpinsRemaining);
 
             if (freeSpinsRemaining <= 0)
@@ -324,7 +324,7 @@ public class GameManager : MonoBehaviour
     {
         isAutoPlaying = false;
         autoPlayRemainingRounds = 0;
-        
+
         uiManager.OnAutoPlayStopped();
     }
 
@@ -351,7 +351,7 @@ public class GameManager : MonoBehaviour
     internal void StartFirstFreeSpin()
     {
         waitingForFreeSpinStart = false;
-        
+
         StartCoroutine(DelayBeforeFirstFreeSpin());
     }
 
@@ -371,9 +371,9 @@ public class GameManager : MonoBehaviour
     {
         isInFreeSpins = false;
         freeSpinsRemaining = 0;
-        
+
         uiManager.OnFreeSpinsEnded();
-        
+
         currentState = GameState.Idle;
     }
 
@@ -401,7 +401,7 @@ public class GameManager : MonoBehaviour
     internal void ExitGame()
     {
         socketManager.CloseSocket();
-        
+
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else

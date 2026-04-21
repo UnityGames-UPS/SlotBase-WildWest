@@ -186,11 +186,14 @@ public class GameConfig
     public List<List<int>> paylines;
     public List<double> availableBets;
     public List<SymbolInfo> symbols;
-    
+
     // Wild configuration
-    public int wildSymbolId = 11;
+    public int wildSymbolId = 11;      // Base wild (1x)
+    public int wild2xSymbolId = 13;     // Wild 2x multiplier
+    public int wild3xSymbolId = 14;     // Wild 3x multiplier
+    public int wild5xSymbolId = 15;     // Wild 5x multiplier
     public List<int> wildMultipliers = new List<int> { 1, 2, 3, 5 };
-    
+
     // Scatter configuration
     public int scatterSymbolId = 12;
 }
@@ -307,7 +310,7 @@ public static class InitDataConverter
             availableBets = serverData.gameData.bets,
             symbols = new List<SymbolInfo>()
         };
-        
+
         foreach (var serverSymbol in serverData.uiData.paylines.symbols)
         {
             var symbolInfo = new SymbolInfo
@@ -319,9 +322,9 @@ public static class InitDataConverter
                 isScatter = serverSymbol.name.ToLower().Contains("scatter"),
                 wildMultiplier = 1
             };
-            
+
             config.symbols.Add(symbolInfo);
-            
+
             if (symbolInfo.isWild)
             {
                 config.wildSymbolId = symbolInfo.id;
@@ -331,10 +334,10 @@ public static class InitDataConverter
                 config.scatterSymbolId = symbolInfo.id;
             }
         }
-        
+
         return config;
     }
-    
+
     public static PlayerData ConvertToPlayerData(ServerPlayer serverPlayer, int defaultBetIndex = 0)
     {
         return new PlayerData
@@ -346,28 +349,29 @@ public static class InitDataConverter
 
     /// <summary>
     /// CRITICAL: Converts server response to client SpinResult
-    /// Handles string-to-int conversion and field name mapping
+    /// Handles string-to-int conversion, matrix transposition, and wild multiplier mapping
+    /// Server sends [row][col] (4 rows x 5 cols), Client needs [col][row] (5 cols x 4 rows)
     /// </summary>
-    public static SpinResult ConvertServerResponseToSpinResult(ServerSpinResponse serverResponse, double currentBalance, double betAmount)
+    public static SpinResult ConvertServerResponseToSpinResult(ServerSpinResponse serverResponse, double currentBalance, double betAmount, GameConfig gameConfig)
     {
         var result = new SpinResult
         {
-            // Convert reels from List<List<string>> to List<List<int>>
-            resultMatrix = ConvertReelsToMatrix(serverResponse.payload.reels),
-            
+            // Convert and transpose reels from server format to client format
+            resultMatrix = ConvertReelsToMatrix(serverResponse.payload.reels, serverResponse.payload.winningLines, gameConfig),
+
             // Map totalWin to winAmount
             winAmount = serverResponse.payload.totalWin,
-            
+
             // Convert winningLines to winLines
             winLines = ConvertWinningLines(serverResponse.payload.winningLines),
-            
+
             // Update player data
             playerData = new PlayerData
             {
                 balance = CalculateNewBalance(currentBalance, betAmount, serverResponse.payload.totalWin),
                 currentBetIndex = 0 // Will be set by GameManager
             },
-            
+
             // Convert free spin data
             freeSpinData = serverResponse.features?.freeSpins != null && serverResponse.features.freeSpins.triggered
                 ? new FreeSpinData
@@ -377,7 +381,7 @@ public static class InitDataConverter
                     remainingSpins = 0
                 }
                 : null,
-            
+
             // Convert scatter data
             scatterData = serverResponse.payload.scatterTriggered
                 ? new ScatterData
@@ -388,36 +392,126 @@ public static class InitDataConverter
                 }
                 : null
         };
-        
+
         return result;
     }
 
     /// <summary>
-    /// Converts server reels (strings) to client matrix (ints)
-    /// Server: [["4","8","3","7"], ...] → Client: [[4,8,3,7], ...]
+    /// Converts server reels to client matrix with wild multiplier handling
+    /// Server format: [row][col] (4 rows x 5 cols) - reels[0] = ["3","8","4","8"] is row 0 across all 5 columns
+    /// Client format: [col][row] (5 cols x 4 rows) - matrix[0] = [3,8,4,8] is column 0 with 4 rows
+    /// 
+    /// Wild handling: Wild ID=11, but client needs:
+    /// - Wild with 1x multiplier → symbolId 11 (Wild)
+    /// - Wild with 2x multiplier → symbolId 13 (Wild2x) 
+    /// - Wild with 3x multiplier → symbolId 14 (Wild3x)
+    /// - Wild with 5x multiplier → symbolId 15 (Wild5x)
     /// </summary>
-    private static List<List<int>> ConvertReelsToMatrix(List<List<string>> reels)
+    private static List<List<int>> ConvertReelsToMatrix(List<List<string>> serverReels, List<ServerWinLine> winningLines, GameConfig gameConfig)
     {
+        // Server sends 4 rows x 5 columns: reels[row][col]
+        // Client needs 5 columns x 4 rows: matrix[col][row]
+
+        if (serverReels == null || serverReels.Count != 4)
+        {
+            UnityEngine.Debug.LogError($"Invalid server reels: expected 4 rows, got {serverReels?.Count}");
+            return GenerateDefaultMatrix();
+        }
+
+        // Build wild multiplier lookup: [col][row] -> multiplier
+        var wildMultipliers = new Dictionary<string, int>();
+        if (winningLines != null)
+        {
+            foreach (var line in winningLines)
+            {
+                if (line.wildDetails != null)
+                {
+                    foreach (var wild in line.wildDetails)
+                    {
+                        string key = $"{wild.col}_{wild.row}";
+                        wildMultipliers[key] = wild.multiplier;
+                    }
+                }
+            }
+        }
+
         var matrix = new List<List<int>>();
-        
-        foreach (var reel in reels)
+
+        // Transpose: iterate by columns
+        for (int col = 0; col < 5; col++)
         {
             var column = new List<int>();
-            foreach (var symbolStr in reel)
+
+            // Each column has 4 rows
+            for (int row = 0; row < 4; row++)
             {
-                if (int.TryParse(symbolStr, out int symbolId))
+                if (col >= serverReels[row].Count)
                 {
-                    column.Add(symbolId);
+                    UnityEngine.Debug.LogError($"Invalid server data at row {row}, col {col}");
+                    column.Add(0);
+                    continue;
                 }
-                else
+
+                string symbolStr = serverReels[row][col];
+
+                if (!int.TryParse(symbolStr, out int symbolId))
                 {
                     UnityEngine.Debug.LogError($"Failed to parse symbol: {symbolStr}");
-                    column.Add(0); // Default to 0
+                    column.Add(0);
+                    continue;
                 }
+
+                // Check if this is a wild with multiplier
+                if (symbolId == gameConfig.wildSymbolId)
+                {
+                    string key = $"{col}_{row}";
+                    if (wildMultipliers.TryGetValue(key, out int multiplier))
+                    {
+                        // Map wild multiplier to correct symbol ID
+                        symbolId = GetWildSymbolIdForMultiplier(multiplier, gameConfig);
+                    }
+                }
+
+                column.Add(symbolId);
+            }
+
+            matrix.Add(column);
+        }
+
+        return matrix;
+    }
+
+    /// <summary>
+    /// Maps wild multiplier to correct symbol ID
+    /// 1x → 11 (Wild), 2x → 13 (Wild2x), 3x → 14 (Wild3x), 5x → 15 (Wild5x)
+    /// </summary>
+    private static int GetWildSymbolIdForMultiplier(int multiplier, GameConfig gameConfig)
+    {
+        return multiplier switch
+        {
+            1 => 11,  // Wild (normal)
+            2 => 13,  // Wild 2x
+            3 => 14,  // Wild 3x
+            5 => 15,  // Wild 5x
+            _ => 11   // Default to normal wild
+        };
+    }
+
+    /// <summary>
+    /// Generate default matrix if conversion fails
+    /// </summary>
+    private static List<List<int>> GenerateDefaultMatrix()
+    {
+        var matrix = new List<List<int>>();
+        for (int col = 0; col < 5; col++)
+        {
+            var column = new List<int>();
+            for (int row = 0; row < 4; row++)
+            {
+                column.Add(0);
             }
             matrix.Add(column);
         }
-        
         return matrix;
     }
 
@@ -429,9 +523,9 @@ public static class InitDataConverter
     private static List<WinLine> ConvertWinningLines(List<ServerWinLine> serverWinLines)
     {
         var winLines = new List<WinLine>();
-        
+
         if (serverWinLines == null) return winLines;
-        
+
         foreach (var serverLine in serverWinLines)
         {
             // Parse symbolId from string to int
@@ -440,7 +534,7 @@ public static class InitDataConverter
                 UnityEngine.Debug.LogError($"Failed to parse symbolId: {serverLine.symbolId}");
                 continue;
             }
-            
+
             // Convert positions from [[row,col]] to flat indices
             var flatPositions = new List<int>();
             foreach (var pos in serverLine.positions)
@@ -453,7 +547,7 @@ public static class InitDataConverter
                     flatPositions.Add(flatIndex);
                 }
             }
-            
+
             winLines.Add(new WinLine
             {
                 lineId = serverLine.lineIndex,
@@ -462,7 +556,7 @@ public static class InitDataConverter
                 winAmount = serverLine.payout
             });
         }
-        
+
         return winLines;
     }
 

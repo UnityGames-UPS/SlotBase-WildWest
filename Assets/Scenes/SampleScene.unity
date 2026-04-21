@@ -2941,10 +2941,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1209000635}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 1080, y: 1920}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &259118119
 MonoBehaviour:
@@ -4452,7 +4452,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useDemoMode: 0
   testToken: 22a9a23c8c0a47e2b8135b4ed324f883
-  scatterSymbolId: 4
+  scatterSymbolId: 12
   scattersRequiredForFreeSpin: 3
   gameManager: {fileID: 855426822}
   uiManager: {fileID: 180954095}
@@ -21507,23 +21507,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 855426822}
-  symbolSprites:
-  - {fileID: 7694539351194386527, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
-  - {fileID: -6860072664755280763, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
-  - {fileID: 8346796939134208883, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
-  - {fileID: -5006130215832699141, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
-  - {fileID: -657942907148848666, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
-  - {fileID: 2444311901403543498, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
-  - {fileID: -3242662826537277931, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
-  - {fileID: -7059714089215120145, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
-  - {fileID: -5397154460310864831, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
-  - {fileID: -5796025296966655307, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
-  - {fileID: 8837785113923931230, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
-  - {fileID: -4088219387745634338, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
-  - {fileID: -6747920257218007334, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
-  - {fileID: 3003351792847239412, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
-  - {fileID: 4300199440285716115, guid: 2bd90c4d58b1b46b085c2b41975be001, type: 3}
-  - {fileID: -2143786333374584434, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
+  spriteSheriff: {fileID: 2444311901403543498, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
+  spriteCowboyBlue: {fileID: -7059714089215120145, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
+  spriteCowgirlGreen: {fileID: -3242662826537277931, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
+  spriteCowgirlRed: {fileID: -5397154460310864831, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
+  spriteTreasure: {fileID: 8837785113923931230, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
+  spriteGun: {fileID: -5796025296966655307, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
+  spriteA: {fileID: -4088219387745634338, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
+  spriteK: {fileID: -6747920257218007334, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
+  spriteQ: {fileID: 3003351792847239412, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
+  spriteJ: {fileID: 4300199440285716115, guid: 2bd90c4d58b1b46b085c2b41975be001, type: 3}
+  spriteTen: {fileID: -2143786333374584434, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
+  spriteWild: {fileID: 7694539351194386527, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
+  spriteScatter: {fileID: -657942907148848666, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
+  spriteWild2x: {fileID: -6860072664755280763, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
+  spriteWild3x: {fileID: 8346796939134208883, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
+  spriteWild5x: {fileID: -5006130215832699141, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
   reelTransforms:
   - {fileID: 1435559482}
   - {fileID: 1049620777}
