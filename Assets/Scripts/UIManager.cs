@@ -14,9 +14,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Image loadingBarFill;
     [SerializeField] private RectTransform loadingBarEndMarker;
     [SerializeField] private GameObject introAnimationObject;
-    [SerializeField] private GameObject freeSpinIntroAnimation; 
+    [SerializeField] private GameObject freeSpinIntroAnimation;
     [SerializeField] private GameObject gameScreen;
-    
+
     [Header("Loading Settings - Random Stops")]
     [SerializeField] private int minStops = 2;
     [SerializeField] private int maxStops = 3;
@@ -63,12 +63,12 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button autoPlayCloseButton;
     [SerializeField] private Button autoPlayStartButton;
     [SerializeField] private TMP_Text autoPlayStartButtonText;
-    
+
     [Header("Auto Play Settings")]
     [SerializeField] private Toggle turboToggle;
     [SerializeField] private Toggle quickSpinToggle;
     [SerializeField] private RoundButton[] roundButtons;
-    
+
     [Header("Auto Play Display")]
     [SerializeField] private GameObject autoPlayCountDisplay;
     [SerializeField] private TMP_Text autoPlayCountText;
@@ -96,13 +96,13 @@ public class UIManager : MonoBehaviour
     [SerializeField] private RectTransform freeSpinEndPopupRect;
     [SerializeField] private Image freeSpinEndPopImage;
     [SerializeField] private Button freeSpinEndCloseButton;
-    
+
     [Header("Free Spin End - Win Amount Display")]
     [SerializeField] private Transform winAmountContainer; // Horizontal layout group container
     [SerializeField] private HorizontalLayoutGroup winAmountLayoutGroup; // Reference to the layout group
     [SerializeField] private Image[] winAmountDigits; // 6 images for digits (123.33)
     [SerializeField] private GameObject decimalPointObject; // Decimal point object
-    
+
     [Header("Free Spin End - Total Spin Count")]
     [SerializeField] private Image freeSpinEndCountTens;
     [SerializeField] private Image freeSpinEndCountOnes;
@@ -112,13 +112,13 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button lowBalanceCloseButton;
     [SerializeField] private GameObject disconnectionPopup;
     [SerializeField] private Button disconnectionCloseButton;
-     
-[Header("Connection Popups")]
-[SerializeField] private GameObject reconnectionPopup;
-[SerializeField] private GameObject anotherDevicePopup;
-[SerializeField] private Button anotherDeviceCloseButton;
- 
-[SerializeField] private SocketIOManager socketManager;
+
+    [Header("Connection Popups")]
+    [SerializeField] private GameObject reconnectionPopup;
+    [SerializeField] private GameObject anotherDevicePopup;
+    [SerializeField] private Button anotherDeviceCloseButton;
+
+    [SerializeField] private SocketIOManager socketManager;
 
     [Header("Animation Settings")]
     [SerializeField] private float winCountDuration = 0.25f;
@@ -146,16 +146,16 @@ public class UIManager : MonoBehaviour
     {
         SetupButtons();
         SetupAutoPlayPanel();
-        
+
         // Initialize display panel
         InitializeDisplayPanel();
-        
+
         // Hide max bet indicator initially
         if (maxBetObject) maxBetObject.SetActive(false);
-        
+
         // Initialize backgrounds
         InitializeBackgrounds();
-        
+
         // Start with loading sequence
         StartCoroutine(LoadingSequence());
     }
@@ -165,36 +165,34 @@ public class UIManager : MonoBehaviour
         // Start with normal background active, free spin background hidden
         if (normalSpinBackground) normalSpinBackground.SetActive(true);
         if (freeSpinBackground) freeSpinBackground.SetActive(false);
-        
-        Debug.Log("[UIManager] Backgrounds initialized - Normal active, Free spin hidden");
+
     }
 
     private void InitializeUI()
     {
         if (spinNormalImage) spinNormalImage.SetActive(true);
         if (spinStopImage) spinStopImage.SetActive(false);
-        
+
         if (autoPlayPanel) autoPlayPanel.SetActive(false);
         if (autoPlayCountDisplay) autoPlayCountDisplay.SetActive(false);
-      
+
         if (lowBalancePopup) lowBalancePopup.SetActive(false);
         if (disconnectionPopup) disconnectionPopup.SetActive(false);
-        
+
         // Initialize free spin count display on game screen
         if (freeSpinCountContainer) freeSpinCountContainer.SetActive(false);
         if (lastSpinLeftObject) lastSpinLeftObject.SetActive(false);
         if (buyFreeSpinObject) buyFreeSpinObject.SetActive(false);
-        
+
         // Initialize free spin popups
         if (freeSpinStartPopup) freeSpinStartPopup.SetActive(false);
         if (freeSpinEndPopup) freeSpinEndPopup.SetActive(false);
 
-         if (reconnectionPopup) reconnectionPopup.SetActive(false);
-    if (anotherDevicePopup) anotherDevicePopup.SetActive(false);
+        if (reconnectionPopup) reconnectionPopup.SetActive(false);
+        if (anotherDevicePopup) anotherDevicePopup.SetActive(false);
 
         UpdateAutoPlayButtonText();
 
-        Debug.Log("[UIManager] UI Initialized - Spin button visible, Stop hidden");
     }
 
     private void InitializeDisplayPanel()
@@ -202,8 +200,7 @@ public class UIManager : MonoBehaviour
         // Show game rules by default, hide win display
         if (gameRuleObject) gameRuleObject.SetActive(true);
         if (winDisplayObject) winDisplayObject.SetActive(false);
-        
-        Debug.Log("[UIManager] Display panel initialized - Game rules visible");
+
     }
 
     #endregion
@@ -216,7 +213,7 @@ public class UIManager : MonoBehaviour
         if (loadingScreen) loadingScreen.SetActive(true);
         if (gameScreen) gameScreen.SetActive(false);
         if (introAnimationObject) introAnimationObject.SetActive(false);
-        
+
         // Initialize loading bar
         if (loadingBarFill)
         {
@@ -224,38 +221,33 @@ public class UIManager : MonoBehaviour
             UpdateLoadingBarEndMarker(0f);
         }
 
-        Debug.Log("[UIManager] Loading sequence started with random stops");
 
         // Generate random stop points
         int numberOfStops = Random.Range(minStops, maxStops + 1);
         float[] stopPoints = GenerateRandomStopPoints(numberOfStops);
-        
-        Debug.Log($"[UIManager] Generated {numberOfStops} random stops at: {string.Join(", ", System.Array.ConvertAll(stopPoints, x => x.ToString("F2")))}");
+
 
         // Fill to each stop point
         float currentFill = 0f;
         for (int i = 0; i < stopPoints.Length; i++)
         {
             yield return StartCoroutine(FillLoadingBar(currentFill, stopPoints[i]));
-            
+
             // Pause at stop point with random duration
             float pauseDuration = Random.Range(minStopDuration, maxStopDuration);
-            Debug.Log($"[UIManager] Pausing at {stopPoints[i]:F2} for {pauseDuration:F2}s");
             yield return new WaitForSeconds(pauseDuration);
-            
+
             currentFill = stopPoints[i];
         }
 
         // Final fill to 100%
         yield return StartCoroutine(FillLoadingBar(currentFill, 1f));
-        
-        Debug.Log("[UIManager] Loading complete");
+
 
         // Show intro animation
         if (introAnimationObject)
         {
             introAnimationObject.SetActive(true);
-            Debug.Log("[UIManager] Intro animation started");
         }
 
         yield return new WaitForSeconds(introAnimDuration);
@@ -270,39 +262,38 @@ public class UIManager : MonoBehaviour
         // Initialize UI
         InitializeUI();
 
-        Debug.Log("[UIManager] Game screen enabled, loading sequence complete");
     }
 
     private float[] GenerateRandomStopPoints(int count)
     {
         float[] stops = new float[count];
-        
+
         for (int i = 0; i < count; i++)
         {
             stops[i] = Random.Range(minStopPosition, maxStopPosition);
         }
-        
+
         // Sort to ensure increasing order
         System.Array.Sort(stops);
-        
+
         return stops;
     }
 
     private IEnumerator FillLoadingBar(float fromFill, float toFill)
     {
         float currentFill = fromFill;
-        
+
         while (currentFill < toFill)
         {
             currentFill += loadingSpeed * Time.deltaTime;
             currentFill = Mathf.Min(currentFill, toFill);
-            
+
             if (loadingBarFill)
             {
                 loadingBarFill.fillAmount = currentFill;
                 UpdateLoadingBarEndMarker(currentFill);
             }
-            
+
             yield return null;
         }
     }
@@ -314,10 +305,10 @@ public class UIManager : MonoBehaviour
         // Calculate the position of the end marker based on fill amount
         RectTransform barRect = loadingBarFill.rectTransform;
         float barWidth = barRect.rect.width;
-        
+
         // Position the marker at the end of the filled portion
         float xPosition = (fillAmount - 0.5f) * barWidth;
-        
+
         loadingBarEndMarker.anchoredPosition = new Vector2(xPosition, loadingBarEndMarker.anchoredPosition.y);
     }
 
@@ -329,12 +320,11 @@ public class UIManager : MonoBehaviour
         if (freeSpinIntroAnimation)
         {
             freeSpinIntroAnimation.SetActive(true);
-            Debug.Log("[UIManager] Free spin intro animation shown for 2 seconds");
         }
 
         yield return new WaitForSeconds(freeSpinIntroDuration);
 
-        if (freeSpinIntroAnimation  )
+        if (freeSpinIntroAnimation)
         {
             freeSpinIntroAnimation.SetActive(false);
         }
@@ -351,42 +341,42 @@ public class UIManager : MonoBehaviour
         if (betPlusButton) betPlusButton.onClick.AddListener(() => gameManager.IncreaseBet());
         if (betMinusButton) betMinusButton.onClick.AddListener(() => gameManager.DecreaseBet());
         if (spinButton) spinButton.onClick.AddListener(OnSpinButtonPressed);
-        
+
         if (autoPlayOpenButton) autoPlayOpenButton.onClick.AddListener(OpenAutoPlayPanel);
         if (autoPlayCloseButton) autoPlayCloseButton.onClick.AddListener(CloseAutoPlayPanel);
         if (autoPlayStartButton) autoPlayStartButton.onClick.AddListener(OnAutoPlayStart);
-        
+
         if (freeSpinStartCloseButton) freeSpinStartCloseButton.onClick.AddListener(CloseFreeSpinStartPopup);
         if (freeSpinEndCloseButton) freeSpinEndCloseButton.onClick.AddListener(CloseFreeSpinEndPopup);
-        
+
         if (lowBalanceCloseButton) lowBalanceCloseButton.onClick.AddListener(() => {
             if (lowBalancePopup) lowBalancePopup.SetActive(false);
         });
-        
+
         if (disconnectionCloseButton) disconnectionCloseButton.onClick.AddListener(() => {
             if (disconnectionPopup) disconnectionPopup.SetActive(false);
         });
 
         if (testFreeSpinButton) testFreeSpinButton.onClick.AddListener(TestFreeSpinPopups);
         // Connection popup buttons
-    if (disconnectionCloseButton)
-    {
-        disconnectionCloseButton.onClick.RemoveAllListeners();
-        disconnectionCloseButton.onClick.AddListener(OnExitButtonPressed);
-    }
-    
-    if (anotherDeviceCloseButton)
-    {
-        anotherDeviceCloseButton.onClick.RemoveAllListeners();
-        anotherDeviceCloseButton.onClick.AddListener(OnExitButtonPressed);
-    }
+        if (disconnectionCloseButton)
+        {
+            disconnectionCloseButton.onClick.RemoveAllListeners();
+            disconnectionCloseButton.onClick.AddListener(OnExitButtonPressed);
+        }
+
+        if (anotherDeviceCloseButton)
+        {
+            anotherDeviceCloseButton.onClick.RemoveAllListeners();
+            anotherDeviceCloseButton.onClick.AddListener(OnExitButtonPressed);
+        }
     }
 
     private void SetupAutoPlayPanel()
     {
         if (turboToggle) turboToggle.onValueChanged.AddListener(OnTurboToggleChanged);
         if (quickSpinToggle) quickSpinToggle.onValueChanged.AddListener(OnQuickSpinToggleChanged);
-        
+
         foreach (var roundButton in roundButtons)
         {
             if (roundButton.button != null)
@@ -412,9 +402,10 @@ public class UIManager : MonoBehaviour
     {
         if (spinNormalImage) spinNormalImage.SetActive(false);
         if (spinStopImage) spinStopImage.SetActive(true);
-        
+
         SetBetControlsEnabled(false);
-        
+        if (autoPlayOpenButton) autoPlayOpenButton.interactable = false;
+
         // Hide win display, show game rules
         if (winDisplayCoroutine != null)
         {
@@ -434,7 +425,7 @@ public class UIManager : MonoBehaviour
         if (result.winAmount > 0)
         {
             AnimateWinUpdate(result.winAmount);
-            
+
             // Show win display temporarily
             ShowWinDisplay(result.winAmount);
         }
@@ -450,8 +441,9 @@ public class UIManager : MonoBehaviour
         {
             if (spinNormalImage) spinNormalImage.SetActive(true);
             if (spinStopImage) spinStopImage.SetActive(false);
-            
+
             SetBetControlsEnabled(true);
+            if (autoPlayOpenButton) autoPlayOpenButton.interactable = true;
         }
     }
 
@@ -460,6 +452,8 @@ public class UIManager : MonoBehaviour
         // Keep controls disabled during win line animation
         SetBetControlsEnabled(false);
         if (spinButton) spinButton.interactable = false;
+        if (spinNormalImage) spinNormalImage.SetActive(false);
+        if (spinStopImage) spinStopImage.SetActive(false);
     }
 
     internal void EnableControlsAfterWinAnimation()
@@ -469,6 +463,9 @@ public class UIManager : MonoBehaviour
         {
             SetBetControlsEnabled(true);
             if (spinButton) spinButton.interactable = true;
+            if (autoPlayOpenButton) autoPlayOpenButton.interactable = true;
+            if (spinNormalImage) spinNormalImage.SetActive(true);
+            if (spinStopImage) spinStopImage.SetActive(false);
         }
     }
 
@@ -476,7 +473,7 @@ public class UIManager : MonoBehaviour
     {
         if (winDisplayCoroutine != null)
             StopCoroutine(winDisplayCoroutine);
-        
+
         winDisplayCoroutine = StartCoroutine(ShowWinDisplayCoroutine(winAmount));
     }
 
@@ -485,7 +482,7 @@ public class UIManager : MonoBehaviour
         // Hide game rules, show win display
         if (gameRuleObject) gameRuleObject.SetActive(false);
         if (winDisplayObject) winDisplayObject.SetActive(true);
-        
+
         if (winDisplayText)
         {
             winDisplayText.text = $"WIN {winAmount:F2}";
@@ -496,7 +493,7 @@ public class UIManager : MonoBehaviour
         // Switch back to game rules
         if (winDisplayObject) winDisplayObject.SetActive(false);
         if (gameRuleObject) gameRuleObject.SetActive(true);
-        
+
         winDisplayCoroutine = null;
     }
 
@@ -524,37 +521,35 @@ public class UIManager : MonoBehaviour
     {
         if (betAmountText)
             betAmountText.text = gameManager.currentBetAmount.ToString("F2");
-        
+
         UpdateBetButtonStates();
         CheckMaxBetIndicator();
     }
 
     private void UpdateBetButtonStates()
     {
-        if (betMinusButton)
-            betMinusButton.interactable = gameManager.currentBetIndex > 0;
-        
-        if (betPlusButton)
-            betPlusButton.interactable = gameManager.currentBetIndex < gameManager.gameConfig.availableBets.Count - 1;
+        // Buttons always interactable - bet wraps cyclically
+        if (betMinusButton) betMinusButton.interactable = true;
+        if (betPlusButton) betPlusButton.interactable = true;
     }
 
     private void CheckMaxBetIndicator()
     {
         bool isMaxBet = gameManager.currentBetIndex >= gameManager.gameConfig.availableBets.Count - 1;
-        
+
         if (isMaxBet && maxBetObject && !maxBetObject.activeSelf)
         {
             // Show max bet indicator
             if (maxBetCoroutine != null)
                 StopCoroutine(maxBetCoroutine);
-            
+
             maxBetCoroutine = StartCoroutine(ShowMaxBetIndicator());
         }
         else if (!isMaxBet && maxBetObject && maxBetObject.activeSelf)
         {
             // Hide immediately if user decreases bet
             maxBetObject.SetActive(false);
-            
+
             if (maxBetCoroutine != null)
             {
                 StopCoroutine(maxBetCoroutine);
@@ -566,9 +561,9 @@ public class UIManager : MonoBehaviour
     private IEnumerator ShowMaxBetIndicator()
     {
         if (maxBetObject) maxBetObject.SetActive(true);
-        
+
         yield return new WaitForSeconds(maxBetDisplayDuration);
-        
+
         if (maxBetObject) maxBetObject.SetActive(false);
         maxBetCoroutine = null;
     }
@@ -581,7 +576,6 @@ public class UIManager : MonoBehaviour
     {
         if (autoPlayPanel) autoPlayPanel.SetActive(true);
         AnimatePopupOpen(autoPlayPanelRect);
-        Debug.Log("[UIManager] Auto play panel opened");
     }
 
     private void CloseAutoPlayPanel()
@@ -589,13 +583,12 @@ public class UIManager : MonoBehaviour
         AnimatePopupClose(autoPlayPanelRect, () => {
             if (autoPlayPanel) autoPlayPanel.SetActive(false);
         });
-        Debug.Log("[UIManager] Auto play panel closed");
     }
 
     private void SelectAutoPlayRounds(int rounds)
     {
         selectedRounds = rounds;
-        
+
         // Update selected indicators
         foreach (var roundButton in roundButtons)
         {
@@ -604,9 +597,8 @@ public class UIManager : MonoBehaviour
                 roundButton.selectedIndicator.SetActive(roundButton.rounds == selectedRounds);
             }
         }
-        
+
         UpdateAutoPlayButtonText();
-        Debug.Log($"[UIManager] Selected {selectedRounds} rounds");
     }
 
     private void UpdateAutoPlayButtonText()
@@ -625,25 +617,24 @@ public class UIManager : MonoBehaviour
     {
         if (autoPlayCountDisplay) autoPlayCountDisplay.SetActive(true);
         UpdateAutoPlayCount();
-        
+
         if (spinNormalImage) spinNormalImage.SetActive(false);
         if (spinStopImage) spinStopImage.SetActive(true);
-        
+
         SetBetControlsEnabled(false);
-        
-        Debug.Log("[UIManager] Auto play UI updated - count display shown");
+
     }
 
     internal void OnAutoPlayStopped()
     {
         if (autoPlayCountDisplay) autoPlayCountDisplay.SetActive(false);
-        
+
         if (spinNormalImage) spinNormalImage.SetActive(true);
         if (spinStopImage) spinStopImage.SetActive(false);
-        
+
         SetBetControlsEnabled(true);
-        
-        Debug.Log("[UIManager] Auto play UI updated - count display hidden");
+        if (autoPlayOpenButton) autoPlayOpenButton.interactable = true;
+
     }
 
     internal void UpdateAutoPlayCount()
@@ -658,7 +649,7 @@ public class UIManager : MonoBehaviour
         {
             quickSpinToggle.isOn = false;
         }
-        
+
         gameManager.SetSpinSpeed(isOn ? SpinSpeed.Turbo : SpinSpeed.Normal);
     }
 
@@ -668,7 +659,7 @@ public class UIManager : MonoBehaviour
         {
             turboToggle.isOn = false;
         }
-        
+
         gameManager.SetSpinSpeed(isOn ? SpinSpeed.QuickSpin : SpinSpeed.Normal);
     }
 
@@ -678,25 +669,23 @@ public class UIManager : MonoBehaviour
 
     internal void OnFreeSpinsStarted(int spinsAwarded)
     {
-        Debug.Log($"[UIManager] Free spins started - {spinsAwarded} spins awarded");
-        
+
         totalFreeSpinWin = 0;
         totalFreeSpinsAwarded = spinsAwarded;
-        
+
         // Show free spin start popup
         ShowFreeSpinStartPopup(spinsAwarded);
-        
+
         // NOTE: Free spin background is NOT enabled here
         // It will be enabled in CloseFreeSpinStartPopup after popup closes
     }
 
     internal void OnFreeSpinsEnded()
     {
-        Debug.Log("[UIManager] Free spins ended");
-        
+
         // Show free spin end popup with total win
         ShowFreeSpinEndPopup(totalFreeSpinWin, totalFreeSpinsAwarded);
-        
+
         // NOTE: Free spin background is NOT disabled here
         // It will be disabled in CloseFreeSpinEndPopup after popup closes
     }
@@ -706,14 +695,12 @@ public class UIManager : MonoBehaviour
     /// </summary>
     internal void UpdateFreeSpinCount(int remainingSpins)
     {
-        Debug.Log($"[UIManager] Updating free spin count: {remainingSpins} remaining");
-        
+
         if (remainingSpins == 1)
         {
             // Last spin - hide count, show "last spin left"
             if (freeSpinCountContainer) freeSpinCountContainer.SetActive(false);
             if (lastSpinLeftObject) lastSpinLeftObject.SetActive(true);
-            Debug.Log("[UIManager] Showing 'Last Spin Left' indicator");
         }
         else if (remainingSpins == 0)
         {
@@ -721,7 +708,6 @@ public class UIManager : MonoBehaviour
             if (freeSpinCountContainer) freeSpinCountContainer.SetActive(false);
             if (lastSpinLeftObject) lastSpinLeftObject.SetActive(false);
             if (buyFreeSpinObject) buyFreeSpinObject.SetActive(true);
-            Debug.Log("[UIManager] Showing 'Buy Free Spin' button");
         }
         else
         {
@@ -729,7 +715,7 @@ public class UIManager : MonoBehaviour
             if (freeSpinCountContainer) freeSpinCountContainer.SetActive(true);
             if (lastSpinLeftObject) lastSpinLeftObject.SetActive(false);
             if (buyFreeSpinObject) buyFreeSpinObject.SetActive(false);
-            
+
             SetFreeSpinCountImages(remainingSpins);
         }
     }
@@ -741,7 +727,6 @@ public class UIManager : MonoBehaviour
     {
         if (freeSpinNumberSprites == null || freeSpinNumberSprites.Length < 10)
         {
-            Debug.LogWarning("[UIManager] Free spin number sprites not configured!");
             return;
         }
 
@@ -758,7 +743,6 @@ public class UIManager : MonoBehaviour
             freeSpinCountOnes.sprite = freeSpinNumberSprites[ones];
         }
 
-        Debug.Log($"[UIManager] Free spin count images set: {tens}{ones}");
     }
 
     #endregion
@@ -788,10 +772,8 @@ public class UIManager : MonoBehaviour
         freeSpinStartPopupRect.DOAnchorPosY(popupFinalY, popupDropDuration)
             .SetEase(Ease.OutBounce)
             .OnComplete(() => {
-                Debug.Log("[UIManager] Free spin start popup animation complete");
             });
-        
-        Debug.Log($"[UIManager] Free spin start popup shown - {spinsAwarded} spins");
+
     }
 
     private void CloseFreeSpinStartPopup()
@@ -800,17 +782,16 @@ public class UIManager : MonoBehaviour
 
         AnimatePopupClose(freeSpinStartPopupRect, () => {
             freeSpinStartPopup.SetActive(false);
-            
+
             // Enable free spin background AFTER popup closes
             if (normalSpinBackground) normalSpinBackground.SetActive(false);
             if (freeSpinBackground) freeSpinBackground.SetActive(true);
-            Debug.Log("[UIManager] Free spin background enabled");
-            
+
             // Show intro animation for 2 seconds, then start free spins
             StartCoroutine(ShowFreeSpinIntroAnimation(() => {
                 // Initialize free spin count display
                 UpdateFreeSpinCount(gameManager.freeSpinsRemaining);
-                
+
                 // Notify GameManager to start first free spin
                 gameManager.StartFirstFreeSpin();
             }));
@@ -827,7 +808,7 @@ public class UIManager : MonoBehaviour
 
         // Set total spin count images
         SetCountImages(totalSpins, freeSpinEndCountTens, freeSpinEndCountOnes);
-        
+
         // Set win amount display
         SetWinAmountDisplay(totalWin);
 
@@ -847,10 +828,8 @@ public class UIManager : MonoBehaviour
         freeSpinEndPopupRect.DOAnchorPosY(popupFinalY, popupDropDuration)
             .SetEase(Ease.OutBounce)
             .OnComplete(() => {
-                Debug.Log("[UIManager] Free spin end popup animation complete");
             });
-        
-        Debug.Log($"[UIManager] Free spin end popup shown - {totalSpins} spins, {totalWin:F2} total win");
+
     }
 
     private void CloseFreeSpinEndPopup()
@@ -859,21 +838,19 @@ public class UIManager : MonoBehaviour
 
         AnimatePopupClose(freeSpinEndPopupRect, () => {
             freeSpinEndPopup.SetActive(false);
-            
+
             // Disable free spin background AFTER popup closes
             if (freeSpinBackground) freeSpinBackground.SetActive(false);
             if (normalSpinBackground) normalSpinBackground.SetActive(true);
-            Debug.Log("[UIManager] Free spin background disabled, normal background enabled");
-            
+
             // Hide free spin count display
             if (freeSpinCountContainer) freeSpinCountContainer.SetActive(false);
             if (lastSpinLeftObject) lastSpinLeftObject.SetActive(false);
-            
+
             // Show free spin intro animation for 2 seconds
             StartCoroutine(ShowFreeSpinIntroAnimation(() => {
                 // After intro animation, show buy free spin button
                 if (buyFreeSpinObject) buyFreeSpinObject.SetActive(true);
-                Debug.Log("[UIManager] Buy Free Spin button shown after intro animation");
             }));
         });
     }
@@ -889,7 +866,6 @@ public class UIManager : MonoBehaviour
     {
         if (numberSprites == null || numberSprites.Length < 10)
         {
-            Debug.LogWarning("[UIManager] Number sprites not configured!");
             return;
         }
 
@@ -906,20 +882,17 @@ public class UIManager : MonoBehaviour
             onesImage.sprite = numberSprites[ones];
         }
 
-        Debug.Log($"[UIManager] Count images set: {tens}{ones}");
     }
 
     private void SetWinAmountDisplay(double amount)
     {
         if (winAmountDigits == null || winAmountDigits.Length == 0)
         {
-            Debug.LogError("[UIManager] Win amount digit images not assigned!");
             return;
         }
 
         if (numberSprites == null || numberSprites.Length < 10)
         {
-            Debug.LogError("[UIManager] Number sprites not assigned!");
             return;
         }
 
@@ -956,12 +929,11 @@ public class UIManager : MonoBehaviour
 
         // Calculate total needed digits
         int digitCount = amountStr.Replace(".", "").Length;
-        
-        Debug.Log($"[UIManager] Displaying win: {amountStr}, Has Decimal: {hasDecimal}, Digit Count: {digitCount}, Total Objects: {totalObjects}");
+
 
         // Position in array from right to left (index 5 is rightmost)
         int arrayIndex = winAmountDigits.Length - 1;
-        
+
         // Process string from right to left
         for (int charIndex = amountStr.Length - 1; charIndex >= 0 && arrayIndex >= 0; charIndex--)
         {
@@ -978,18 +950,17 @@ public class UIManager : MonoBehaviour
             else if (char.IsDigit(c))
             {
                 int num = int.Parse(c.ToString());
-                
+
                 if (winAmountDigits[arrayIndex])
                 {
                     winAmountDigits[arrayIndex].gameObject.SetActive(true);
                     winAmountDigits[arrayIndex].sprite = numberSprites[num];
                 }
-                
+
                 arrayIndex--;
             }
         }
 
-        Debug.Log($"[UIManager] Win amount display set: {amountStr}");
     }
 
     /// <summary>
@@ -1004,7 +975,6 @@ public class UIManager : MonoBehaviour
     {
         if (winAmountLayoutGroup == null)
         {
-            Debug.LogWarning("[UIManager] Win amount layout group not assigned!");
             return;
         }
 
@@ -1030,12 +1000,10 @@ public class UIManager : MonoBehaviour
                 break;
             default:
                 spacing = 0f;
-                Debug.LogWarning($"[UIManager] Unexpected object count: {objectCount}");
                 break;
         }
 
         winAmountLayoutGroup.spacing = spacing;
-        Debug.Log($"[UIManager] Layout spacing set to {spacing} for {objectCount} objects");
     }
 
     #endregion
@@ -1059,7 +1027,7 @@ public class UIManager : MonoBehaviour
         if (!popupRect) return;
 
         Sequence closeSeq = DOTween.Sequence();
-        
+
         closeSeq.Append(popupRect.DOScale(1.1f, 0.1f));
         closeSeq.Append(popupRect.DOScale(0f, 0.2f).SetEase(Ease.InBack));
         closeSeq.OnComplete(() => {
@@ -1089,7 +1057,7 @@ public class UIManager : MonoBehaviour
         if (balanceTween != null) balanceTween.Kill();
 
         double oldBalance = gameManager.playerData.balance;
-        
+
         balanceTween = DOTween.To(
             () => oldBalance,
             x => {
@@ -1122,7 +1090,6 @@ public class UIManager : MonoBehaviour
             .SetEase(Ease.OutCubic)
             .OnComplete(() => {
                 UpdateWinDisplay(winAmount);
-                Debug.Log($"[UIManager] Win count animation completed: {winAmount:F2}");
             });
         }
         else
@@ -1139,23 +1106,15 @@ public class UIManager : MonoBehaviour
     {
         if (betPlusButton) betPlusButton.interactable = enabled;
         if (betMinusButton) betMinusButton.interactable = enabled;
-        
-        // Re-apply min/max button states if enabling
-        if (enabled)
-        {
-            UpdateBetButtonStates();
-        }
     }
 
     internal void ShowLowBalancePopup()
     {
-        Debug.Log("[UIManager] Low balance");
         if (lowBalancePopup) lowBalancePopup.SetActive(true);
     }
 
     internal void ShowDisconnectionPopup()
     {
-        Debug.Log("[UIManager] Disconnected");
         if (disconnectionPopup) disconnectionPopup.SetActive(true);
     }
 
@@ -1165,24 +1124,20 @@ public class UIManager : MonoBehaviour
 
     private void TestFreeSpinPopups()
     {
-        Debug.Log("[UIManager] Testing free spin popups");
-        
-      ShowFreeSpinStartPopup(1);
+
+        ShowFreeSpinStartPopup(1);
     }
 
     /*private IEnumerator TestFreeSpinSequence()
     {
-        Debug.Log("[UIManager] === TEST FREE SPIN CYCLE START ===");
         
         // Step 1: Show start popup with 1 spin
         ShowFreeSpinStartPopup(1);
-      /*  Debug.Log("[UIManager] Test: Start popup shown with 1 spin");
         
         // Wait 2 seconds to view the popup
         yield return new WaitForSeconds(2f);
         
         // Step 2: Close start popup (triggers background change and intro animation)
-        Debug.Log("[UIManager] Test: Closing start popup...");
         
         // Manually simulate popup close
         if (freeSpinStartPopup) freeSpinStartPopup.SetActive(false);
@@ -1190,13 +1145,11 @@ public class UIManager : MonoBehaviour
         // Step 3: Switch to free spin background
         if (normalSpinBackground) normalSpinBackground.SetActive(false);
         if (freeSpinBackground) freeSpinBackground.SetActive(true);
-        Debug.Log("[UIManager] Test: Background switched to free spin");
         
         // Step 4: Play free spin intro animation
         if (freeSpinIntroAnimation)
         {
             freeSpinIntroAnimation.SetActive(true);
-            Debug.Log("[UIManager] Test: Free spin intro animation playing");
         }
         
         yield return new WaitForSeconds(2f);
@@ -1207,7 +1160,6 @@ public class UIManager : MonoBehaviour
         }
         
         // Step 5: Simulate 1 spin happening (wait to represent spin duration)
-        Debug.Log("[UIManager] Test: Simulating 1 free spin...");
         
         // Show free spin count display (1 spin remaining)
         if (freeSpinCountContainer) freeSpinCountContainer.SetActive(false); // Hide count for last spin
@@ -1218,17 +1170,14 @@ public class UIManager : MonoBehaviour
         // Hide last spin indicator
         if (lastSpinLeftObject) lastSpinLeftObject.SetActive(false);
         
-        Debug.Log("[UIManager] Test: Spin complete");
         
         // Step 6: Show end popup with total win (example: 125.50)
         ShowFreeSpinEndPopup(125.50, 1);
-        Debug.Log("[UIManager] Test: End popup shown with win 125.50");
         
         // Wait 3 seconds to view the popup
         yield return new WaitForSeconds(3f);
         
         // Step 7: Close end popup (triggers background restore and intro animation)
-        Debug.Log("[UIManager] Test: Closing end popup...");
         
         // Manually simulate popup close
         if (freeSpinEndPopup) freeSpinEndPopup.SetActive(false);
@@ -1236,13 +1185,11 @@ public class UIManager : MonoBehaviour
         // Step 8: Switch back to normal background
         if (freeSpinBackground) freeSpinBackground.SetActive(false);
         if (normalSpinBackground) normalSpinBackground.SetActive(true);
-        Debug.Log("[UIManager] Test: Background switched to normal");
         
         // Step 9: Play free spin intro animation again (transition back)
         if (freeSpinIntroAnimation)
         {
             freeSpinIntroAnimation.SetActive(true);
-            Debug.Log("[UIManager] Test: Free spin intro animation playing (return to normal)");
         }
         
         yield return new WaitForSeconds(2f);
@@ -1251,9 +1198,8 @@ public class UIManager : MonoBehaviour
         {
             freeSpinIntroAnimation.SetActive(false);
         }
-        
-        Debug.Log("[UIManager] === TEST FREE SPIN CYCLE COMPLETE ===");*/
-    
+        */
+
 
     #endregion
 
@@ -1268,88 +1214,81 @@ public class UIManager : MonoBehaviour
 
     #endregion
     #region Connection Popup Management
- 
-/// <summary>
-/// Show reconnection popup when 2 pongs are missed (warning state)
-/// </summary>
-internal void ReconnectionPopup()
-{
-    Debug.Log("[UIManager] Showing reconnection popup");
-    
-    if (reconnectionPopup != null)
+
+    /// <summary>
+    /// Show reconnection popup when 2 pongs are missed (warning state)
+    /// </summary>
+    internal void ReconnectionPopup()
     {
-        reconnectionPopup.SetActive(true);
+
+        if (reconnectionPopup != null)
+        {
+            reconnectionPopup.SetActive(true);
+        }
     }
-}
- 
-/// <summary>
-/// Show disconnection popup when 5 pongs are missed (disconnect state)
-/// Auto-closes reconnection popup if showing
-/// </summary>
-internal void DisconnectionPopup()
-{
-    Debug.Log("[UIManager] Showing disconnection popup");
-    
-    // Close reconnection popup if it's showing
-    if (reconnectionPopup != null)
+
+    /// <summary>
+    /// Show disconnection popup when 5 pongs are missed (disconnect state)
+    /// Auto-closes reconnection popup if showing
+    /// </summary>
+    internal void DisconnectionPopup()
     {
-        reconnectionPopup.SetActive(false);
+
+        // Close reconnection popup if it's showing
+        if (reconnectionPopup != null)
+        {
+            reconnectionPopup.SetActive(false);
+        }
+
+        if (disconnectionPopup != null)
+        {
+            disconnectionPopup.SetActive(true);
+        }
     }
-    
-    if (disconnectionPopup != null)
+
+    /// <summary>
+    /// Check and close connection-related popups when connection recovers
+    /// Called from SocketIOManager when pong is received after missed pongs
+    /// </summary>
+    internal void CheckAndClosePopups()
     {
-        disconnectionPopup.SetActive(true);
+
+        if (reconnectionPopup != null && reconnectionPopup.activeSelf)
+        {
+            reconnectionPopup.SetActive(false);
+        }
+
+        if (disconnectionPopup != null && disconnectionPopup.activeSelf)
+        {
+            disconnectionPopup.SetActive(false);
+        }
     }
-}
- 
-/// <summary>
-/// Check and close connection-related popups when connection recovers
-/// Called from SocketIOManager when pong is received after missed pongs
-/// </summary>
-internal void CheckAndClosePopups()
-{
-    Debug.Log("[UIManager] Checking and closing connection popups");
-    
-    if (reconnectionPopup != null && reconnectionPopup.activeSelf)
+
+    /// <summary>
+    /// Show another device popup when user logs in from another device
+    /// </summary>
+    internal void AnotherDevicePopup()
     {
-        Debug.Log("[UIManager] Closing reconnection popup - connection restored");
-        reconnectionPopup.SetActive(false);
+
+        if (anotherDevicePopup != null)
+        {
+            anotherDevicePopup.SetActive(true);
+        }
     }
-    
-    if (disconnectionPopup != null && disconnectionPopup.activeSelf)
+
+    /// <summary>
+    /// Exit game and return to platform
+    /// </summary>
+    private void OnExitButtonPressed()
     {
-        Debug.Log("[UIManager] Closing disconnection popup - connection restored");
-        disconnectionPopup.SetActive(false);
+
+        if (gameManager != null)
+        {
+            gameManager.ExitGame();
+        }
     }
-}
- 
-/// <summary>
-/// Show another device popup when user logs in from another device
-/// </summary>
-internal void AnotherDevicePopup()
-{
-    Debug.Log("[UIManager] Showing another device popup");
-    
-    if (anotherDevicePopup != null)
-    {
-        anotherDevicePopup.SetActive(true);
-    }
-}
- 
-/// <summary>
-/// Exit game and return to platform
-/// </summary>
-private void OnExitButtonPressed()
-{
-    Debug.Log("[UIManager] Exit button pressed");
-    
-    if (gameManager != null)
-    {
-        gameManager.ExitGame();
-    }
-}
- 
-#endregion
+
+    #endregion      
 }
 
 [System.Serializable]

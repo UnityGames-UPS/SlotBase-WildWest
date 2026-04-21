@@ -8,52 +8,39 @@ using Newtonsoft.Json;
 
 public class SocketIOManager : MonoBehaviour
 {
-    #region Configuration
     [Header("Configuration")]
     [SerializeField] internal bool useDemoMode = false;
-    [SerializeField] string testToken = "test-token";
-    protected string testSocketURL = "https://devrealtime.dingdinghouse.com/";
-    protected string nameSpace = "playground";
-    protected string gameID = "SL-WW";
+    [SerializeField] private string testToken = "test-token";
+    [SerializeField] private string testSocketURL = "https://devrealtime.dingdinghouse.com/";
+    [SerializeField] private string nameSpace = "playground";
+    [SerializeField] private string gameID = "SL-WW";
 
     [Header("Scatter Configuration")]
     [SerializeField] private int scatterSymbolId = 12;
     [SerializeField] private int scattersRequiredForFreeSpin = 3;
-    #endregion
 
-    #region References
     [Header("References")]
     [SerializeField] private GameManager gameManager;
     [SerializeField] private UIManager uiManager;
     [SerializeField] internal JSFunctCalls JSManager;
     [SerializeField] private GameObject RaycastBlocker;
-    #endregion
 
-    #region Socket Objects
     private SocketManager socketManager;
     private Socket gameSocket;
-    #endregion
 
-    #region Authentication
     private string authToken;
     private string socketURL;
-    #endregion
 
-    #region State Flags
     internal bool isConnected;
     internal bool isInitialized;
-    private bool hasEverConnected = false;
-    #endregion
 
-    #region Ping/Pong Health Monitoring
     private Coroutine pingCoroutine;
     private float lastPongTime;
     private bool waitingForPong;
     private int missedPongs;
-    private const int MAX_MISSED_PONGS = 5;
+    private const int MAX_MISSED_PONGS = 3;
     private const float PING_INTERVAL = 2f;
-    private const float PONG_TIMEOUT = 3f;
-    #endregion
+    private const float PONG_TIMEOUT = 5f;
 
     #region Initialization
 
@@ -71,28 +58,28 @@ public class SocketIOManager : MonoBehaviour
         }
         else
         {
-            InitializeSocketConnection();
+            RequestAuthToken();
         }
     }
 
-    private void InitializeSocketConnection()
+    private void RequestAuthToken()
     {
 #if UNITY_WEBGL && !UNITY_EDITOR
         if (JSManager != null)
         {
             JSManager.SendCustomMessage("authToken");
         }
-        StartCoroutine(WaitForAuthAndConnect());
 #else
         authToken = testToken;
         socketURL = testSocketURL;
-        SetupSocketManager();
+        InitializeSocket();
 #endif
     }
 
     void ReceiveAuthToken(string jsonData)
     {
-        Debug.Log($"[SocketIO] Auth data received");
+        Debug.Log($"[SocketIO] Auth received");
+
         try
         {
             var authData = JsonUtility.FromJson<AuthTokenData>(jsonData);
@@ -103,46 +90,28 @@ public class SocketIOManager : MonoBehaviour
             {
                 nameSpace = authData.nameSpace;
             }
+
+            InitializeSocket();
         }
         catch (Exception e)
         {
-            Debug.LogError($"[SocketIO] Failed to parse auth data: {e.Message}");
+            Debug.LogError($"[SocketIO] Auth parse failed: {e.Message}");
         }
     }
 
-    private IEnumerator WaitForAuthAndConnect()
-    {
-        while (authToken == null)
-        {
-            yield return null;
-        }
-
-        while (socketURL == null)
-        {
-            yield return null;
-        }
-
-        SetupSocketManager();
-    }
-
-    private void SetupSocketManager()
+    private void InitializeSocket()
     {
         if (RaycastBlocker) RaycastBlocker.SetActive(true);
 
-        SocketOptions options = new SocketOptions();
-        options.AutoConnect = false;
-        options.Reconnection = false;
-        options.Timeout = TimeSpan.FromSeconds(3);
-        options.ConnectWith = Best.SocketIO.Transports.TransportTypes.WebSocket;
-
-        object authFunction(SocketManager manager, Socket socket)
+        SocketOptions options = new SocketOptions
         {
-            return new
-            {
-                token = authToken
-            };
-        }
-        options.Auth = authFunction;
+            AutoConnect = false,
+            Reconnection = false,
+            Timeout = TimeSpan.FromSeconds(3),
+            ConnectWith = Best.SocketIO.Transports.TransportTypes.WebSocket
+        };
+
+        options.Auth = (SocketManager manager, Socket socket) => new { token = authToken };
 
 #if UNITY_EDITOR
         socketManager = new SocketManager(new Uri(testSocketURL), options);
@@ -150,24 +119,16 @@ public class SocketIOManager : MonoBehaviour
         socketManager = new SocketManager(new Uri(socketURL), options);
 #endif
 
-        if (string.IsNullOrEmpty(nameSpace))
-        {
-            gameSocket = socketManager.Socket;
-        }
-        else
-        {
-            gameSocket = socketManager.GetSocket("/" + nameSpace);
-        }
+        gameSocket = string.IsNullOrEmpty(nameSpace)
+            ? socketManager.Socket
+            : socketManager.GetSocket("/" + nameSpace);
 
-        gameSocket.On<ConnectResponse>(SocketIOEventTypes.Connect, OnConnected);
-        gameSocket.On(SocketIOEventTypes.Disconnect, OnDisconnected);
-        gameSocket.On<Error>(SocketIOEventTypes.Error, OnError);
+        gameSocket.On<ConnectResponse>(SocketIOEventTypes.Connect, OnSocketConnected);
+        gameSocket.On(SocketIOEventTypes.Disconnect, OnSocketDisconnected);
+        gameSocket.On<Error>(SocketIOEventTypes.Error, OnSocketError);
 
         gameSocket.On<string>("game:init", OnInitReceived);
         gameSocket.On<string>("result", OnResultReceived);
-        gameSocket.On<bool>("socketState", OnSocketState);
-        gameSocket.On<string>("internalError", OnInternalError);
-        gameSocket.On<string>("alert", OnAlert);
         gameSocket.On<string>("pong", OnPongReceived);
         gameSocket.On<string>("AnotherDevice", OnAnotherDevice);
 
@@ -176,29 +137,28 @@ public class SocketIOManager : MonoBehaviour
 
     #endregion
 
-    #region Socket Event Handlers
+    #region Socket Events
 
-    private void OnConnected(ConnectResponse resp)
+    private void OnSocketConnected(ConnectResponse resp)
     {
-        Debug.Log("[SocketIO] Connected to server");
-
-        if (hasEverConnected && uiManager != null)
-        {
-            uiManager.CheckAndClosePopups();
-        }
+        Debug.Log("[SocketIO] Connected");
 
         isConnected = true;
-        hasEverConnected = true;
         waitingForPong = false;
         missedPongs = 0;
         lastPongTime = Time.time;
 
+        if (uiManager != null)
+        {
+            uiManager.CheckAndClosePopups();
+        }
+
         StartPingRoutine();
     }
 
-    private void OnDisconnected()
+    private void OnSocketDisconnected()
     {
-        Debug.LogWarning("[SocketIO] Disconnected from server");
+        Debug.Log("[SocketIO] Disconnected");
 
         isConnected = false;
         StopPingRoutine();
@@ -214,9 +174,9 @@ public class SocketIOManager : MonoBehaviour
         }
     }
 
-    private void OnError(Error err)
+    private void OnSocketError(Error err)
     {
-        Debug.LogError($"[SocketIO] Socket Error: {err.message}");
+        Debug.LogError($"[SocketIO] Error: {err.message}");
 
 #if UNITY_WEBGL && !UNITY_EDITOR
         if (JSManager != null)
@@ -228,7 +188,7 @@ public class SocketIOManager : MonoBehaviour
 
     private void OnInitReceived(string jsonData)
     {
-        Debug.Log("[SocketIO] Init data received" + jsonData);
+        Debug.Log($"[SocketIO] Init received: {jsonData}");
 
         try
         {
@@ -236,10 +196,10 @@ public class SocketIOManager : MonoBehaviour
 
             var gameConfig = InitDataConverter.ConvertToGameConfig(initData);
             var playerData = InitDataConverter.ConvertToPlayerData(initData.player);
-
-            List<List<int>> initialMatrix = GenerateRandomMatrix();
+            var initialMatrix = GenerateRandomMatrix();
 
             isInitialized = true;
+
             gameManager.OnInitDataReceived(gameConfig, playerData, initialMatrix);
 
             if (RaycastBlocker) RaycastBlocker.SetActive(false);
@@ -253,13 +213,13 @@ public class SocketIOManager : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.LogError($"[SocketIO] Failed to parse init data: {e.Message}");
+            Debug.LogError($"[SocketIO] Init parse failed: {e.Message}");
         }
     }
 
     private void OnResultReceived(string jsonData)
     {
-        Debug.Log("[SocketIO] Result received" + jsonData);
+        Debug.Log($"[SocketIO] Result received: {jsonData}");
 
         try
         {
@@ -267,11 +227,10 @@ public class SocketIOManager : MonoBehaviour
 
             if (!serverResponse.success)
             {
-                Debug.LogError("[SocketIO] Server returned unsuccessful spin result");
+                Debug.LogError("[SocketIO] Spin failed");
                 return;
             }
 
-            // CRITICAL FIX: Use converter with proper balance calculation
             double currentBalance = gameManager.playerData.balance;
             double betAmount = gameManager.currentBetAmount;
             GameConfig gameConfig = gameManager.gameConfig;
@@ -283,37 +242,23 @@ public class SocketIOManager : MonoBehaviour
                 gameConfig
             );
 
-            Debug.Log($"[SocketIO] Converted result - Matrix: {result.resultMatrix.Count} cols, Win: {result.winAmount}, Balance: {result.playerData.balance}");
+            result.playerData.currentBetIndex = gameManager.currentBetIndex;
 
             gameManager.OnSpinResultReceived(result);
         }
         catch (Exception e)
         {
-            Debug.LogError($"[SocketIO] Failed to parse result: {e.Message}\nStack: {e.StackTrace}");
+            Debug.LogError($"[SocketIO] Result parse failed: {e.Message}");
         }
-    }
-
-    private void OnSocketState(bool state)
-    {
-        Debug.Log($"[SocketIO] Socket state: {state}");
-    }
-
-    private void OnInternalError(string errorData)
-    {
-        Debug.LogError($"[SocketIO] Internal error: {errorData}");
-    }
-
-    private void OnAlert(string alertData)
-    {
-        Debug.LogWarning($"[SocketIO] Alert: {alertData}");
     }
 
     private void OnAnotherDevice(string data)
     {
-        Debug.LogWarning("[SocketIO] Another device connected");
+        Debug.Log("[SocketIO] Another device login");
+
         if (uiManager != null)
         {
-          //  uiManager.ShowAnotherDevicePopup();
+            uiManager.AnotherDevicePopup();
         }
     }
 
@@ -323,8 +268,10 @@ public class SocketIOManager : MonoBehaviour
 
     private void StartPingRoutine()
     {
-        StopPingRoutine();
-        pingCoroutine = StartCoroutine(PingHeartbeat());
+        if (pingCoroutine != null)
+            StopCoroutine(pingCoroutine);
+
+        pingCoroutine = StartCoroutine(PingRoutine());
     }
 
     private void StopPingRoutine()
@@ -336,36 +283,43 @@ public class SocketIOManager : MonoBehaviour
         }
     }
 
-    private IEnumerator PingHeartbeat()
+    private IEnumerator PingRoutine()
     {
         while (isConnected)
         {
             yield return new WaitForSeconds(PING_INTERVAL);
 
-            if (uiManager != null)
-            {
-                uiManager.CheckAndClosePopups();
-            }
-
             if (waitingForPong)
             {
                 float timeSinceLastPong = Time.time - lastPongTime;
 
-                if (timeSinceLastPong >= PONG_TIMEOUT)
+                if (timeSinceLastPong > PONG_TIMEOUT)
                 {
                     missedPongs++;
-                    Debug.LogWarning($"[SocketIO] Missed pong {missedPongs}/{MAX_MISSED_PONGS}");
 
                     if (missedPongs >= MAX_MISSED_PONGS)
                     {
-                        Debug.LogError("[SocketIO] Connection unhealthy - too many missed pongs");
-                        OnDisconnected();
+                        Debug.LogWarning("[SocketIO] Max pongs missed - disconnecting");
+                        OnSocketDisconnected();
                         yield break;
+                    }
+
+                    if (missedPongs == 2 && uiManager != null)
+                    {
+                        uiManager.ReconnectionPopup();
                     }
                 }
             }
 
+            SendPing();
             waitingForPong = true;
+        }
+    }
+
+    private void SendPing()
+    {
+        if (gameSocket != null && isConnected)
+        {
             gameSocket.Emit("ping");
         }
     }
@@ -373,13 +327,22 @@ public class SocketIOManager : MonoBehaviour
     private void OnPongReceived(string data)
     {
         waitingForPong = false;
-        missedPongs = 0;
         lastPongTime = Time.time;
+
+        if (missedPongs > 0)
+        {
+            missedPongs = 0;
+
+            if (uiManager != null)
+            {
+                uiManager.CheckAndClosePopups();
+            }
+        }
     }
 
     #endregion
 
-    #region Send Requests
+    #region Spin Request
 
     internal void SendSpinRequest(int betIndex, bool isFreeSpin)
     {
@@ -388,6 +351,8 @@ public class SocketIOManager : MonoBehaviour
             SendDemoSpinRequest(betIndex, isFreeSpin);
             return;
         }
+
+        Debug.Log($"[SocketIO] Spin request: betIndex={betIndex}, isFreeSpin={isFreeSpin}");
 
         var request = new SpinRequest
         {
@@ -400,10 +365,7 @@ public class SocketIOManager : MonoBehaviour
         };
 
         string json = JsonUtility.ToJson(request);
-        Debug.Log($"[SocketIO] Sending spin request - BetIndex: {betIndex}, IsFreeSpin: {isFreeSpin}");
-
         gameSocket.Emit("request", json);
-        Debug.Log($"[SocketIO] Spin request sent: {json}");
     }
 
     #endregion
@@ -444,7 +406,6 @@ public class SocketIOManager : MonoBehaviour
         yield return new WaitForSeconds(UnityEngine.Random.Range(0.3f, 0.8f));
 
         var result = GenerateDemoSpinResult(betIndex, isFreeSpin);
-
         gameManager.OnSpinResultReceived(result);
     }
 
@@ -656,6 +617,11 @@ public class SocketIOManager : MonoBehaviour
 #endif
     }
 
+    private void OnDisable()
+    {
+        StopPingRoutine();
+    }
+
     private void OnDestroy()
     {
         CloseSocket();
@@ -664,8 +630,6 @@ public class SocketIOManager : MonoBehaviour
     #endregion
 }
 
-#region Data Models
-
 [Serializable]
 public class AuthTokenData
 {
@@ -673,5 +637,3 @@ public class AuthTokenData
     public string socketURL;
     public string nameSpace;
 }
-
-#endregion

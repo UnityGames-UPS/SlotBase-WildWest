@@ -69,24 +69,18 @@ public class GameManager : MonoBehaviour
     {
         if (currentState != GameState.Idle || isAutoPlaying) return;
 
-        if (currentBetIndex < gameConfig.availableBets.Count - 1)
-        {
-            currentBetIndex++;
-            UpdateBetAmount();
-            uiManager.UpdateBetDisplay();
-        }
+        currentBetIndex = (currentBetIndex + 1) % gameConfig.availableBets.Count;
+        UpdateBetAmount();
+        uiManager.UpdateBetDisplay();
     }
 
     internal void DecreaseBet()
     {
         if (currentState != GameState.Idle || isAutoPlaying) return;
 
-        if (currentBetIndex > 0)
-        {
-            currentBetIndex--;
-            UpdateBetAmount();
-            uiManager.UpdateBetDisplay();
-        }
+        currentBetIndex = (currentBetIndex - 1 + gameConfig.availableBets.Count) % gameConfig.availableBets.Count;
+        UpdateBetAmount();
+        uiManager.UpdateBetDisplay();
     }
 
     private void UpdateBetAmount()
