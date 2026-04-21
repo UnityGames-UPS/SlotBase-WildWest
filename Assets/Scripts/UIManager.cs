@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
 using System.Collections;
+using System.Collections.Generic;
 
 public class UIManager : MonoBehaviour
 {
@@ -20,16 +21,16 @@ public class UIManager : MonoBehaviour
     [Header("Loading Settings - Random Stops")]
     [SerializeField] private int minStops = 2;
     [SerializeField] private int maxStops = 3;
-    [SerializeField] private float minStopPosition = 0.2f; // Don't stop before 20%
-    [SerializeField] private float maxStopPosition = 0.9f; // Don't stop after 90%
+    [SerializeField] private float minStopPosition = 0.2f;
+    [SerializeField] private float maxStopPosition = 0.9f;
     [SerializeField] private float minStopDuration = 0.2f;
     [SerializeField] private float maxStopDuration = 0.5f;
-    [SerializeField] private float loadingSpeed = 0.5f; // Fill amount per second
+    [SerializeField] private float loadingSpeed = 0.5f;
     [SerializeField] private float introAnimDuration = 2f;
 
     [Header("Backgrounds")]
-    [SerializeField] private GameObject normalSpinBackground; // Normal game background
-    [SerializeField] private GameObject freeSpinBackground; // Free spin mode background
+    [SerializeField] private GameObject normalSpinBackground;
+    [SerializeField] private GameObject freeSpinBackground;
 
     [Header("Bet Controls")]
     [SerializeField] private TMP_Text betAmountText;
@@ -37,19 +38,19 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button betMinusButton;
 
     [Header("Max Bet Indicator")]
-    [SerializeField] private GameObject maxBetObject; // Object to show when max bet is selected
-    [SerializeField] private float maxBetDisplayDuration = 1f; // How long to show the indicator
+    [SerializeField] private GameObject maxBetObject;
+    [SerializeField] private float maxBetDisplayDuration = 1f;
 
     [Header("Balance & Win")]
     [SerializeField] private TMP_Text balanceText;
     [SerializeField] private TMP_Text winAmountText;
 
     [Header("Display Panel - Game Rules & Win")]
-    [SerializeField] private GameObject displayPanel; // Parent panel
-    [SerializeField] private GameObject gameRuleObject; // Shows by default
-    [SerializeField] private GameObject winDisplayObject; // Shows when player wins
-    [SerializeField] private TMP_Text winDisplayText; // Text showing "WIN X"
-    [SerializeField] private float winDisplayDuration = 1f; // How long to show win display
+    [SerializeField] private GameObject displayPanel;
+    [SerializeField] private GameObject gameRuleObject;
+    [SerializeField] private GameObject winDisplayObject;
+    [SerializeField] private TMP_Text winDisplayText;
+    [SerializeField] private float winDisplayDuration = 1f;
 
     [Header("Spin Button")]
     [SerializeField] private Button spinButton;
@@ -73,14 +74,35 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject autoPlayCountDisplay;
     [SerializeField] private TMP_Text autoPlayCountText;
 
-    [Header("Free Spin Count Display - Game Screen")]
-    [SerializeField] private GameObject freeSpinCountContainer; // Container for count display
-    [SerializeField] private Image freeSpinCountTens; // Tens digit
-    [SerializeField] private Image freeSpinCountOnes; // Ones digit
-    [SerializeField] private Sprite[] freeSpinNumberSprites; // 0-9 sprites for game screen (different from popup)
-    [SerializeField] private GameObject lastSpinLeftObject; // Shows on last spin
-    [SerializeField] private GameObject buyFreeSpinObject; // Shows after free spins end
+    [Header("Settings Panel")]
+    [SerializeField] private GameObject settingsPanel;
+    [SerializeField] private RectTransform settingsPanelRect;
+    [SerializeField] private Button settingsOpenButton;
+    [SerializeField] private Button settingsCloseButton;
 
+    [Header("Settings - Spin Speed Toggles (mirrored in AutoPlay)")]
+    [SerializeField] private Toggle settingsTurboToggle;
+    [SerializeField] private Toggle settingsQuickSpinToggle;
+
+    [Header("Game Rules Panel")]
+    [SerializeField] private GameObject gameRulesPanel;
+    [SerializeField] private RectTransform gameRulesPanelRect;
+    [SerializeField] private Button gameRulesOpenButton;
+    [SerializeField] private Button gameRulesBackButton;
+    [SerializeField] private Button gameRulesNextPageButton;
+    [SerializeField] private Button gameRulesPrevPageButton;
+
+    [Tooltip("Assign exactly 6 page RectTransforms that live inside the panel.")]
+    [SerializeField] private RectTransform[] gameRulePages;
+    [SerializeField] private float pageSlideWidth = 800f;
+
+    [Header("Free Spin Count Display - Game Screen")]
+    [SerializeField] private GameObject freeSpinCountContainer;
+    [SerializeField] private Image freeSpinCountTens;
+    [SerializeField] private Image freeSpinCountOnes;
+    [SerializeField] private Sprite[] freeSpinNumberSprites;
+    [SerializeField] private GameObject lastSpinLeftObject;
+    [SerializeField] private GameObject buyFreeSpinObject;
 
     [Header("Free Spin Start Popup")]
     [SerializeField] private GameObject freeSpinStartPopup;
@@ -89,7 +111,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button freeSpinStartCloseButton;
     [SerializeField] private Image freeSpinStartCountTens;
     [SerializeField] private Image freeSpinStartCountOnes;
-    [SerializeField] private Sprite[] numberSprites; // 0-9 sprites for popups
+    [SerializeField] private Sprite[] numberSprites;
 
     [Header("Free Spin End Popup")]
     [SerializeField] private GameObject freeSpinEndPopup;
@@ -98,10 +120,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button freeSpinEndCloseButton;
 
     [Header("Free Spin End - Win Amount Display")]
-    [SerializeField] private Transform winAmountContainer; // Horizontal layout group container
-    [SerializeField] private HorizontalLayoutGroup winAmountLayoutGroup; // Reference to the layout group
-    [SerializeField] private Image[] winAmountDigits; // 6 images for digits (123.33)
-    [SerializeField] private GameObject decimalPointObject; // Decimal point object
+    [SerializeField] private Transform winAmountContainer;
+    [SerializeField] private HorizontalLayoutGroup winAmountLayoutGroup;
+    [SerializeField] private Image[] winAmountDigits;
+    [SerializeField] private GameObject decimalPointObject;
 
     [Header("Free Spin End - Total Spin Count")]
     [SerializeField] private Image freeSpinEndCountTens;
@@ -140,32 +162,31 @@ public class UIManager : MonoBehaviour
     private Coroutine maxBetCoroutine;
     private Coroutine winDisplayCoroutine;
 
+    private int currentRulesPage = 0;
+    private bool isPageAnimating = false;
+    private bool isSyncingToggles = false;
+
     #region Initialization
 
     private void Start()
     {
         SetupButtons();
         SetupAutoPlayPanel();
+        SetupSettingsPanel();
+        SetupGameRulesPanel();
 
-        // Initialize display panel
         InitializeDisplayPanel();
 
-        // Hide max bet indicator initially
         if (maxBetObject) maxBetObject.SetActive(false);
 
-        // Initialize backgrounds
         InitializeBackgrounds();
-
-        // Start with loading sequence
         StartCoroutine(LoadingSequence());
     }
 
     private void InitializeBackgrounds()
     {
-        // Start with normal background active, free spin background hidden
         if (normalSpinBackground) normalSpinBackground.SetActive(true);
         if (freeSpinBackground) freeSpinBackground.SetActive(false);
-
     }
 
     private void InitializeUI()
@@ -176,15 +197,16 @@ public class UIManager : MonoBehaviour
         if (autoPlayPanel) autoPlayPanel.SetActive(false);
         if (autoPlayCountDisplay) autoPlayCountDisplay.SetActive(false);
 
+        if (settingsPanel) settingsPanel.SetActive(false);
+        if (gameRulesPanel) gameRulesPanel.SetActive(false);
+
         if (lowBalancePopup) lowBalancePopup.SetActive(false);
         if (disconnectionPopup) disconnectionPopup.SetActive(false);
 
-        // Initialize free spin count display on game screen
         if (freeSpinCountContainer) freeSpinCountContainer.SetActive(false);
         if (lastSpinLeftObject) lastSpinLeftObject.SetActive(false);
         if (buyFreeSpinObject) buyFreeSpinObject.SetActive(false);
 
-        // Initialize free spin popups
         if (freeSpinStartPopup) freeSpinStartPopup.SetActive(false);
         if (freeSpinEndPopup) freeSpinEndPopup.SetActive(false);
 
@@ -192,15 +214,12 @@ public class UIManager : MonoBehaviour
         if (anotherDevicePopup) anotherDevicePopup.SetActive(false);
 
         UpdateAutoPlayButtonText();
-
     }
 
     private void InitializeDisplayPanel()
     {
-        // Show game rules by default, hide win display
         if (gameRuleObject) gameRuleObject.SetActive(true);
         if (winDisplayObject) winDisplayObject.SetActive(false);
-
     }
 
     #endregion
@@ -209,91 +228,61 @@ public class UIManager : MonoBehaviour
 
     private IEnumerator LoadingSequence()
     {
-        // Initial setup - show loading screen, hide game screen
         if (loadingScreen) loadingScreen.SetActive(true);
         if (gameScreen) gameScreen.SetActive(false);
         if (introAnimationObject) introAnimationObject.SetActive(false);
 
-        // Initialize loading bar
         if (loadingBarFill)
         {
             loadingBarFill.fillAmount = 0f;
             UpdateLoadingBarEndMarker(0f);
         }
 
-
-        // Generate random stop points
         int numberOfStops = Random.Range(minStops, maxStops + 1);
         float[] stopPoints = GenerateRandomStopPoints(numberOfStops);
 
-
-        // Fill to each stop point
         float currentFill = 0f;
         for (int i = 0; i < stopPoints.Length; i++)
         {
             yield return StartCoroutine(FillLoadingBar(currentFill, stopPoints[i]));
-
-            // Pause at stop point with random duration
             float pauseDuration = Random.Range(minStopDuration, maxStopDuration);
             yield return new WaitForSeconds(pauseDuration);
-
             currentFill = stopPoints[i];
         }
 
-        // Final fill to 100%
         yield return StartCoroutine(FillLoadingBar(currentFill, 1f));
 
-
-        // Show intro animation
-        if (introAnimationObject)
-        {
-            introAnimationObject.SetActive(true);
-        }
-
+        if (introAnimationObject) introAnimationObject.SetActive(true);
         yield return new WaitForSeconds(introAnimDuration);
 
-        // Hide loading screen and intro animation
         if (loadingScreen) loadingScreen.SetActive(false);
         if (introAnimationObject) introAnimationObject.SetActive(false);
 
-        // Enable game screen
         if (gameScreen) gameScreen.SetActive(true);
-
-        // Initialize UI
         InitializeUI();
-
     }
 
     private float[] GenerateRandomStopPoints(int count)
     {
         float[] stops = new float[count];
-
         for (int i = 0; i < count; i++)
-        {
             stops[i] = Random.Range(minStopPosition, maxStopPosition);
-        }
-
-        // Sort to ensure increasing order
         System.Array.Sort(stops);
-
         return stops;
     }
 
     private IEnumerator FillLoadingBar(float fromFill, float toFill)
     {
         float currentFill = fromFill;
-
         while (currentFill < toFill)
         {
             currentFill += loadingSpeed * Time.deltaTime;
             currentFill = Mathf.Min(currentFill, toFill);
-
             if (loadingBarFill)
             {
                 loadingBarFill.fillAmount = currentFill;
                 UpdateLoadingBarEndMarker(currentFill);
             }
-
             yield return null;
         }
     }
@@ -301,34 +290,17 @@ public class UIManager : MonoBehaviour
     private void UpdateLoadingBarEndMarker(float fillAmount)
     {
         if (!loadingBarEndMarker || !loadingBarFill) return;
-
-        // Calculate the position of the end marker based on fill amount
         RectTransform barRect = loadingBarFill.rectTransform;
         float barWidth = barRect.rect.width;
-
-        // Position the marker at the end of the filled portion
         float xPosition = (fillAmount - 0.5f) * barWidth;
-
         loadingBarEndMarker.anchoredPosition = new Vector2(xPosition, loadingBarEndMarker.anchoredPosition.y);
     }
 
-    /// <summary>
-    /// Show intro animation for 2 seconds (called from free spin flows)
-    /// </summary>
     private IEnumerator ShowFreeSpinIntroAnimation(System.Action onComplete)
     {
-        if (freeSpinIntroAnimation)
-        {
-            freeSpinIntroAnimation.SetActive(true);
-        }
-
+        if (freeSpinIntroAnimation) freeSpinIntroAnimation.SetActive(true);
         yield return new WaitForSeconds(freeSpinIntroDuration);
-
-        if (freeSpinIntroAnimation)
-        {
-            freeSpinIntroAnimation.SetActive(false);
-        }
-
+        if (freeSpinIntroAnimation) freeSpinIntroAnimation.SetActive(false);
         onComplete?.Invoke();
     }
 
@@ -349,16 +321,9 @@ public class UIManager : MonoBehaviour
         if (freeSpinStartCloseButton) freeSpinStartCloseButton.onClick.AddListener(CloseFreeSpinStartPopup);
         if (freeSpinEndCloseButton) freeSpinEndCloseButton.onClick.AddListener(CloseFreeSpinEndPopup);
 
-        if (lowBalanceCloseButton) lowBalanceCloseButton.onClick.AddListener(() => {
-            if (lowBalancePopup) lowBalancePopup.SetActive(false);
-        });
+        if (lowBalanceCloseButton)
+            lowBalanceCloseButton.onClick.AddListener(() => { if (lowBalancePopup) lowBalancePopup.SetActive(false); });
 
-        if (disconnectionCloseButton) disconnectionCloseButton.onClick.AddListener(() => {
-            if (disconnectionPopup) disconnectionPopup.SetActive(false);
-        });
-
-        if (testFreeSpinButton) testFreeSpinButton.onClick.AddListener(TestFreeSpinPopups);
-        // Connection popup buttons
         if (disconnectionCloseButton)
         {
             disconnectionCloseButton.onClick.RemoveAllListeners();
@@ -370,12 +335,17 @@ public class UIManager : MonoBehaviour
             anotherDeviceCloseButton.onClick.RemoveAllListeners();
             anotherDeviceCloseButton.onClick.AddListener(OnExitButtonPressed);
         }
+
+        if (testFreeSpinButton) testFreeSpinButton.onClick.AddListener(TestFreeSpinPopups);
     }
 
     private void SetupAutoPlayPanel()
     {
         if (turboToggle) turboToggle.onValueChanged.AddListener(OnTurboToggleChanged);
         if (quickSpinToggle) quickSpinToggle.onValueChanged.AddListener(OnQuickSpinToggleChanged);
+
+        RefreshToggleBgAlpha(turboToggle);
+        RefreshToggleBgAlpha(quickSpinToggle);
 
         foreach (var roundButton in roundButtons)
         {
@@ -385,6 +355,31 @@ public class UIManager : MonoBehaviour
                 roundButton.button.onClick.AddListener(() => SelectAutoPlayRounds(rounds));
             }
         }
+    }
+
+    private void SetupSettingsPanel()
+    {
+        if (settingsOpenButton) settingsOpenButton.onClick.AddListener(OpenSettingsPanel);
+        if (settingsCloseButton) settingsCloseButton.onClick.AddListener(CloseSettingsPanel);
+
+        if (settingsTurboToggle)
+        {
+            settingsTurboToggle.onValueChanged.AddListener(OnSettingsTurboToggleChanged);
+            RefreshToggleBgAlpha(settingsTurboToggle);
+        }
+        if (settingsQuickSpinToggle)
+        {
+            settingsQuickSpinToggle.onValueChanged.AddListener(OnSettingsQuickSpinToggleChanged);
+            RefreshToggleBgAlpha(settingsQuickSpinToggle);
+        }
+    }
+
+    private void SetupGameRulesPanel()
+    {
+        if (gameRulesOpenButton) gameRulesOpenButton.onClick.AddListener(OpenGameRulesPanel);
+        if (gameRulesBackButton) gameRulesBackButton.onClick.AddListener(CloseGameRulesPanel);
+        if (gameRulesNextPageButton) gameRulesNextPageButton.onClick.AddListener(NextRulesPage);
+        if (gameRulesPrevPageButton) gameRulesPrevPageButton.onClick.AddListener(PrevRulesPage);
     }
 
     #endregion
@@ -406,7 +401,6 @@ public class UIManager : MonoBehaviour
         SetBetControlsEnabled(false);
         if (autoPlayOpenButton) autoPlayOpenButton.interactable = false;
 
-        // Hide win display, show game rules
         if (winDisplayCoroutine != null)
         {
             StopCoroutine(winDisplayCoroutine);
@@ -418,15 +412,11 @@ public class UIManager : MonoBehaviour
 
     internal void OnSpinStopping(SpinResult result)
     {
-        // Update balance with animation
         AnimateBalanceUpdate(result.playerData.balance);
 
-        // Update win amount with animation
         if (result.winAmount > 0)
         {
             AnimateWinUpdate(result.winAmount);
-
-            // Show win display temporarily
             ShowWinDisplay(result.winAmount);
         }
         else
@@ -449,7 +439,6 @@ public class UIManager : MonoBehaviour
 
     internal void DisableControlsDuringWinAnimation()
     {
-        // Keep controls disabled during win line animation
         SetBetControlsEnabled(false);
         if (spinButton) spinButton.interactable = false;
         if (spinNormalImage) spinNormalImage.SetActive(false);
@@ -458,7 +447,6 @@ public class UIManager : MonoBehaviour
 
     internal void EnableControlsAfterWinAnimation()
     {
-        // Re-enable controls after win animation
         if (!gameManager.isAutoPlaying && !gameManager.isInFreeSpins)
         {
             SetBetControlsEnabled(true);
@@ -471,29 +459,21 @@ public class UIManager : MonoBehaviour
 
     private void ShowWinDisplay(double winAmount)
     {
-        if (winDisplayCoroutine != null)
-            StopCoroutine(winDisplayCoroutine);
-
+        if (winDisplayCoroutine != null) StopCoroutine(winDisplayCoroutine);
         winDisplayCoroutine = StartCoroutine(ShowWinDisplayCoroutine(winAmount));
     }
 
     private IEnumerator ShowWinDisplayCoroutine(double winAmount)
     {
-        // Hide game rules, show win display
         if (gameRuleObject) gameRuleObject.SetActive(false);
         if (winDisplayObject) winDisplayObject.SetActive(true);
 
-        if (winDisplayText)
-        {
-            winDisplayText.text = $"WIN {winAmount:F2}";
-        }
+        if (winDisplayText) winDisplayText.text = $"WIN {winAmount:F2}";
 
         yield return new WaitForSeconds(winDisplayDuration);
 
-        // Switch back to game rules
         if (winDisplayObject) winDisplayObject.SetActive(false);
         if (gameRuleObject) gameRuleObject.SetActive(true);
-
         winDisplayCoroutine = null;
     }
 
@@ -504,13 +484,9 @@ public class UIManager : MonoBehaviour
     private void OnSpinButtonPressed()
     {
         if (gameManager.IsSpinning())
-        {
             gameManager.RequestStop();
-        }
         else
-        {
             gameManager.RequestSpin();
-        }
     }
 
     #endregion
@@ -521,14 +497,12 @@ public class UIManager : MonoBehaviour
     {
         if (betAmountText)
             betAmountText.text = gameManager.currentBetAmount.ToString("F2");
-
         UpdateBetButtonStates();
         CheckMaxBetIndicator();
     }
 
     private void UpdateBetButtonStates()
     {
-        // Buttons always interactable - bet wraps cyclically
         if (betMinusButton) betMinusButton.interactable = true;
         if (betPlusButton) betPlusButton.interactable = true;
     }
@@ -539,17 +513,12 @@ public class UIManager : MonoBehaviour
 
         if (isMaxBet && maxBetObject && !maxBetObject.activeSelf)
         {
-            // Show max bet indicator
-            if (maxBetCoroutine != null)
-                StopCoroutine(maxBetCoroutine);
-
+            if (maxBetCoroutine != null) StopCoroutine(maxBetCoroutine);
             maxBetCoroutine = StartCoroutine(ShowMaxBetIndicator());
         }
         else if (!isMaxBet && maxBetObject && maxBetObject.activeSelf)
         {
-            // Hide immediately if user decreases bet
             maxBetObject.SetActive(false);
-
             if (maxBetCoroutine != null)
             {
                 StopCoroutine(maxBetCoroutine);
@@ -561,26 +530,28 @@ public class UIManager : MonoBehaviour
     private IEnumerator ShowMaxBetIndicator()
     {
         if (maxBetObject) maxBetObject.SetActive(true);
-
         yield return new WaitForSeconds(maxBetDisplayDuration);
-
         if (maxBetObject) maxBetObject.SetActive(false);
         maxBetCoroutine = null;
     }
 
     #endregion
 
-    #region Auto Play
+    #region Auto Play Panel
 
     private void OpenAutoPlayPanel()
     {
+        if (settingsPanel && settingsPanel.activeSelf)
+            CloseSettingsPanelImmediate();
+
         if (autoPlayPanel) autoPlayPanel.SetActive(true);
         AnimatePopupOpen(autoPlayPanelRect);
     }
 
     private void CloseAutoPlayPanel()
     {
-        AnimatePopupClose(autoPlayPanelRect, () => {
+        AnimatePopupClose(autoPlayPanelRect, () =>
+        {
             if (autoPlayPanel) autoPlayPanel.SetActive(false);
         });
     }
@@ -588,16 +559,11 @@ public class UIManager : MonoBehaviour
     private void SelectAutoPlayRounds(int rounds)
     {
         selectedRounds = rounds;
-
-        // Update selected indicators
         foreach (var roundButton in roundButtons)
         {
             if (roundButton.selectedIndicator)
-            {
                 roundButton.selectedIndicator.SetActive(roundButton.rounds == selectedRounds);
-            }
         }
-
         UpdateAutoPlayButtonText();
     }
 
@@ -617,50 +583,289 @@ public class UIManager : MonoBehaviour
     {
         if (autoPlayCountDisplay) autoPlayCountDisplay.SetActive(true);
         UpdateAutoPlayCount();
-
         if (spinNormalImage) spinNormalImage.SetActive(false);
         if (spinStopImage) spinStopImage.SetActive(true);
-
         SetBetControlsEnabled(false);
-
     }
 
     internal void OnAutoPlayStopped()
     {
         if (autoPlayCountDisplay) autoPlayCountDisplay.SetActive(false);
-
         if (spinNormalImage) spinNormalImage.SetActive(true);
         if (spinStopImage) spinStopImage.SetActive(false);
-
         SetBetControlsEnabled(true);
         if (autoPlayOpenButton) autoPlayOpenButton.interactable = true;
-
     }
 
     internal void UpdateAutoPlayCount()
     {
         if (autoPlayCountText)
-            autoPlayCountText.text = $"{gameManager.autoPlayRemainingRounds}/{gameManager.autoPlayTotalRounds}";
+            autoPlayCountText.text = $"{gameManager.autoPlayRemainingRounds}";
     }
+
+    #endregion
+
+    #region Spin Speed Toggle Logic
 
     private void OnTurboToggleChanged(bool isOn)
     {
-        if (isOn && quickSpinToggle && quickSpinToggle.isOn)
-        {
-            quickSpinToggle.isOn = false;
-        }
+        if (isSyncingToggles) return;
+        isSyncingToggles = true;
 
-        gameManager.SetSpinSpeed(isOn ? SpinSpeed.Turbo : SpinSpeed.Normal);
+        if (isOn && quickSpinToggle && quickSpinToggle.isOn)
+            quickSpinToggle.isOn = false;
+
+        if (settingsTurboToggle && settingsTurboToggle.isOn != isOn)
+            settingsTurboToggle.isOn = isOn;
+        if (isOn && settingsQuickSpinToggle && settingsQuickSpinToggle.isOn)
+            settingsQuickSpinToggle.isOn = false;
+
+        isSyncingToggles = false;
+
+        RefreshAllToggleBgAlpha();
+        ApplySpinSpeedFromToggles();
     }
 
     private void OnQuickSpinToggleChanged(bool isOn)
     {
+        if (isSyncingToggles) return;
+        isSyncingToggles = true;
+
         if (isOn && turboToggle && turboToggle.isOn)
-        {
             turboToggle.isOn = false;
+
+        if (settingsQuickSpinToggle && settingsQuickSpinToggle.isOn != isOn)
+            settingsQuickSpinToggle.isOn = isOn;
+        if (isOn && settingsTurboToggle && settingsTurboToggle.isOn)
+            settingsTurboToggle.isOn = false;
+
+        isSyncingToggles = false;
+
+        RefreshAllToggleBgAlpha();
+        ApplySpinSpeedFromToggles();
+    }
+
+    private void OnSettingsTurboToggleChanged(bool isOn)
+    {
+        if (isSyncingToggles) return;
+        isSyncingToggles = true;
+
+        if (isOn && settingsQuickSpinToggle && settingsQuickSpinToggle.isOn)
+            settingsQuickSpinToggle.isOn = false;
+
+        if (turboToggle && turboToggle.isOn != isOn)
+            turboToggle.isOn = isOn;
+        if (isOn && quickSpinToggle && quickSpinToggle.isOn)
+            quickSpinToggle.isOn = false;
+
+        isSyncingToggles = false;
+
+        RefreshAllToggleBgAlpha();
+        ApplySpinSpeedFromToggles();
+    }
+
+    private void OnSettingsQuickSpinToggleChanged(bool isOn)
+    {
+        if (isSyncingToggles) return;
+        isSyncingToggles = true;
+
+        if (isOn && settingsTurboToggle && settingsTurboToggle.isOn)
+            settingsTurboToggle.isOn = false;
+
+        if (quickSpinToggle && quickSpinToggle.isOn != isOn)
+            quickSpinToggle.isOn = isOn;
+        if (isOn && turboToggle && turboToggle.isOn)
+            turboToggle.isOn = false;
+
+        isSyncingToggles = false;
+
+        RefreshAllToggleBgAlpha();
+        ApplySpinSpeedFromToggles();
+    }
+
+    private void ApplySpinSpeedFromToggles()
+    {
+        bool turboOn = (turboToggle != null && turboToggle.isOn) ||
+                           (settingsTurboToggle != null && settingsTurboToggle.isOn);
+        bool quickSpinOn = (quickSpinToggle != null && quickSpinToggle.isOn) ||
+                           (settingsQuickSpinToggle != null && settingsQuickSpinToggle.isOn);
+
+        if (turboOn)
+            gameManager.SetSpinSpeed(SpinSpeed.Turbo);
+        else if (quickSpinOn)
+            gameManager.SetSpinSpeed(SpinSpeed.QuickSpin);
+        else
+            gameManager.SetSpinSpeed(SpinSpeed.Normal);
+    }
+
+    private void RefreshAllToggleBgAlpha()
+    {
+        RefreshToggleBgAlpha(turboToggle);
+        RefreshToggleBgAlpha(quickSpinToggle);
+        RefreshToggleBgAlpha(settingsTurboToggle);
+        RefreshToggleBgAlpha(settingsQuickSpinToggle);
+    }
+
+    // Reads the background Image directly from Toggle.targetGraphic.
+    // Sets alpha to 0 when the toggle is ON so the checkmark is not obscured,
+    // and restores full alpha when the toggle is OFF.
+    private static void RefreshToggleBgAlpha(Toggle toggle)
+    {
+        if (toggle == null) return;
+        Image bgImage = toggle.targetGraphic as Image;
+        if (bgImage == null) return;
+        Color c = bgImage.color;
+        c.a = toggle.isOn ? 0f : 1f;
+        bgImage.color = c;
+    }
+
+    #endregion
+
+    #region Settings Panel
+
+    private void OpenSettingsPanel()
+    {
+        if (autoPlayPanel && autoPlayPanel.activeSelf)
+            CloseAutoPlayPanelImmediate();
+
+        if (settingsPanel) settingsPanel.SetActive(true);
+        AnimatePopupOpen(settingsPanelRect);
+    }
+
+    private void CloseSettingsPanel()
+    {
+        AnimatePopupClose(settingsPanelRect, () =>
+        {
+            if (settingsPanel) settingsPanel.SetActive(false);
+        });
+    }
+
+    private void CloseSettingsPanelImmediate()
+    {
+        if (settingsPanelRect) settingsPanelRect.localScale = Vector3.one;
+        if (settingsPanel) settingsPanel.SetActive(false);
+    }
+
+    private void CloseAutoPlayPanelImmediate()
+    {
+        if (autoPlayPanelRect) autoPlayPanelRect.localScale = Vector3.one;
+        if (autoPlayPanel) autoPlayPanel.SetActive(false);
+    }
+
+    #endregion
+
+    #region Game Rules Panel
+
+    private void OpenGameRulesPanel()
+    {
+        if (settingsPanel && settingsPanel.activeSelf)
+        {
+            CloseSettingsPanel();
+            StartCoroutine(OpenGameRulesPanelAfterDelay(0.15f));
+        }
+        else
+        {
+            ShowGameRulesPanel();
+        }
+    }
+
+    private IEnumerator OpenGameRulesPanelAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        ShowGameRulesPanel();
+    }
+
+    private void ShowGameRulesPanel()
+    {
+        if (gameRulesPanel == null) return;
+
+        currentRulesPage = 0;
+        isPageAnimating = false;
+
+        if (gameRulePages != null)
+        {
+            for (int i = 0; i < gameRulePages.Length; i++)
+            {
+                if (gameRulePages[i] == null) continue;
+                gameRulePages[i].gameObject.SetActive(true);
+                gameRulePages[i].anchoredPosition = new Vector2(i * pageSlideWidth, 0f);
+            }
         }
 
-        gameManager.SetSpinSpeed(isOn ? SpinSpeed.QuickSpin : SpinSpeed.Normal);
+        gameRulesPanel.SetActive(true);
+
+        if (gameRulesPanelRect)
+        {
+            gameRulesPanelRect.anchoredPosition = new Vector2(Screen.width, gameRulesPanelRect.anchoredPosition.y);
+            gameRulesPanelRect.DOAnchorPosX(0f, 0.35f).SetEase(Ease.OutCubic);
+        }
+    }
+
+    private void CloseGameRulesPanel()
+    {
+        if (gameRulesPanel == null || !gameRulesPanel.activeSelf) return;
+
+        if (gameRulesPanelRect)
+        {
+            gameRulesPanelRect.DOAnchorPosX(Screen.width, 0.35f)
+                .SetEase(Ease.InCubic)
+                .OnComplete(() =>
+                {
+                    gameRulesPanel.SetActive(false);
+                    if (gameRulesPanelRect)
+                        gameRulesPanelRect.anchoredPosition = new Vector2(0f, gameRulesPanelRect.anchoredPosition.y);
+                });
+        }
+        else
+        {
+            gameRulesPanel.SetActive(false);
+        }
+    }
+
+    private void NextRulesPage()
+    {
+        if (isPageAnimating || gameRulePages == null || gameRulePages.Length == 0) return;
+        int next = (currentRulesPage + 1) % gameRulePages.Length;
+        SlideToPage(currentRulesPage, next, slideLeft: true);
+    }
+
+    private void PrevRulesPage()
+    {
+        if (isPageAnimating || gameRulePages == null || gameRulePages.Length == 0) return;
+        int prev = (currentRulesPage - 1 + gameRulePages.Length) % gameRulePages.Length;
+        SlideToPage(currentRulesPage, prev, slideLeft: false);
+    }
+
+    private void SlideToPage(int fromIndex, int toIndex, bool slideLeft)
+    {
+        if (gameRulePages == null) return;
+        if (fromIndex < 0 || fromIndex >= gameRulePages.Length) return;
+        if (toIndex < 0 || toIndex >= gameRulePages.Length) return;
+
+        RectTransform fromPage = gameRulePages[fromIndex];
+        RectTransform toPage = gameRulePages[toIndex];
+        if (fromPage == null || toPage == null) return;
+
+        isPageAnimating = true;
+
+        float direction = slideLeft ? 1f : -1f;
+
+        toPage.anchoredPosition = new Vector2(direction * pageSlideWidth, 0f);
+        toPage.gameObject.SetActive(true);
+        fromPage.anchoredPosition = new Vector2(0f, 0f);
+
+        float slideDuration = 0.35f;
+
+        fromPage.DOAnchorPosX(-direction * pageSlideWidth, slideDuration).SetEase(Ease.InOutCubic);
+
+        toPage.DOAnchorPosX(0f, slideDuration)
+            .SetEase(Ease.InOutCubic)
+            .OnComplete(() =>
+            {
+                fromPage.anchoredPosition = new Vector2(direction * pageSlideWidth, 0f);
+                currentRulesPage = toIndex;
+                isPageAnimating = false;
+            });
     }
 
     #endregion
@@ -669,80 +874,43 @@ public class UIManager : MonoBehaviour
 
     internal void OnFreeSpinsStarted(int spinsAwarded)
     {
-
         totalFreeSpinWin = 0;
         totalFreeSpinsAwarded = spinsAwarded;
-
-        // Show free spin start popup
         ShowFreeSpinStartPopup(spinsAwarded);
-
-        // NOTE: Free spin background is NOT enabled here
-        // It will be enabled in CloseFreeSpinStartPopup after popup closes
     }
 
     internal void OnFreeSpinsEnded()
     {
-
-        // Show free spin end popup with total win
         ShowFreeSpinEndPopup(totalFreeSpinWin, totalFreeSpinsAwarded);
-
-        // NOTE: Free spin background is NOT disabled here
-        // It will be disabled in CloseFreeSpinEndPopup after popup closes
     }
 
-    /// <summary>
-    /// Update free spin count display on game screen
-    /// </summary>
     internal void UpdateFreeSpinCount(int remainingSpins)
     {
-
         if (remainingSpins == 1)
         {
-            // Last spin - hide count, show "last spin left"
             if (freeSpinCountContainer) freeSpinCountContainer.SetActive(false);
             if (lastSpinLeftObject) lastSpinLeftObject.SetActive(true);
         }
         else if (remainingSpins == 0)
         {
-            // After last spin - hide both, show buy free spin
             if (freeSpinCountContainer) freeSpinCountContainer.SetActive(false);
             if (lastSpinLeftObject) lastSpinLeftObject.SetActive(false);
             if (buyFreeSpinObject) buyFreeSpinObject.SetActive(true);
         }
         else
         {
-            // Normal count display
             if (freeSpinCountContainer) freeSpinCountContainer.SetActive(true);
             if (lastSpinLeftObject) lastSpinLeftObject.SetActive(false);
             if (buyFreeSpinObject) buyFreeSpinObject.SetActive(false);
-
             SetFreeSpinCountImages(remainingSpins);
         }
     }
 
-    /// <summary>
-    /// Set free spin count images on game screen (uses freeSpinNumberSprites)
-    /// </summary>
     private void SetFreeSpinCountImages(int count)
     {
-        if (freeSpinNumberSprites == null || freeSpinNumberSprites.Length < 10)
-        {
-            return;
-        }
-
-        int tens = count / 10;
-        int ones = count % 10;
-
-        if (freeSpinCountTens)
-        {
-            freeSpinCountTens.sprite = freeSpinNumberSprites[tens];
-        }
-
-        if (freeSpinCountOnes)
-        {
-            freeSpinCountOnes.sprite = freeSpinNumberSprites[ones];
-        }
-
+        if (freeSpinNumberSprites == null || freeSpinNumberSprites.Length < 10) return;
+        if (freeSpinCountTens) freeSpinCountTens.sprite = freeSpinNumberSprites[count / 10];
+        if (freeSpinCountOnes) freeSpinCountOnes.sprite = freeSpinNumberSprites[count % 10];
     }
 
     #endregion
@@ -753,46 +921,27 @@ public class UIManager : MonoBehaviour
     {
         if (!freeSpinStartPopup || !freeSpinStartPopupRect) return;
 
-        // Set count images
         SetCountImages(spinsAwarded, freeSpinStartCountTens, freeSpinStartCountOnes);
-
-        // Enable popup
         freeSpinStartPopup.SetActive(true);
 
-        // Set initial position (high Y position)
-        freeSpinStartPopupRect.anchoredPosition = new Vector2(
-            freeSpinStartPopupRect.anchoredPosition.x,
-            popupAppearY
-        );
-
-        // Reset scale
+        freeSpinStartPopupRect.anchoredPosition = new Vector2(freeSpinStartPopupRect.anchoredPosition.x, popupAppearY);
         freeSpinStartPopupRect.localScale = Vector3.one;
-
-        // Animate drop with bounce
-        freeSpinStartPopupRect.DOAnchorPosY(popupFinalY, popupDropDuration)
-            .SetEase(Ease.OutBounce)
-            .OnComplete(() => {
-            });
-
+        freeSpinStartPopupRect.DOAnchorPosY(popupFinalY, popupDropDuration).SetEase(Ease.OutBounce);
     }
 
     private void CloseFreeSpinStartPopup()
     {
         if (!freeSpinStartPopup) return;
 
-        AnimatePopupClose(freeSpinStartPopupRect, () => {
+        AnimatePopupClose(freeSpinStartPopupRect, () =>
+        {
             freeSpinStartPopup.SetActive(false);
-
-            // Enable free spin background AFTER popup closes
             if (normalSpinBackground) normalSpinBackground.SetActive(false);
             if (freeSpinBackground) freeSpinBackground.SetActive(true);
 
-            // Show intro animation for 2 seconds, then start free spins
-            StartCoroutine(ShowFreeSpinIntroAnimation(() => {
-                // Initialize free spin count display
+            StartCoroutine(ShowFreeSpinIntroAnimation(() =>
+            {
                 UpdateFreeSpinCount(gameManager.freeSpinsRemaining);
-
-                // Notify GameManager to start first free spin
                 gameManager.StartFirstFreeSpin();
             }));
         });
@@ -806,50 +955,30 @@ public class UIManager : MonoBehaviour
     {
         if (!freeSpinEndPopup || !freeSpinEndPopupRect) return;
 
-        // Set total spin count images
         SetCountImages(totalSpins, freeSpinEndCountTens, freeSpinEndCountOnes);
-
-        // Set win amount display
         SetWinAmountDisplay(totalWin);
 
-        // Enable popup
         freeSpinEndPopup.SetActive(true);
-
-        // Set initial position (high Y position)
-        freeSpinEndPopupRect.anchoredPosition = new Vector2(
-            freeSpinEndPopupRect.anchoredPosition.x,
-            popupAppearY
-        );
-
-        // Reset scale
+        freeSpinEndPopupRect.anchoredPosition = new Vector2(freeSpinEndPopupRect.anchoredPosition.x, popupAppearY);
         freeSpinEndPopupRect.localScale = Vector3.one;
-
-        // Animate drop with bounce
-        freeSpinEndPopupRect.DOAnchorPosY(popupFinalY, popupDropDuration)
-            .SetEase(Ease.OutBounce)
-            .OnComplete(() => {
-            });
-
+        freeSpinEndPopupRect.DOAnchorPosY(popupFinalY, popupDropDuration).SetEase(Ease.OutBounce);
     }
 
     private void CloseFreeSpinEndPopup()
     {
         if (!freeSpinEndPopup) return;
 
-        AnimatePopupClose(freeSpinEndPopupRect, () => {
+        AnimatePopupClose(freeSpinEndPopupRect, () =>
+        {
             freeSpinEndPopup.SetActive(false);
-
-            // Disable free spin background AFTER popup closes
             if (freeSpinBackground) freeSpinBackground.SetActive(false);
             if (normalSpinBackground) normalSpinBackground.SetActive(true);
 
-            // Hide free spin count display
             if (freeSpinCountContainer) freeSpinCountContainer.SetActive(false);
             if (lastSpinLeftObject) lastSpinLeftObject.SetActive(false);
 
-            // Show free spin intro animation for 2 seconds
-            StartCoroutine(ShowFreeSpinIntroAnimation(() => {
-                // After intro animation, show buy free spin button
+            StartCoroutine(ShowFreeSpinIntroAnimation(() =>
+            {
                 if (buyFreeSpinObject) buyFreeSpinObject.SetActive(true);
             }));
         });
@@ -859,151 +988,65 @@ public class UIManager : MonoBehaviour
 
     #region Free Spin Popup Helpers
 
-    /// <summary>
-    /// Set count images for popups (uses numberSprites)
-    /// </summary>
     private void SetCountImages(int count, Image tensImage, Image onesImage)
     {
-        if (numberSprites == null || numberSprites.Length < 10)
-        {
-            return;
-        }
-
-        int tens = count / 10;
-        int ones = count % 10;
-
-        if (tensImage)
-        {
-            tensImage.sprite = numberSprites[tens];
-        }
-
-        if (onesImage)
-        {
-            onesImage.sprite = numberSprites[ones];
-        }
-
+        if (numberSprites == null || numberSprites.Length < 10) return;
+        if (tensImage) tensImage.sprite = numberSprites[count / 10];
+        if (onesImage) onesImage.sprite = numberSprites[count % 10];
     }
 
     private void SetWinAmountDisplay(double amount)
     {
-        if (winAmountDigits == null || winAmountDigits.Length == 0)
-        {
-            return;
-        }
+        if (winAmountDigits == null || winAmountDigits.Length == 0) return;
+        if (numberSprites == null || numberSprites.Length < 10) return;
 
-        if (numberSprites == null || numberSprites.Length < 10)
-        {
-            return;
-        }
-
-        // Deactivate all digits first
         foreach (var digit in winAmountDigits)
-        {
             if (digit) digit.gameObject.SetActive(false);
-        }
 
-        // Hide decimal point initially
         if (decimalPointObject) decimalPointObject.SetActive(false);
 
-        // Check if amount has decimals
         bool hasDecimal = (amount % 1) != 0;
+        string amountStr = hasDecimal ? amount.ToString("F2") : amount.ToString("F0");
 
-        string amountStr;
-        if (hasDecimal)
-        {
-            // Format with 2 decimals
-            amountStr = amount.ToString("F2");
-        }
-        else
-        {
-            // No decimal needed
-            amountStr = amount.ToString("F0");
-        }
-
-        // Count total objects needed (digits + decimal point if applicable)
         int totalObjects = amountStr.Replace(".", "").Length;
-        if (hasDecimal) totalObjects++; // Add 1 for decimal point
+        if (hasDecimal) totalObjects++;
 
-        // Adjust horizontal layout spacing based on total objects
         AdjustWinAmountLayoutSpacing(totalObjects);
 
-        // Calculate total needed digits
-        int digitCount = amountStr.Replace(".", "").Length;
-
-
-        // Position in array from right to left (index 5 is rightmost)
         int arrayIndex = winAmountDigits.Length - 1;
 
-        // Process string from right to left
         for (int charIndex = amountStr.Length - 1; charIndex >= 0 && arrayIndex >= 0; charIndex--)
         {
             char c = amountStr[charIndex];
-
             if (c == '.')
             {
-                // Show decimal point at current position
-                if (decimalPointObject)
-                {
-                    decimalPointObject.SetActive(true);
-                }
+                if (decimalPointObject) decimalPointObject.SetActive(true);
             }
             else if (char.IsDigit(c))
             {
                 int num = int.Parse(c.ToString());
-
                 if (winAmountDigits[arrayIndex])
                 {
                     winAmountDigits[arrayIndex].gameObject.SetActive(true);
                     winAmountDigits[arrayIndex].sprite = numberSprites[num];
                 }
-
                 arrayIndex--;
             }
         }
-
     }
 
-    /// <summary>
-    /// Adjust horizontal layout group spacing based on number of objects displayed
-    /// Follows the rules: 6 objects (e.g., 123.45) = 0 spacing
-    ///                    5 objects (e.g., 23.34) = -40 spacing
-    ///                    4 objects (e.g., 3.43) = -90 spacing
-    ///                    3 objects (e.g., 2.2) = -140 spacing
-    ///                    1-2 objects (single/double digit) = 0 spacing
-    /// </summary>
     private void AdjustWinAmountLayoutSpacing(int objectCount)
     {
-        if (winAmountLayoutGroup == null)
+        if (winAmountLayoutGroup == null) return;
+
+        winAmountLayoutGroup.spacing = objectCount switch
         {
-            return;
-        }
-
-        float spacing = 0f;
-
-        switch (objectCount)
-        {
-            case 6:
-                spacing = 0f;
-                break;
-            case 5:
-                spacing = -40f;
-                break;
-            case 4:
-                spacing = -90f;
-                break;
-            case 3:
-                spacing = -140f;
-                break;
-            case 1:
-            case 2:
-                spacing = 0f;
-                break;
-            default:
-                spacing = 0f;
-                break;
-        }
-
-        winAmountLayoutGroup.spacing = spacing;
+            6 => 0f,
+            5 => -40f,
+            4 => -90f,
+            3 => -140f,
+            _ => 0f
+        };
     }
 
     #endregion
@@ -1013,13 +1056,8 @@ public class UIManager : MonoBehaviour
     private void AnimatePopupOpen(RectTransform popupRect)
     {
         if (!popupRect) return;
-
-        // Start from scale 0
         popupRect.localScale = Vector3.zero;
-
-        // Pop in animation
-        popupRect.DOScale(1f, 0.3f)
-            .SetEase(Ease.OutBack);
+        popupRect.DOScale(1f, 0.3f).SetEase(Ease.OutBack);
     }
 
     private void AnimatePopupClose(RectTransform popupRect, System.Action onComplete)
@@ -1027,10 +1065,10 @@ public class UIManager : MonoBehaviour
         if (!popupRect) return;
 
         Sequence closeSeq = DOTween.Sequence();
-
         closeSeq.Append(popupRect.DOScale(1.1f, 0.1f));
         closeSeq.Append(popupRect.DOScale(0f, 0.2f).SetEase(Ease.InBack));
-        closeSeq.OnComplete(() => {
+        closeSeq.OnComplete(() =>
+        {
             popupRect.localScale = Vector3.one;
             onComplete?.Invoke();
         });
@@ -1060,10 +1098,7 @@ public class UIManager : MonoBehaviour
 
         balanceTween = DOTween.To(
             () => oldBalance,
-            x => {
-                if (balanceText != null)
-                    balanceText.text = x.ToString("F2");
-            },
+            x => { if (balanceText != null) balanceText.text = x.ToString("F2"); },
             newBalance,
             balanceCountDuration
         ).SetEase(Ease.OutCubic);
@@ -1073,11 +1108,7 @@ public class UIManager : MonoBehaviour
     {
         if (winTween != null) winTween.Kill();
 
-        // Add to total free spin win if in free spins
-        if (gameManager.isInFreeSpins)
-        {
-            totalFreeSpinWin += winAmount;
-        }
+        if (gameManager.isInFreeSpins) totalFreeSpinWin += winAmount;
 
         if (winAmount > 0)
         {
@@ -1086,11 +1117,8 @@ public class UIManager : MonoBehaviour
                 x => UpdateWinDisplay(x),
                 winAmount,
                 winCountDuration
-            )
-            .SetEase(Ease.OutCubic)
-            .OnComplete(() => {
-                UpdateWinDisplay(winAmount);
-            });
+            ).SetEase(Ease.OutCubic)
+             .OnComplete(() => UpdateWinDisplay(winAmount));
         }
         else
         {
@@ -1124,82 +1152,8 @@ public class UIManager : MonoBehaviour
 
     private void TestFreeSpinPopups()
     {
-
         ShowFreeSpinStartPopup(1);
     }
-
-    /*private IEnumerator TestFreeSpinSequence()
-    {
-        
-        // Step 1: Show start popup with 1 spin
-        ShowFreeSpinStartPopup(1);
-        
-        // Wait 2 seconds to view the popup
-        yield return new WaitForSeconds(2f);
-        
-        // Step 2: Close start popup (triggers background change and intro animation)
-        
-        // Manually simulate popup close
-        if (freeSpinStartPopup) freeSpinStartPopup.SetActive(false);
-        
-        // Step 3: Switch to free spin background
-        if (normalSpinBackground) normalSpinBackground.SetActive(false);
-        if (freeSpinBackground) freeSpinBackground.SetActive(true);
-        
-        // Step 4: Play free spin intro animation
-        if (freeSpinIntroAnimation)
-        {
-            freeSpinIntroAnimation.SetActive(true);
-        }
-        
-        yield return new WaitForSeconds(2f);
-        
-        if (freeSpinIntroAnimation)
-        {
-            freeSpinIntroAnimation.SetActive(false);
-        }
-        
-        // Step 5: Simulate 1 spin happening (wait to represent spin duration)
-        
-        // Show free spin count display (1 spin remaining)
-        if (freeSpinCountContainer) freeSpinCountContainer.SetActive(false); // Hide count for last spin
-        if (lastSpinLeftObject) lastSpinLeftObject.SetActive(true);
-        
-        yield return new WaitForSeconds(3f); // Simulate spin duration
-        
-        // Hide last spin indicator
-        if (lastSpinLeftObject) lastSpinLeftObject.SetActive(false);
-        
-        
-        // Step 6: Show end popup with total win (example: 125.50)
-        ShowFreeSpinEndPopup(125.50, 1);
-        
-        // Wait 3 seconds to view the popup
-        yield return new WaitForSeconds(3f);
-        
-        // Step 7: Close end popup (triggers background restore and intro animation)
-        
-        // Manually simulate popup close
-        if (freeSpinEndPopup) freeSpinEndPopup.SetActive(false);
-        
-        // Step 8: Switch back to normal background
-        if (freeSpinBackground) freeSpinBackground.SetActive(false);
-        if (normalSpinBackground) normalSpinBackground.SetActive(true);
-        
-        // Step 9: Play free spin intro animation again (transition back)
-        if (freeSpinIntroAnimation)
-        {
-            freeSpinIntroAnimation.SetActive(true);
-        }
-        
-        yield return new WaitForSeconds(2f);
-        
-        if (freeSpinIntroAnimation)
-        {
-            freeSpinIntroAnimation.SetActive(false);
-        }
-        */
-
 
     #endregion
 
@@ -1213,82 +1167,37 @@ public class UIManager : MonoBehaviour
     }
 
     #endregion
+
     #region Connection Popup Management
 
-    /// <summary>
-    /// Show reconnection popup when 2 pongs are missed (warning state)
-    /// </summary>
     internal void ReconnectionPopup()
     {
-
-        if (reconnectionPopup != null)
-        {
-            reconnectionPopup.SetActive(true);
-        }
+        if (reconnectionPopup != null) reconnectionPopup.SetActive(true);
     }
 
-    /// <summary>
-    /// Show disconnection popup when 5 pongs are missed (disconnect state)
-    /// Auto-closes reconnection popup if showing
-    /// </summary>
     internal void DisconnectionPopup()
     {
-
-        // Close reconnection popup if it's showing
-        if (reconnectionPopup != null)
-        {
-            reconnectionPopup.SetActive(false);
-        }
-
-        if (disconnectionPopup != null)
-        {
-            disconnectionPopup.SetActive(true);
-        }
+        if (reconnectionPopup != null) reconnectionPopup.SetActive(false);
+        if (disconnectionPopup != null) disconnectionPopup.SetActive(true);
     }
 
-    /// <summary>
-    /// Check and close connection-related popups when connection recovers
-    /// Called from SocketIOManager when pong is received after missed pongs
-    /// </summary>
     internal void CheckAndClosePopups()
     {
-
-        if (reconnectionPopup != null && reconnectionPopup.activeSelf)
-        {
-            reconnectionPopup.SetActive(false);
-        }
-
-        if (disconnectionPopup != null && disconnectionPopup.activeSelf)
-        {
-            disconnectionPopup.SetActive(false);
-        }
+        if (reconnectionPopup != null && reconnectionPopup.activeSelf) reconnectionPopup.SetActive(false);
+        if (disconnectionPopup != null && disconnectionPopup.activeSelf) disconnectionPopup.SetActive(false);
     }
 
-    /// <summary>
-    /// Show another device popup when user logs in from another device
-    /// </summary>
     internal void AnotherDevicePopup()
     {
-
-        if (anotherDevicePopup != null)
-        {
-            anotherDevicePopup.SetActive(true);
-        }
+        if (anotherDevicePopup != null) anotherDevicePopup.SetActive(true);
     }
 
-    /// <summary>
-    /// Exit game and return to platform
-    /// </summary>
     private void OnExitButtonPressed()
     {
-
-        if (gameManager != null)
-        {
-            gameManager.ExitGame();
-        }
+        if (gameManager != null) gameManager.ExitGame();
     }
 
-    #endregion      
+    #endregion
 }
 
 [System.Serializable]

@@ -2228,6 +2228,26 @@ MonoBehaviour:
     selectedIndicator: {fileID: 1126421845}
   autoPlayCountDisplay: {fileID: 974324681}
   autoPlayCountText: {fileID: 1299954255}
+  settingsPanel: {fileID: 1103573647}
+  settingsPanelRect: {fileID: 1880704924}
+  settingsOpenButton: {fileID: 1882682725}
+  settingsCloseButton: {fileID: 1562980498}
+  settingsTurboToggle: {fileID: 990195117}
+  settingsQuickSpinToggle: {fileID: 1167815583}
+  gameRulesPanel: {fileID: 354488344}
+  gameRulesPanelRect: {fileID: 354488345}
+  gameRulesOpenButton: {fileID: 1853287806}
+  gameRulesBackButton: {fileID: 1712807107}
+  gameRulesNextPageButton: {fileID: 388987414}
+  gameRulesPrevPageButton: {fileID: 1148759624}
+  gameRulePages:
+  - {fileID: 939019447}
+  - {fileID: 1610773630}
+  - {fileID: 125088225}
+  - {fileID: 109000151}
+  - {fileID: 579278356}
+  - {fileID: 1801951555}
+  pageSlideWidth: 1080
   freeSpinCountContainer: {fileID: 439413647}
   freeSpinCountTens: {fileID: 1147529917}
   freeSpinCountOnes: {fileID: 1452922762}
@@ -2283,14 +2303,14 @@ MonoBehaviour:
   reconnectionPopup: {fileID: 0}
   anotherDevicePopup: {fileID: 0}
   anotherDeviceCloseButton: {fileID: 0}
-  socketManager: {fileID: 0}
+  socketManager: {fileID: 416965697}
   winCountDuration: 0.25
   balanceCountDuration: 0.25
   popupAppearY: 555
   popupFinalY: 165
   popupDropDuration: 0.8
   popupBounceCount: 2
-  freeSpinIntroDuration: 2
+  freeSpinIntroDuration: 3.5
   testFreeSpinButton: {fileID: 0}
 --- !u!4 &180954096
 Transform:
@@ -2926,7 +2946,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &259118118
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3677,6 +3697,7 @@ RectTransform:
   - {fileID: 939019447}
   - {fileID: 1610773630}
   - {fileID: 109000151}
+  - {fileID: 579278356}
   - {fileID: 125088225}
   - {fileID: 1801951555}
   - {fileID: 936000047}
@@ -6787,6 +6808,81 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 576755426}
+  m_CullTransparentMesh: 1
+--- !u!1 &579278355
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 579278356}
+  - component: {fileID: 579278358}
+  - component: {fileID: 579278357}
+  m_Layer: 5
+  m_Name: Page1 (5)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &579278356
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 579278355}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 354488345}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 1080, y: 1920}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &579278357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 579278355}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 5062786025851780264, guid: 958ebcaa240d64893a533ac4b597eb51, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &579278358
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 579278355}
   m_CullTransparentMesh: 1
 --- !u!1 &587961539
 GameObject:
@@ -17540,8 +17636,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Win 50.00
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 828531b9439307a4a81db5d9f4172982, type: 2}
-  m_sharedMaterial: {fileID: 8779833449504305310, guid: 828531b9439307a4a81db5d9f4172982, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: c9ce18338542a654f91f2554b3029b48, type: 2}
+  m_sharedMaterial: {fileID: -5529424953355028208, guid: c9ce18338542a654f91f2554b3029b48, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -17565,7 +17661,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 65.4
+  m_fontSize: 58.5
   m_fontSizeBase: 60.7
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -18142,7 +18238,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 44fca2ac6efc849afac0a2e604f79900, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0cf8cdb6a9de547cdbab125a0a8f57b3, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
