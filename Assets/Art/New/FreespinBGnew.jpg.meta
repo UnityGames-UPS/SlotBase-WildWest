@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 480b1990f943447a2bffc0e6a876975e
+guid: 0f1f23d7ab0e64a8597de66aa12a3990
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6181449339044822364
-    second: "Screenshot 2026-04-10 at 2.02.41\u202FPM_0"
+      213: 7290518266833230860
+    second: FreespinBGnew_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -139,13 +139,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "Screenshot 2026-04-10 at 2.02.41\u202FPM_0"
+      name: FreespinBGnew_0
       rect:
         serializedVersion: 2
-        x: 10
+        x: 0
         y: 0
-        width: 558
-        height: 992
+        width: 720
+        height: 1535
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 4a2092da394173aa0800000000000000
-      internalID: -6181449339044822364
+      spriteID: c0c5713acbf1d2560800000000000000
+      internalID: 7290518266833230860
       vertices: []
       indices: 
       edges: []
@@ -164,7 +164,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 6a76e6d072d9f48d0b1ffefe77fac1dd
+    spriteID: 32035de777a704e29bedbf20e7040c30
     internalID: 0
     vertices: []
     indices: 
@@ -174,7 +174,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      "Screenshot 2026-04-10 at 2.02.41\u202FPM_0": -6181449339044822364
+      FreespinBGnew_0: 7290518266833230860
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

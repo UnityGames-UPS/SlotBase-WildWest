@@ -58,6 +58,7 @@ public class UIManager : MonoBehaviour
 
     [Header("Auto Play Panel")]
     [SerializeField] private GameObject autoPlayPanel;
+    [SerializeField] private RectTransform autoPlayPanelRect;
     [SerializeField] private Button autoPlayOpenButton;
     [SerializeField] private Button autoPlayCloseButton;
     [SerializeField] private Button autoPlayStartButton;
@@ -557,14 +558,13 @@ public class UIManager : MonoBehaviour
     private void OpenAutoPlayPanel()
     {
         if (autoPlayPanel) autoPlayPanel.SetActive(true);
-         AnimatePopupOpen(autoPlayPanel.GetComponent<RectTransform>());
+        AnimatePopupOpen(autoPlayPanelRect);
         Debug.Log("[UIManager] Auto play panel opened");
     }
 
     private void CloseAutoPlayPanel()
     {
-        if (autoPlayPanel) autoPlayPanel.SetActive(false);
-        AnimatePopupClose(autoPlayPanel.GetComponent<RectTransform>(), () => {
+        AnimatePopupClose(autoPlayPanelRect, () => {
             if (autoPlayPanel) autoPlayPanel.SetActive(false);
         });
         Debug.Log("[UIManager] Auto play panel closed");
@@ -590,7 +590,7 @@ public class UIManager : MonoBehaviour
     private void UpdateAutoPlayButtonText()
     {
         if (autoPlayStartButtonText)
-            autoPlayStartButtonText.text = $"START ({selectedRounds})";
+            autoPlayStartButtonText.text = $"START AUTOPLAY({selectedRounds})";
     }
 
     private void OnAutoPlayStart()
