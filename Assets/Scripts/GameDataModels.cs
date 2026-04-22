@@ -117,7 +117,17 @@ public class ServerPayload
     public double totalWin;                  // Server uses "totalWin"
     public int scatterCount;
     public bool scatterTriggered;
-    public object freeSpinState; // Can be null
+    public ServerFreeSpinState freeSpinState; // Can be null
+}
+
+[Serializable]
+public class ServerFreeSpinState
+{
+    public bool isActive;
+    public int spinsRemaining;
+    public int spinsUsed;
+    public double totalRoundWin;
+    public Dictionary<string, int> stickyWilds;
 }
 
 [Serializable]
@@ -152,6 +162,20 @@ public class ServerFreeSpinResult
 {
     public bool triggered;
     public int spinsAwarded;
+    public bool isFreeSpin;
+    public bool isRoundOver;
+    public int spinsRemaining;
+    public int stickyWildsCount;
+    public ServerOverlayScatter overlayScatter;
+}
+
+[Serializable]
+public class ServerOverlayScatter
+{
+    public bool isTriggered;
+    public int count;
+    public int extraSpins;
+    public List<List<int>> positions;
 }
 
 // ============================================================================
@@ -229,6 +253,8 @@ public class SpinResult
     public PlayerData playerData;
     public FreeSpinData freeSpinData;
     public ScatterData scatterData;
+    public OverlayScatterData overlayScatterData;
+    public Dictionary<string, int> stickyWilds;
 }
 
 [Serializable]
@@ -254,6 +280,15 @@ public class ScatterData
     public bool isTriggered;
     public int scatterCount;
     public double winAmount;
+}
+
+[Serializable]
+public class OverlayScatterData
+{
+    public bool isTriggered;
+    public int count;
+    public int extraSpins;
+    public List<List<int>> positions;
 }
 
 #endregion
@@ -363,7 +398,7 @@ public static class InitDataConverter
             winAmount = serverResponse.payload.totalWin,
 
             // Convert winningLines to winLines
-            winLines = ConvertWinningLines(serverResponse.payload.winningLines),
+            winLines = ConvertWinningLines(serverResponse.payload.winningLines, gameConfig),
 
             // Update player data
             playerData = new PlayerData
@@ -390,7 +425,19 @@ public static class InitDataConverter
                     scatterCount = serverResponse.payload.scatterCount,
                     winAmount = 0 // Calculate if needed
                 }
-                : null
+                : null,
+            
+            overlayScatterData = serverResponse.features?.freeSpins?.overlayScatter != null && serverResponse.features.freeSpins.overlayScatter.isTriggered
+                ? new OverlayScatterData
+                {
+                    isTriggered = true,
+                    count = serverResponse.features.freeSpins.overlayScatter.count,
+                    extraSpins = serverResponse.features.freeSpins.overlayScatter.extraSpins,
+                    positions = serverResponse.features.freeSpins.overlayScatter.positions
+                }
+                : null,
+            
+            stickyWilds = serverResponse.payload.freeSpinState?.stickyWilds
         };
 
         return result;
@@ -516,11 +563,11 @@ public static class InitDataConverter
     }
 
     /// <summary>
-    /// Converts server winningLines to client winLines
-    /// Server: positions as [[row,col], [row,col]]
-    /// Client: positions as flat list [index0, index1, ...]
+    /// Converts server winningLines to client winLines.
+    /// Uses the server-provided positions directly: each position is [row, col].
+    /// Encodes as flat index = col * rowCount + row (rowCount = 4).
     /// </summary>
-    private static List<WinLine> ConvertWinningLines(List<ServerWinLine> serverWinLines)
+    private static List<WinLine> ConvertWinningLines(List<ServerWinLine> serverWinLines, GameConfig gameConfig)
     {
         var winLines = new List<WinLine>();
 
@@ -535,16 +582,38 @@ public static class InitDataConverter
                 continue;
             }
 
-            // Convert positions from [[row,col]] to flat indices
             var flatPositions = new List<int>();
-            foreach (var pos in serverLine.positions)
+
+            UnityEngine.Debug.Log($"[ConvertWinningLines] Converting line {serverLine.lineIndex}, symbolId: {serverLine.symbolId}");
+
+            if (serverLine.positions != null && serverLine.positions.Count > 0)
             {
-                if (pos.Count >= 2)
+                foreach (var pos in serverLine.positions)
                 {
-                    int row = pos[0];
-                    int col = pos[1];
-                    int flatIndex = col * 4 + row; // col * rowCount + row
-                    flatPositions.Add(flatIndex);
+                    if (pos.Count >= 2)
+                    {
+                        int row = pos[0];
+                        int col = pos[1];
+                        int flatIndex = row * 5 + col;
+                        flatPositions.Add(flatIndex);
+                        UnityEngine.Debug.Log($"[ConvertWinningLines] Position [{row},{col}] -> flatIndex: {flatIndex}");
+                    }
+                }
+            }
+            else
+            {
+                // Fallback: derive from payline definition + matchCount if positions missing
+                UnityEngine.Debug.LogWarning($"[ConvertWinningLines] No positions from server for lineIndex {serverLine.lineIndex}, falling back to payline table");
+                if (gameConfig?.paylines != null &&
+                    serverLine.lineIndex >= 0 &&
+                    serverLine.lineIndex < gameConfig.paylines.Count)
+                {
+                    var payline = gameConfig.paylines[serverLine.lineIndex];
+                    for (int col = 0; col < serverLine.matchCount && col < payline.Count; col++)
+                    {
+                        int row = payline[col];
+                        flatPositions.Add(row * 5 + col);
+                    }
                 }
             }
 

@@ -8,12 +8,10 @@ using Newtonsoft.Json;
 
 public class SocketIOManager : MonoBehaviour
 {
-    [Header("Configuration")]
-    [SerializeField] internal bool useDemoMode = false;
     [SerializeField] private string testToken = "test-token";
-    [SerializeField] private string testSocketURL = "https://devrealtime.dingdinghouse.com/";
-    [SerializeField] private string nameSpace = "playground";
-    [SerializeField] private string gameID = "SL-WW";
+    protected string testSocketURL = "https://devrealtime.dingdinghouse.com/";
+    protected string nameSpace = "playground";
+    protected string gameID = "SL-WW";
 
     [Header("Scatter Configuration")]
     [SerializeField] private int scatterSymbolId = 12;
@@ -52,14 +50,7 @@ public class SocketIOManager : MonoBehaviour
 
     private void Start()
     {
-        if (useDemoMode)
-        {
-            StartCoroutine(InitializeDemoMode());
-        }
-        else
-        {
-            RequestAuthToken();
-        }
+        RequestAuthToken();
     }
 
     private void RequestAuthToken()
@@ -323,6 +314,7 @@ public class SocketIOManager : MonoBehaviour
             gameSocket.Emit("ping");
         }
     }
+    
 
     private void OnPongReceived(string data)
     {
@@ -346,12 +338,6 @@ public class SocketIOManager : MonoBehaviour
 
     internal void SendSpinRequest(int betIndex, bool isFreeSpin)
     {
-        if (useDemoMode)
-        {
-            SendDemoSpinRequest(betIndex, isFreeSpin);
-            return;
-        }
-
         Debug.Log($"[SocketIO] Spin request: betIndex={betIndex}, isFreeSpin={isFreeSpin}");
 
         var request = new SpinRequest
@@ -370,228 +356,7 @@ public class SocketIOManager : MonoBehaviour
 
     #endregion
 
-    #region Demo Mode
 
-    private IEnumerator InitializeDemoMode()
-    {
-        if (RaycastBlocker) RaycastBlocker.SetActive(true);
-
-        yield return new WaitForSeconds(0.5f);
-
-        isConnected = true;
-        isInitialized = true;
-
-        var demoConfig = GenerateDemoGameConfig();
-        var demoPlayer = new PlayerData { balance = 100.00, currentBetIndex = 0 };
-
-        gameManager.OnInitDataReceived(demoConfig, demoPlayer, GenerateRandomMatrix());
-
-        if (RaycastBlocker) RaycastBlocker.SetActive(false);
-
-#if UNITY_WEBGL && !UNITY_EDITOR
-        if (JSManager != null)
-        {
-            JSManager.SendCustomMessage("OnEnter");
-        }
-#endif
-    }
-
-    internal void SendDemoSpinRequest(int betIndex, bool isFreeSpin)
-    {
-        StartCoroutine(SimulateDemoSpinResult(betIndex, isFreeSpin));
-    }
-
-    private IEnumerator SimulateDemoSpinResult(int betIndex, bool isFreeSpin)
-    {
-        yield return new WaitForSeconds(UnityEngine.Random.Range(0.3f, 0.8f));
-
-        var result = GenerateDemoSpinResult(betIndex, isFreeSpin);
-        gameManager.OnSpinResultReceived(result);
-    }
-
-    private GameConfig GenerateDemoGameConfig()
-    {
-        var config = new GameConfig
-        {
-            reelCount = 5,
-            rowCount = 4,
-            symbolCount = 13,
-            paylineCount = 40,
-            availableBets = new List<double> { 0.01, 0.02, 0.05, 0.10, 0.20, 0.50, 1.00, 2.00, 5.00, 10.00 },
-            paylines = GenerateDemoPaylines(),
-            symbols = GenerateDemoSymbols(),
-            wildSymbolId = 11,
-            wild2xSymbolId = 13,
-            wild3xSymbolId = 14,
-            wild5xSymbolId = 15,
-            wildMultipliers = new List<int> { 1, 2, 3, 5 },
-            scatterSymbolId = 12
-        };
-
-        return config;
-    }
-
-    private SpinResult GenerateDemoSpinResult(int betIndex, bool isFreeSpin)
-    {
-        var gameConfig = gameManager.gameConfig;
-        double betAmount = gameConfig.availableBets[betIndex];
-
-        var result = new SpinResult
-        {
-            resultMatrix = GenerateRandomMatrix(),
-            winAmount = 0,
-            winLines = new List<WinLine>(),
-            playerData = new PlayerData
-            {
-                balance = gameManager.playerData.balance,
-                currentBetIndex = betIndex
-            }
-        };
-
-        if (!isFreeSpin)
-            result.playerData.balance -= betAmount;
-
-        int scatterCount = CountScattersInMatrix(result.resultMatrix);
-
-        if (UnityEngine.Random.value < 0.35f && scatterCount < scattersRequiredForFreeSpin)
-        {
-            result.winAmount = betAmount * UnityEngine.Random.Range(2, 25);
-
-            int numWinLines = UnityEngine.Random.Range(1, 4);
-            for (int i = 0; i < numWinLines; i++)
-            {
-                int lineLength = UnityEngine.Random.Range(3, 6);
-                List<int> positions = new List<int>();
-                for (int j = 0; j < lineLength; j++)
-                {
-                    positions.Add(j * 4 + UnityEngine.Random.Range(0, 4));
-                }
-
-                result.winLines.Add(new WinLine
-                {
-                    lineId = UnityEngine.Random.Range(0, 40),
-                    symbolId = UnityEngine.Random.Range(0, 11),
-                    positions = positions,
-                    winAmount = result.winAmount / numWinLines
-                });
-            }
-        }
-
-        result.playerData.balance += result.winAmount;
-
-        if (!isFreeSpin && scatterCount >= scattersRequiredForFreeSpin)
-        {
-            if (scatterCount > scattersRequiredForFreeSpin)
-            {
-                result.resultMatrix = GenerateMatrixWithExactScatters(scattersRequiredForFreeSpin);
-            }
-
-            result.freeSpinData = new FreeSpinData
-            {
-                isTriggered = true,
-                spinsAwarded = UnityEngine.Random.Range(8, 16),
-                remainingSpins = 0
-            };
-
-            result.scatterData = new ScatterData
-            {
-                isTriggered = true,
-                scatterCount = scattersRequiredForFreeSpin,
-                winAmount = betAmount * 5.0
-            };
-
-            result.winAmount += result.scatterData.winAmount;
-            result.playerData.balance += result.scatterData.winAmount;
-        }
-
-        return result;
-    }
-
-    private List<List<int>> GenerateRandomMatrix()
-    {
-        var matrix = new List<List<int>>();
-        for (int col = 0; col < 5; col++)
-        {
-            var column = new List<int>();
-            for (int row = 0; row < 4; row++)
-            {
-                column.Add(UnityEngine.Random.Range(0, 11));
-            }
-            matrix.Add(column);
-        }
-        return matrix;
-    }
-
-    private List<List<int>> GenerateMatrixWithExactScatters(int scatterCount)
-    {
-        var matrix = GenerateRandomMatrix();
-
-        for (int col = 0; col < 5; col++)
-        {
-            for (int row = 0; row < 4; row++)
-            {
-                if (matrix[col][row] == scatterSymbolId)
-                {
-                    matrix[col][row] = UnityEngine.Random.Range(0, 11);
-                }
-            }
-        }
-
-        for (int i = 0; i < scatterCount; i++)
-        {
-            int col = UnityEngine.Random.Range(0, 5);
-            int row = UnityEngine.Random.Range(0, 4);
-            matrix[col][row] = scatterSymbolId;
-        }
-
-        return matrix;
-    }
-
-    private int CountScattersInMatrix(List<List<int>> matrix)
-    {
-        int count = 0;
-        foreach (var column in matrix)
-        {
-            foreach (var symbolId in column)
-            {
-                if (symbolId == scatterSymbolId)
-                {
-                    count++;
-                }
-            }
-        }
-        return count;
-    }
-
-    private List<List<int>> GenerateDemoPaylines()
-    {
-        var paylines = new List<List<int>>();
-        for (int i = 0; i < 40; i++)
-        {
-            paylines.Add(new List<int> { 0, 1, 2, 3, 4 });
-        }
-        return paylines;
-    }
-
-    private List<SymbolInfo> GenerateDemoSymbols()
-    {
-        var symbols = new List<SymbolInfo>();
-        for (int i = 0; i < 13; i++)
-        {
-            symbols.Add(new SymbolInfo
-            {
-                id = i,
-                name = $"Symbol_{i}",
-                multipliers = new List<double> { 1, 2, 5, 10, 20 },
-                isWild = i == 11,
-                isScatter = i == 12,
-                wildMultiplier = 1
-            });
-        }
-        return symbols;
-    }
-
-    #endregion
 
     #region Cleanup
 
@@ -628,7 +393,22 @@ public class SocketIOManager : MonoBehaviour
     }
 
     #endregion
+     private List<List<int>> GenerateRandomMatrix()
+    {
+        var matrix = new List<List<int>>();
+        for (int col = 0; col < 5; col++)
+        {
+            var column = new List<int>();
+            for (int row = 0; row < 4; row++)
+            {
+                column.Add(UnityEngine.Random.Range(0, 11));
+            }
+            matrix.Add(column);
+        }
+        return matrix;
+    }
 }
+
 
 [Serializable]
 public class AuthTokenData

@@ -112,6 +112,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Image freeSpinStartCountTens;
     [SerializeField] private Image freeSpinStartCountOnes;
     [SerializeField] private Sprite[] numberSprites;
+    [SerializeField] private GameObject freeSpinStartPlusIcon;
 
     [Header("Free Spin End Popup")]
     [SerializeField] private GameObject freeSpinEndPopup;
@@ -876,7 +877,7 @@ public class UIManager : MonoBehaviour
     {
         totalFreeSpinWin = 0;
         totalFreeSpinsAwarded = spinsAwarded;
-        ShowFreeSpinStartPopup(spinsAwarded);
+        ShowFreeSpinStartPopup(spinsAwarded, false);
     }
 
     internal void OnFreeSpinsEnded()
@@ -917,9 +918,21 @@ public class UIManager : MonoBehaviour
 
     #region Free Spin Start Popup
 
-    private void ShowFreeSpinStartPopup(int spinsAwarded)
+    private bool isClosingExtraSpins = false;
+
+    internal void ShowExtraFreeSpinsPopup(int extraSpins)
+    {
+        isClosingExtraSpins = true;
+        ShowFreeSpinStartPopup(extraSpins, true);
+    }
+
+    private void ShowFreeSpinStartPopup(int spinsAwarded, bool isExtraSpins = false)
     {
         if (!freeSpinStartPopup || !freeSpinStartPopupRect) return;
+
+        if (!isExtraSpins) isClosingExtraSpins = false;
+        
+        if (freeSpinStartPlusIcon) freeSpinStartPlusIcon.SetActive(isExtraSpins);
 
         SetCountImages(spinsAwarded, freeSpinStartCountTens, freeSpinStartCountOnes);
         freeSpinStartPopup.SetActive(true);
@@ -927,6 +940,20 @@ public class UIManager : MonoBehaviour
         freeSpinStartPopupRect.anchoredPosition = new Vector2(freeSpinStartPopupRect.anchoredPosition.x, popupAppearY);
         freeSpinStartPopupRect.localScale = Vector3.one;
         freeSpinStartPopupRect.DOAnchorPosY(popupFinalY, popupDropDuration).SetEase(Ease.OutBounce);
+        
+        if (isExtraSpins)
+        {
+            StartCoroutine(HideExtraFreeSpinsPopup());
+        }
+    }
+
+    private IEnumerator HideExtraFreeSpinsPopup()
+    {
+        yield return new WaitForSeconds(2.0f);
+        if (freeSpinStartPopup && freeSpinStartPopup.activeSelf && isClosingExtraSpins)
+        {
+            CloseFreeSpinStartPopup();
+        }
     }
 
     private void CloseFreeSpinStartPopup()
@@ -936,14 +963,23 @@ public class UIManager : MonoBehaviour
         AnimatePopupClose(freeSpinStartPopupRect, () =>
         {
             freeSpinStartPopup.SetActive(false);
-            if (normalSpinBackground) normalSpinBackground.SetActive(false);
-            if (freeSpinBackground) freeSpinBackground.SetActive(true);
-
-            StartCoroutine(ShowFreeSpinIntroAnimation(() =>
+            
+            if (isClosingExtraSpins)
             {
-                UpdateFreeSpinCount(gameManager.freeSpinsRemaining);
-                gameManager.StartFirstFreeSpin();
-            }));
+                isClosingExtraSpins = false;
+                // Skip intro anim for extra free spins
+            }
+            else
+            {
+                if (normalSpinBackground) normalSpinBackground.SetActive(false);
+                if (freeSpinBackground) freeSpinBackground.SetActive(true);
+
+                StartCoroutine(ShowFreeSpinIntroAnimation(() =>
+                {
+                    UpdateFreeSpinCount(gameManager.freeSpinsRemaining);
+                    gameManager.StartFirstFreeSpin();
+                }));
+            }
         });
     }
 
@@ -985,6 +1021,8 @@ public class UIManager : MonoBehaviour
     }
 
     #endregion
+
+
 
     #region Free Spin Popup Helpers
 
@@ -1152,7 +1190,7 @@ public class UIManager : MonoBehaviour
 
     private void TestFreeSpinPopups()
     {
-        ShowFreeSpinStartPopup(1);
+        ShowFreeSpinStartPopup(1, false);
     }
 
     #endregion

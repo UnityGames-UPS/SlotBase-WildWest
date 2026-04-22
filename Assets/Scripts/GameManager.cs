@@ -97,7 +97,7 @@ public class GameManager : MonoBehaviour
         if (waitingForFreeSpinStart) return;
 
         if (currentState != GameState.Idle) return;
-        if (!socketManager.isConnected && !socketManager.useDemoMode) return;
+        if (!socketManager.isConnected) return;
 
         if (!isInFreeSpins && playerData.balance < currentBetAmount)
         {
@@ -233,6 +233,16 @@ public class GameManager : MonoBehaviour
     internal void OnSpinResultReceived(SpinResult result)
     {
         lastResult = result;
+        Debug.Log($"[GameManager] OnSpinResultReceived - winAmount: {result.winAmount}, winLines count: {result.winLines?.Count ?? 0}");
+
+        if (result.winLines != null)
+        {
+            for (int i = 0; i < result.winLines.Count; i++)
+            {
+                var line = result.winLines[i];
+                Debug.Log($"[GameManager] WinLine {i}: lineId={line.lineId}, symbolId={line.symbolId}, positions={string.Join(",", line.positions)}, winAmount={line.winAmount}");
+            }
+        }
     }
 
     private void ProcessSpinResult()
@@ -240,6 +250,16 @@ public class GameManager : MonoBehaviour
         playerData = lastResult.playerData;
 
         uiManager.OnSpinCompleted(lastResult);
+
+        if (lastResult.overlayScatterData != null && lastResult.overlayScatterData.isTriggered)
+        {
+            if (isInFreeSpins)
+            {
+                freeSpinsRemaining += lastResult.overlayScatterData.extraSpins;
+                uiManager.ShowExtraFreeSpinsPopup(lastResult.overlayScatterData.extraSpins);
+                uiManager.UpdateFreeSpinCount(freeSpinsRemaining);
+            }
+        }
 
         if (lastResult.freeSpinData != null && lastResult.freeSpinData.isTriggered)
         {
