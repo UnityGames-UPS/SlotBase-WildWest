@@ -2738,6 +2738,13 @@ MonoBehaviour:
   - {fileID: 579278356}
   - {fileID: 1801951555}
   pageSlideWidth: 1080
+  rulePageIndicators:
+  - {fileID: 556409465}
+  - {fileID: 1589567310}
+  - {fileID: 731022838}
+  - {fileID: 344040083}
+  - {fileID: 1614391763}
+  - {fileID: 805611440}
   freeSpinCountContainer: {fileID: 439413647}
   freeSpinCountTens: {fileID: 1147529917}
   freeSpinCountOnes: {fileID: 1452922762}

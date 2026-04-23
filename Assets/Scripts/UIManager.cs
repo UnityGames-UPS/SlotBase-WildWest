@@ -95,6 +95,7 @@ public class UIManager : MonoBehaviour
     [Tooltip("Assign exactly 6 page RectTransforms that live inside the panel.")]
     [SerializeField] private RectTransform[] gameRulePages;
     [SerializeField] private float pageSlideWidth = 800f;
+    [SerializeField] private GameObject[] rulePageIndicators;
 
     [Header("Free Spin Count Display - Game Screen")]
     [SerializeField] private GameObject freeSpinCountContainer;
@@ -794,6 +795,8 @@ public class UIManager : MonoBehaviour
             }
         }
 
+        UpdateRulePageIndicators(currentRulesPage);
+
         gameRulesPanel.SetActive(true);
 
         if (gameRulesPanelRect)
@@ -867,7 +870,22 @@ public class UIManager : MonoBehaviour
                 fromPage.anchoredPosition = new Vector2(direction * pageSlideWidth, 0f);
                 currentRulesPage = toIndex;
                 isPageAnimating = false;
+                UpdateRulePageIndicators(currentRulesPage);
             });
+    }
+
+    private void UpdateRulePageIndicators(int activeIndex)
+    {
+        if (rulePageIndicators == null || rulePageIndicators.Length == 0) return;
+        for (int i = 0; i < rulePageIndicators.Length; i++)
+        {
+            if (rulePageIndicators[i] == null) continue;
+            // Enable the first child for the active index, disable for others
+            if (rulePageIndicators[i].transform.childCount > 0)
+            {
+                rulePageIndicators[i].transform.GetChild(0).gameObject.SetActive(i == activeIndex);
+            }
+        }
     }
 
     #endregion
