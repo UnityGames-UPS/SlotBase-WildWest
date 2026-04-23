@@ -118,6 +118,8 @@ public class ServerPayload
     public int scatterCount;
     public bool scatterTriggered;
     public ServerFreeSpinState freeSpinState; // Can be null
+    public bool isRoundOver;                 // True when free spin round is over
+    public double totalRoundWin;             // Total round win (at payload level when isRoundOver)
 }
 
 [Serializable]
@@ -255,6 +257,12 @@ public class SpinResult
     public ScatterData scatterData;
     public OverlayScatterData overlayScatterData;
     public Dictionary<string, int> stickyWilds;
+
+    // Server-authoritative free spin state
+    public int serverSpinsRemaining;
+    public int serverSpinsUsed;
+    public double serverTotalRoundWin;
+    public bool isRoundOver;
 }
 
 [Serializable]
@@ -389,6 +397,17 @@ public static class InitDataConverter
     /// </summary>
     public static SpinResult ConvertServerResponseToSpinResult(ServerSpinResponse serverResponse, double currentBalance, double betAmount, GameConfig gameConfig)
     {
+        // Use server balance directly if available
+        double newBalance = serverResponse.player?.balance ?? CalculateNewBalance(currentBalance, betAmount, serverResponse.payload.totalWin);
+
+        // Get server free spin state values
+        int spinsRemaining = serverResponse.features?.freeSpins?.spinsRemaining ?? serverResponse.payload.freeSpinState?.spinsRemaining ?? 0;
+        int spinsUsed = serverResponse.payload.freeSpinState?.spinsUsed ?? 0;
+        double totalRoundWin = serverResponse.payload.totalRoundWin > 0
+            ? serverResponse.payload.totalRoundWin
+            : (serverResponse.payload.freeSpinState?.totalRoundWin ?? 0);
+        bool isRoundOver = serverResponse.features?.freeSpins?.isRoundOver ?? serverResponse.payload.isRoundOver;
+
         var result = new SpinResult
         {
             // Convert and transpose reels from server format to client format
@@ -400,10 +419,10 @@ public static class InitDataConverter
             // Convert winningLines to winLines
             winLines = ConvertWinningLines(serverResponse.payload.winningLines, gameConfig),
 
-            // Update player data
+            // Update player data — use server balance directly
             playerData = new PlayerData
             {
-                balance = CalculateNewBalance(currentBalance, betAmount, serverResponse.payload.totalWin),
+                balance = newBalance,
                 currentBetIndex = 0 // Will be set by GameManager
             },
 
@@ -437,23 +456,19 @@ public static class InitDataConverter
                 }
                 : null,
             
-            stickyWilds = serverResponse.payload.freeSpinState?.stickyWilds
+            stickyWilds = serverResponse.payload.freeSpinState?.stickyWilds,
+
+            // Server-authoritative free spin state
+            serverSpinsRemaining = spinsRemaining,
+            serverSpinsUsed = spinsUsed,
+            serverTotalRoundWin = totalRoundWin,
+            isRoundOver = isRoundOver
         };
 
         return result;
     }
 
-    /// <summary>
-    /// Converts server reels to client matrix with wild multiplier handling
-    /// Server format: [row][col] (4 rows x 5 cols) - reels[0] = ["3","8","4","8"] is row 0 across all 5 columns
-    /// Client format: [col][row] (5 cols x 4 rows) - matrix[0] = [3,8,4,8] is column 0 with 4 rows
-    /// 
-    /// Wild handling: Wild ID=11, but client needs:
-    /// - Wild with 1x multiplier → symbolId 11 (Wild)
-    /// - Wild with 2x multiplier → symbolId 13 (Wild2x) 
-    /// - Wild with 3x multiplier → symbolId 14 (Wild3x)
-    /// - Wild with 5x multiplier → symbolId 15 (Wild5x)
-    /// </summary>
+
     private static List<List<int>> ConvertReelsToMatrix(List<List<string>> serverReels, List<ServerWinLine> winningLines, GameConfig gameConfig)
     {
         // Server sends 4 rows x 5 columns: reels[row][col]
@@ -544,9 +559,7 @@ public static class InitDataConverter
         };
     }
 
-    /// <summary>
-    /// Generate default matrix if conversion fails
-    /// </summary>
+
     private static List<List<int>> GenerateDefaultMatrix()
     {
         var matrix = new List<List<int>>();
@@ -584,7 +597,7 @@ public static class InitDataConverter
 
             var flatPositions = new List<int>();
 
-            UnityEngine.Debug.Log($"[ConvertWinningLines] Converting line {serverLine.lineIndex}, symbolId: {serverLine.symbolId}");
+         
 
             if (serverLine.positions != null && serverLine.positions.Count > 0)
             {
@@ -596,7 +609,7 @@ public static class InitDataConverter
                         int col = pos[1];
                         int flatIndex = row * 5 + col;
                         flatPositions.Add(flatIndex);
-                        UnityEngine.Debug.Log($"[ConvertWinningLines] Position [{row},{col}] -> flatIndex: {flatIndex}");
+                      
                     }
                 }
             }
@@ -629,9 +642,6 @@ public static class InitDataConverter
         return winLines;
     }
 
-    /// <summary>
-    /// Calculate new balance: current - bet + win
-    /// </summary>
     private static double CalculateNewBalance(double currentBalance, double betAmount, double winAmount)
     {
         return currentBalance - betAmount + winAmount;

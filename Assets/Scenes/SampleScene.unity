@@ -5340,7 +5340,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f521a04de7f494272a617b2719edd271, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testToken: 7a600cf64f11420797142c961fedd947
+  testToken: d73b3705f39e48ad9fc9ab3a81b3a2a6
   scatterSymbolId: 12
   scattersRequiredForFreeSpin: 3
   gameManager: {fileID: 855426822}

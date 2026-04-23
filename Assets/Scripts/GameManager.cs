@@ -233,14 +233,14 @@ public class GameManager : MonoBehaviour
     internal void OnSpinResultReceived(SpinResult result)
     {
         lastResult = result;
-        Debug.Log($"[GameManager] OnSpinResultReceived - winAmount: {result.winAmount}, winLines count: {result.winLines?.Count ?? 0}");
+     
 
         if (result.winLines != null)
         {
             for (int i = 0; i < result.winLines.Count; i++)
             {
                 var line = result.winLines[i];
-                Debug.Log($"[GameManager] WinLine {i}: lineId={line.lineId}, symbolId={line.symbolId}, positions={string.Join(",", line.positions)}, winAmount={line.winAmount}");
+              
             }
         }
     }
@@ -251,22 +251,28 @@ public class GameManager : MonoBehaviour
 
         uiManager.OnSpinCompleted(lastResult);
 
+        // Show overlay scatter extra spins popup (display only — server already updated spinsRemaining)
         if (lastResult.overlayScatterData != null && lastResult.overlayScatterData.isTriggered)
         {
             if (isInFreeSpins)
             {
-                freeSpinsRemaining += lastResult.overlayScatterData.extraSpins;
                 uiManager.ShowExtraFreeSpinsPopup(lastResult.overlayScatterData.extraSpins);
-                uiManager.UpdateFreeSpinCount(freeSpinsRemaining);
             }
         }
 
+        // Check if free spins were just triggered (initial trigger)
         if (lastResult.freeSpinData != null && lastResult.freeSpinData.isTriggered)
         {
             StartFreeSpins(lastResult.freeSpinData.spinsAwarded);
             lastResult = null;
             return;
         }
+
+        // Use server-authoritative free spin state
+        int serverSpinsRemaining = lastResult.serverSpinsRemaining;
+        int serverSpinsUsed = lastResult.serverSpinsUsed;
+        double serverTotalRoundWin = lastResult.serverTotalRoundWin;
+        bool isRoundOver = lastResult.isRoundOver;
 
         lastResult = null;
 
@@ -289,13 +295,14 @@ public class GameManager : MonoBehaviour
         }
         else if (isInFreeSpins)
         {
-            freeSpinsRemaining--;
+            // Use server values directly instead of client-side computation
+            freeSpinsRemaining = serverSpinsRemaining;
 
             uiManager.UpdateFreeSpinCount(freeSpinsRemaining);
 
-            if (freeSpinsRemaining <= 0)
+            if (isRoundOver || freeSpinsRemaining <= 0)
             {
-                EndFreeSpins();
+                EndFreeSpins(serverTotalRoundWin, serverSpinsUsed);
             }
             else
             {
@@ -381,12 +388,18 @@ public class GameManager : MonoBehaviour
         RequestSpin();
     }
 
-    private void EndFreeSpins()
+    private void EndFreeSpins(double totalRoundWin, int totalSpinsUsed)
     {
         isInFreeSpins = false;
         freeSpinsRemaining = 0;
 
-        uiManager.OnFreeSpinsEnded();
+        // Clear sticky wild overlays and stored state
+        if (slotView != null)
+        {
+            slotView.ClearStickyWilds();
+        }
+
+        uiManager.OnFreeSpinsEnded(totalRoundWin, totalSpinsUsed);
 
         currentState = GameState.Idle;
     }

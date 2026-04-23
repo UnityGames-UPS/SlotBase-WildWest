@@ -875,14 +875,16 @@ public class UIManager : MonoBehaviour
 
     internal void OnFreeSpinsStarted(int spinsAwarded)
     {
-        totalFreeSpinWin = 0;
         totalFreeSpinsAwarded = spinsAwarded;
         ShowFreeSpinStartPopup(spinsAwarded, false);
     }
 
-    internal void OnFreeSpinsEnded()
+    internal void OnFreeSpinsEnded(double serverTotalRoundWin, int serverTotalSpinsUsed)
     {
-        ShowFreeSpinEndPopup(totalFreeSpinWin, totalFreeSpinsAwarded);
+        // Use server spinsUsed if available, otherwise fall back to totalFreeSpinsAwarded
+        // (on the last spin, freeSpinState can be null so spinsUsed defaults to 0)
+        int totalSpins = serverTotalSpinsUsed > 0 ? serverTotalSpinsUsed : totalFreeSpinsAwarded;
+        ShowFreeSpinEndPopup(serverTotalRoundWin, totalSpins);
     }
 
     internal void UpdateFreeSpinCount(int remainingSpins)
@@ -910,7 +912,20 @@ public class UIManager : MonoBehaviour
     private void SetFreeSpinCountImages(int count)
     {
         if (freeSpinNumberSprites == null || freeSpinNumberSprites.Length < 10) return;
-        if (freeSpinCountTens) freeSpinCountTens.sprite = freeSpinNumberSprites[count / 10];
+
+        // Use alpha to hide tens digit when count is single-digit
+        if (freeSpinCountTens)
+        {
+            if (count >= 10)
+            {
+                freeSpinCountTens.color = Color.white;
+                freeSpinCountTens.sprite = freeSpinNumberSprites[count / 10];
+            }
+            else
+            {
+                freeSpinCountTens.color = new Color(1f, 1f, 1f, 0f);
+            }
+        }
         if (freeSpinCountOnes) freeSpinCountOnes.sprite = freeSpinNumberSprites[count % 10];
     }
 
@@ -919,6 +934,7 @@ public class UIManager : MonoBehaviour
     #region Free Spin Start Popup
 
     private bool isClosingExtraSpins = false;
+    private Coroutine hideExtraSpinsCoroutine;
 
     internal void ShowExtraFreeSpinsPopup(int extraSpins)
     {
@@ -931,11 +947,21 @@ public class UIManager : MonoBehaviour
         if (!freeSpinStartPopup || !freeSpinStartPopupRect) return;
 
         if (!isExtraSpins) isClosingExtraSpins = false;
-        
+
+        if (hideExtraSpinsCoroutine != null)
+        {
+            StopCoroutine(hideExtraSpinsCoroutine);
+            hideExtraSpinsCoroutine = null;
+        }
+
+        // Activate popup first so child modifications happen in active hierarchy
+        freeSpinStartPopup.SetActive(true);
+
+        // Set plus icon visibility (show "+" for extra spins only)
         if (freeSpinStartPlusIcon) freeSpinStartPlusIcon.SetActive(isExtraSpins);
 
+        // Set count digit images
         SetCountImages(spinsAwarded, freeSpinStartCountTens, freeSpinStartCountOnes);
-        freeSpinStartPopup.SetActive(true);
 
         freeSpinStartPopupRect.anchoredPosition = new Vector2(freeSpinStartPopupRect.anchoredPosition.x, popupAppearY);
         freeSpinStartPopupRect.localScale = Vector3.one;
@@ -943,7 +969,7 @@ public class UIManager : MonoBehaviour
         
         if (isExtraSpins)
         {
-            StartCoroutine(HideExtraFreeSpinsPopup());
+            hideExtraSpinsCoroutine = StartCoroutine(HideExtraFreeSpinsPopup());
         }
     }
 
@@ -960,13 +986,15 @@ public class UIManager : MonoBehaviour
     {
         if (!freeSpinStartPopup) return;
 
+        bool wasExtraSpins = isClosingExtraSpins;
+        isClosingExtraSpins = false;
+
         AnimatePopupClose(freeSpinStartPopupRect, () =>
         {
             freeSpinStartPopup.SetActive(false);
             
-            if (isClosingExtraSpins)
+            if (wasExtraSpins)
             {
-                isClosingExtraSpins = false;
                 // Skip intro anim for extra free spins
             }
             else
@@ -1029,8 +1057,27 @@ public class UIManager : MonoBehaviour
     private void SetCountImages(int count, Image tensImage, Image onesImage)
     {
         if (numberSprites == null || numberSprites.Length < 10) return;
-        if (tensImage) tensImage.sprite = numberSprites[count / 10];
-        if (onesImage) onesImage.sprite = numberSprites[count % 10];
+
+        // Use SetActive to properly handle layout groups
+        if (tensImage)
+        {
+            if (count >= 10)
+            {
+                tensImage.gameObject.SetActive(true);
+                tensImage.color = Color.white;
+                tensImage.sprite = numberSprites[count / 10];
+            }
+            else
+            {
+                tensImage.gameObject.SetActive(false);
+            }
+        }
+        
+        if (onesImage)
+        {
+            onesImage.gameObject.SetActive(true);
+            onesImage.sprite = numberSprites[count % 10];
+        }
     }
 
     private void SetWinAmountDisplay(double amount)
@@ -1145,8 +1192,6 @@ public class UIManager : MonoBehaviour
     private void AnimateWinUpdate(double winAmount)
     {
         if (winTween != null) winTween.Kill();
-
-        if (gameManager.isInFreeSpins) totalFreeSpinWin += winAmount;
 
         if (winAmount > 0)
         {

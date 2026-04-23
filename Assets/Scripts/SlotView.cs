@@ -99,6 +99,9 @@ public class SlotView : MonoBehaviour
     private bool isSpinning;
     private bool scatterAnticipationActive = false;
 
+    // Sticky wild state persisted across spins during free spins
+    private Dictionary<string, int> currentStickyWilds;
+
     #region Initialization
 
     private void Start()
@@ -116,7 +119,6 @@ public class SlotView : MonoBehaviour
         if (anticipationFrame) anticipationFrame.SetActive(false);
     }
 
-    // Disables every row GameObject in all 5 columns of an overlay array
     private static void DisableColumns(ColumnOverlays[] cols)
     {
         if (cols == null) return;
@@ -126,7 +128,6 @@ public class SlotView : MonoBehaviour
                     if (go) go.SetActive(false);
     }
 
-    // Direct cell access helpers
     private static GameObject WinBox(ColumnOverlays[] cols, int col, int row)
         => (col >= 0 && col < cols?.Length && cols[col]?.rows != null && row >= 0 && row < cols[col].rows.Length)
             ? cols[col].rows[row] : null;
@@ -161,7 +162,6 @@ public class SlotView : MonoBehaviour
             }
         }
 
-        Debug.Log($"[SlotView] Built symbol sprite array with {symbolSprites.Length} sprites");
     }
 
     private void InitializeReels()
@@ -279,6 +279,12 @@ public class SlotView : MonoBehaviour
         KillAllTweens();
 
         DisableAllOverlays();
+
+        // Re-enable sticky wilds so they stay visible during the spin
+        if (currentStickyWilds != null && currentStickyWilds.Count > 0)
+        {
+            ApplyStickyWilds(currentStickyWilds);
+        }
 
         for (int i = 0; i < reelCycleCount.Count; i++)
         {
@@ -488,20 +494,13 @@ public class SlotView : MonoBehaviour
         var currentResult = gameManager.lastResult;
         if (currentResult != null)
         {
-            // Sticky wilds — server key format: "col_row"
+            // Sticky wilds — store state for next spin (overlays only shown during spinning)
             if (currentResult.stickyWilds != null)
             {
-                foreach (var kvp in currentResult.stickyWilds)
-                {
-                    string[] parts = kvp.Key.Split('_');
-                    if (parts.Length == 2 &&
-                        int.TryParse(parts[0], out int col) &&
-                        int.TryParse(parts[1], out int row))
-                    {
-                        var go = WinBox(stickyWildColumns, col, row);
-                        if (go) go.SetActive(true);
-                    }
-                }
+                currentStickyWilds = currentResult.stickyWilds;
+                // Don't apply overlays here — they only show during spinning.
+                // The reel symbols already display the correct wild sprite after stopping.
+                DisableColumns(stickyWildColumns);
             }
 
             // Overlay scatter badges — server pos format: [row, col]
@@ -623,11 +622,9 @@ public class SlotView : MonoBehaviour
 
     internal void ShowWinLineAnimation(List<WinLine> winLines, System.Action onComplete)
     {
-        Debug.Log($"[ShowWinLineAnimation] Called with {winLines?.Count ?? 0} win lines");
 
         if (winLines == null || winLines.Count == 0)
         {
-            Debug.Log("[ShowWinLineAnimation] No win lines to animate");
             onComplete?.Invoke();
             return;
         }
@@ -635,21 +632,14 @@ public class SlotView : MonoBehaviour
         for (int i = 0; i < winLines.Count; i++)
         {
             var line = winLines[i];
-            Debug.Log($"[ShowWinLineAnimation] Line {i}: lineId={line.lineId}, symbolId={line.symbolId}, positions={string.Join(",", line.positions)}");
+    
         }
 
         KillWinTweens();
         StartCoroutine(PlayWinLinesSequentially(winLines, onComplete));
     }
 
-    /// <summary>
-    /// Plays each winning line animation one at a time:
-    ///   1. Enable win boxes for this line's positions
-    ///   2. Pop-animate each symbol winPopRepeat times
-    ///   3. Wait for the animation to finish
-    ///   4. Disable only the previous line's cells (not all) and reset their scales
-    ///   5. Move to next line — invoke onComplete after all lines done
-    /// </summary>
+
     private IEnumerator PlayWinLinesSequentially(List<WinLine> winLines, System.Action onComplete)
     {
         float lineDuration = (winPopDuration * winPopRepeat) + (0.1f * (winPopRepeat - 1));
@@ -662,8 +652,7 @@ public class SlotView : MonoBehaviour
         {
             if (winLine.positions == null || winLine.positions.Count == 0) continue;
 
-            Debug.Log($"[PlayWinLinesSequentially] Processing winLine ID: {winLine.lineId}, symbolId: {winLine.symbolId}, positions count: {winLine.positions.Count}");
-
+           
             if (prevPositions != null)
             {
                 KillWinTweens();
@@ -671,7 +660,6 @@ public class SlotView : MonoBehaviour
                 {
                     int r = flatIdx / 5;
                     int c = flatIdx % 5;
-                    Debug.Log($"[PlayWinLinesSequentially] Disabling previous flatIdx: {flatIdx} -> col: {c}, row: {r}");
                     DisableWinBox(c, r);
                     ResetSymbolScale(c, r);
                 }
@@ -682,7 +670,6 @@ public class SlotView : MonoBehaviour
                 int row = flatIndex / 5;
                 int col = flatIndex % 5;
 
-                Debug.Log($"[PlayWinLinesSequentially] flatIndex: {flatIndex} -> col: {col}, row: {row}");
 
                 if (col < 0 || col >= 5 || row < 0 || row >= 4)
                 {
@@ -690,10 +677,8 @@ public class SlotView : MonoBehaviour
                     continue;
                 }
 
-                Debug.Log($"[PlayWinLinesSequentially] Enabling win box at col: {col}, row: {row}");
                 EnableWinBox(col, row);
 
-                Debug.Log($"[PlayWinLinesSequentially] Animating symbol at col: {col}, row: {row}");
                 AnimateWinSymbol(col, row);
             }
 
@@ -706,18 +691,12 @@ public class SlotView : MonoBehaviour
 
         onComplete?.Invoke();
     }
-
-    /// <summary>
-    /// Enables the win-box overlay at the given (col, row) cell.
-    /// Handles both column-organised and row-organised reelOverlaysList.
-    /// </summary>
     private void EnableWinBox(int col, int row)
     {
         var go = WinBox(winBoxColumns, col, row);
         if (go)
         {
             go.SetActive(true);
-            Debug.Log($"[EnableWinBox] Enabled win box at col: {col}, row: {row}, GameObject: {go.name}");
         }
         else
         {
@@ -731,9 +710,6 @@ public class SlotView : MonoBehaviour
         if (go) go.SetActive(false);
     }
 
-    /// <summary>
-    /// Resets the scale of the symbol image at (col, row) to Vector3.one.
-    /// </summary>
     private void ResetSymbolScale(int col, int row)
     {
         if (col >= reelImagesList.Count) return;
@@ -748,7 +724,6 @@ public class SlotView : MonoBehaviour
 
     private void AnimateWinSymbol(int column, int row)
     {
-        Debug.Log($"[AnimateWinSymbol] Called for col: {column}, row: {row}");
 
         if (column >= reelImagesList.Count)
         {
@@ -776,8 +751,6 @@ public class SlotView : MonoBehaviour
             Debug.LogError($"[AnimateWinSymbol] Symbol image is NULL at col: {column}, row: {row}, imageIndex: {imageIndex}");
             return;
         }
-
-        Debug.Log($"[AnimateWinSymbol] Animating symbol at col: {column}, row: {row}, imageIndex: {imageIndex}, GameObject: {symbolImage.gameObject.name}");
 
         symbolImage.transform.localScale = Vector3.one;
 
@@ -857,6 +830,64 @@ public class SlotView : MonoBehaviour
         KillWinTweens();
     }
 
+    /// <summary>
+    /// Apply sticky wild overlays: enable the overlay GO and set its Image sprite
+    /// to the correct wild multiplier variant.
+    /// </summary>
+    private void ApplyStickyWilds(Dictionary<string, int> stickyWilds)
+    {
+        if (stickyWilds == null) return;
+
+        foreach (var kvp in stickyWilds)
+        {
+            string[] parts = kvp.Key.Split('_');
+            if (parts.Length == 2 &&
+                int.TryParse(parts[0], out int row) &&
+                int.TryParse(parts[1], out int col))
+            {
+                var go = WinBox(stickyWildColumns, col, row);
+                if (go)
+                {
+                    go.SetActive(true);
+
+                    // Set the overlay image to the correct wild multiplier sprite
+                    int multiplier = kvp.Value;
+                    int wildSpriteId = GetWildSpriteIdForMultiplier(multiplier);
+                    Image img = go.GetComponent<Image>();
+                    if (img != null && wildSpriteId >= 0 && wildSpriteId < symbolSprites.Length)
+                    {
+                        img.sprite = symbolSprites[wildSpriteId];
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Maps a wild multiplier value to the correct sprite ID.
+    /// 1x → 11 (Wild), 2x → 13 (Wild2x), 3x → 14 (Wild3x), 5x → 15 (Wild5x)
+    /// </summary>
+    private int GetWildSpriteIdForMultiplier(int multiplier)
+    {
+        return multiplier switch
+        {
+            1 => 11,
+            2 => 13,
+            3 => 14,
+            5 => 15,
+            _ => 11
+        };
+    }
+
+    /// <summary>
+    /// Clear sticky wild state — call when free spins end.
+    /// </summary>
+    internal void ClearStickyWilds()
+    {
+        currentStickyWilds = null;
+        DisableColumns(stickyWildColumns);
+    }
+
     #endregion
 
     #region Cleanup
@@ -875,12 +906,7 @@ public class ReelImages
     public List<Image> images = new List<Image>(16);
 }
 
-/// <summary>
-/// One column of overlay GameObjects.
-/// rows[0] = top visible row, rows[3] = bottom visible row.
-/// Assign in Inspector: 5 entries of this class (Col0..Col4),
-/// each with exactly 4 row slots.
-/// </summary>
+
 [System.Serializable]
 public class ColumnOverlays
 {
