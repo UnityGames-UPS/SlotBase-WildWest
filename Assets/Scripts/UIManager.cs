@@ -1006,6 +1006,8 @@ public class UIManager : MonoBehaviour
                 pausedForExtraSpins = false;
                 if (gameManager.isInFreeSpins)
                 {
+                    // Update the free spin count display to show new total
+                    UpdateFreeSpinCount(gameManager.freeSpinsRemaining);
                     gameManager.ResumeAfterExtraSpinsPopup();
                 }
             }

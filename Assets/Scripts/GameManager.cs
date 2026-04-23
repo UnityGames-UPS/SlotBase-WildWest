@@ -251,6 +251,17 @@ public class GameManager : MonoBehaviour
 
         uiManager.OnSpinCompleted(lastResult);
 
+        // Extract server-authoritative values before nullifying lastResult
+        int serverSpinsRemaining = lastResult.serverSpinsRemaining;
+        int serverSpinsUsed = lastResult.serverSpinsUsed;
+        double serverTotalRoundWin = lastResult.serverTotalRoundWin;
+        bool isRoundOver = lastResult.isRoundOver;
+        
+        if (isInFreeSpins)
+        {
+            freeSpinsRemaining = serverSpinsRemaining;
+        }
+
         // Show overlay scatter extra spins popup (display only — server already updated spinsRemaining)
         if (lastResult.overlayScatterData != null && lastResult.overlayScatterData.isTriggered)
         {
@@ -273,12 +284,6 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // Use server-authoritative free spin state
-        int serverSpinsRemaining = lastResult.serverSpinsRemaining;
-        int serverSpinsUsed = lastResult.serverSpinsUsed;
-        double serverTotalRoundWin = lastResult.serverTotalRoundWin;
-        bool isRoundOver = lastResult.isRoundOver;
-
         lastResult = null;
 
         if (isAutoPlaying && !isInFreeSpins)
@@ -300,9 +305,6 @@ public class GameManager : MonoBehaviour
         }
         else if (isInFreeSpins)
         {
-            // Use server values directly instead of client-side computation
-            freeSpinsRemaining = serverSpinsRemaining;
-
             uiManager.UpdateFreeSpinCount(freeSpinsRemaining);
 
             if (isRoundOver || freeSpinsRemaining <= 0)
