@@ -408,10 +408,12 @@ public static class InitDataConverter
             : (serverResponse.payload.freeSpinState?.totalRoundWin ?? 0);
         bool isRoundOver = serverResponse.features?.freeSpins?.isRoundOver ?? serverResponse.payload.isRoundOver;
 
+        var stickyWilds = serverResponse.payload.freeSpinState?.stickyWilds;
+
         var result = new SpinResult
         {
             // Convert and transpose reels from server format to client format
-            resultMatrix = ConvertReelsToMatrix(serverResponse.payload.reels, serverResponse.payload.winningLines, gameConfig),
+            resultMatrix = ConvertReelsToMatrix(serverResponse.payload.reels, serverResponse.payload.winningLines, stickyWilds, gameConfig),
 
             // Map totalWin to winAmount
             winAmount = serverResponse.payload.totalWin,
@@ -469,7 +471,7 @@ public static class InitDataConverter
     }
 
 
-    private static List<List<int>> ConvertReelsToMatrix(List<List<string>> serverReels, List<ServerWinLine> winningLines, GameConfig gameConfig)
+    private static List<List<int>> ConvertReelsToMatrix(List<List<string>> serverReels, List<ServerWinLine> winningLines, Dictionary<string, int> stickyWilds, GameConfig gameConfig)
     {
         // Server sends 4 rows x 5 columns: reels[row][col]
         // Client needs 5 columns x 4 rows: matrix[col][row]
@@ -482,6 +484,8 @@ public static class InitDataConverter
 
         // Build wild multiplier lookup: [col][row] -> multiplier
         var wildMultipliers = new Dictionary<string, int>();
+
+        // 1. Add winning line wild details (format explicit col, row)
         if (winningLines != null)
         {
             foreach (var line in winningLines)
@@ -493,6 +497,24 @@ public static class InitDataConverter
                         string key = $"{wild.col}_{wild.row}";
                         wildMultipliers[key] = wild.multiplier;
                     }
+                }
+            }
+        }
+
+        // 2. Add sticky wilds (format row_col) - these override winningLines if they overlap
+        // to ensure the authoritative sticky multiplier is used (e.g. 3x instead of 1x)
+        if (stickyWilds != null)
+        {
+            foreach (var kvp in stickyWilds)
+            {
+                string[] parts = kvp.Key.Split('_');
+                if (parts.Length == 2 &&
+                    int.TryParse(parts[0], out int row) &&
+                    int.TryParse(parts[1], out int col))
+                {
+                    // Convert row_col to col_row for lookup
+                    string key = $"{col}_{row}";
+                    wildMultipliers[key] = kvp.Value;
                 }
             }
         }

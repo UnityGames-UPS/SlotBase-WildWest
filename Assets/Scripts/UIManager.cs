@@ -208,7 +208,7 @@ public class UIManager : MonoBehaviour
 
         if (freeSpinCountContainer) freeSpinCountContainer.SetActive(false);
         if (lastSpinLeftObject) lastSpinLeftObject.SetActive(false);
-        if (buyFreeSpinObject) buyFreeSpinObject.SetActive(false);
+        if (buyFreeSpinObject) buyFreeSpinObject.SetActive(true);
 
         if (freeSpinStartPopup) freeSpinStartPopup.SetActive(false);
         if (freeSpinEndPopup) freeSpinEndPopup.SetActive(false);
@@ -896,6 +896,7 @@ public class UIManager : MonoBehaviour
     {
         initialFreeSpins = spinsAwarded;
         totalFreeSpinsAwarded = spinsAwarded;
+        if (buyFreeSpinObject) buyFreeSpinObject.SetActive(false);
         ShowFreeSpinStartPopup(spinsAwarded, false);
     }
 
@@ -913,6 +914,7 @@ public class UIManager : MonoBehaviour
         {
             if (freeSpinCountContainer) freeSpinCountContainer.SetActive(false);
             if (lastSpinLeftObject) lastSpinLeftObject.SetActive(true);
+            if (buyFreeSpinObject) buyFreeSpinObject.SetActive(false);
         }
         else if (remainingSpins == 0)
         {
