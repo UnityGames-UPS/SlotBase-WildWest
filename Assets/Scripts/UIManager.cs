@@ -160,6 +160,7 @@ public class UIManager : MonoBehaviour
     private Tween winTween;
     private double totalFreeSpinWin = 0;
     private int totalFreeSpinsAwarded = 0;
+    private int initialFreeSpins = 0;
     private Coroutine maxBetCoroutine;
     private Coroutine winDisplayCoroutine;
 
@@ -875,6 +876,7 @@ public class UIManager : MonoBehaviour
 
     internal void OnFreeSpinsStarted(int spinsAwarded)
     {
+        initialFreeSpins = spinsAwarded;
         totalFreeSpinsAwarded = spinsAwarded;
         ShowFreeSpinStartPopup(spinsAwarded, false);
     }
@@ -935,10 +937,13 @@ public class UIManager : MonoBehaviour
 
     private bool isClosingExtraSpins = false;
     private Coroutine hideExtraSpinsCoroutine;
+    private bool pausedForExtraSpins = false;
 
     internal void ShowExtraFreeSpinsPopup(int extraSpins)
     {
         isClosingExtraSpins = true;
+        pausedForExtraSpins = true;
+        totalFreeSpinsAwarded += extraSpins;
         ShowFreeSpinStartPopup(extraSpins, true);
     }
 
@@ -946,7 +951,11 @@ public class UIManager : MonoBehaviour
     {
         if (!freeSpinStartPopup || !freeSpinStartPopupRect) return;
 
-        if (!isExtraSpins) isClosingExtraSpins = false;
+        if (!isExtraSpins) 
+        {
+            isClosingExtraSpins = false;
+            pausedForExtraSpins = false;
+        }
 
         if (hideExtraSpinsCoroutine != null)
         {
@@ -967,10 +976,8 @@ public class UIManager : MonoBehaviour
         freeSpinStartPopupRect.localScale = Vector3.one;
         freeSpinStartPopupRect.DOAnchorPosY(popupFinalY, popupDropDuration).SetEase(Ease.OutBounce);
         
-        if (isExtraSpins)
-        {
-            hideExtraSpinsCoroutine = StartCoroutine(HideExtraFreeSpinsPopup());
-        }
+        // Extra spins now require manual close - no auto-hide
+        // User must click the close button
     }
 
     private IEnumerator HideExtraFreeSpinsPopup()
@@ -995,7 +1002,12 @@ public class UIManager : MonoBehaviour
             
             if (wasExtraSpins)
             {
-                // Skip intro anim for extra free spins
+                // Resume spinning after extra spins popup closed - bypass intro animation
+                pausedForExtraSpins = false;
+                if (gameManager.isInFreeSpins)
+                {
+                    gameManager.ResumeAfterExtraSpinsPopup();
+                }
             }
             else
             {
@@ -1032,6 +1044,10 @@ public class UIManager : MonoBehaviour
     {
         if (!freeSpinEndPopup) return;
 
+        // Reset free spin tracking
+        initialFreeSpins = 0;
+        totalFreeSpinsAwarded = 0;
+
         AnimatePopupClose(freeSpinEndPopupRect, () =>
         {
             freeSpinEndPopup.SetActive(false);
@@ -1058,7 +1074,7 @@ public class UIManager : MonoBehaviour
     {
         if (numberSprites == null || numberSprites.Length < 10) return;
 
-        // Use SetActive to properly handle layout groups
+        // Properly handle tens digit visibility
         if (tensImage)
         {
             if (count >= 10)
@@ -1069,13 +1085,16 @@ public class UIManager : MonoBehaviour
             }
             else
             {
+                // Disable completely for single digits
                 tensImage.gameObject.SetActive(false);
+                tensImage.color = new Color(1f, 1f, 1f, 0f);
             }
         }
         
         if (onesImage)
         {
             onesImage.gameObject.SetActive(true);
+            onesImage.color = Color.white;
             onesImage.sprite = numberSprites[count % 10];
         }
     }
@@ -1212,6 +1231,11 @@ public class UIManager : MonoBehaviour
     #endregion
 
     #region Helper Methods
+
+    internal bool IsPausedForExtraSpins()
+    {
+        return pausedForExtraSpins;
+    }
 
     private void SetBetControlsEnabled(bool enabled)
     {

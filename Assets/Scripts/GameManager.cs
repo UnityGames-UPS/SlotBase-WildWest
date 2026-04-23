@@ -257,6 +257,11 @@ public class GameManager : MonoBehaviour
             if (isInFreeSpins)
             {
                 uiManager.ShowExtraFreeSpinsPopup(lastResult.overlayScatterData.extraSpins);
+                
+                // Wait for user to close popup before continuing
+                lastResult = null;
+                currentState = GameState.Idle;
+                return;
             }
         }
 
@@ -374,6 +379,13 @@ public class GameManager : MonoBehaviour
         waitingForFreeSpinStart = false;
 
         StartCoroutine(DelayBeforeFirstFreeSpin());
+    }
+
+    internal void ResumeAfterExtraSpinsPopup()
+    {
+        // Resume free spin cycle after extra spins popup is closed
+        // Bypass intro animation and continue to next spin
+        StartCoroutine(DelayBeforeNextFreeSpin());
     }
 
     private IEnumerator DelayBeforeFirstFreeSpin()
