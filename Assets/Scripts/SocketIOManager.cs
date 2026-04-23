@@ -314,7 +314,7 @@ public class SocketIOManager : MonoBehaviour
             gameSocket.Emit("ping");
         }
     }
-    
+
 
     private void OnPongReceived(string data)
     {
@@ -347,6 +347,23 @@ public class SocketIOManager : MonoBehaviour
             {
                 betIndex = betIndex,
                 isFreeSpin = isFreeSpin
+            }
+        };
+
+        string json = JsonUtility.ToJson(request);
+        gameSocket.Emit("request", json);
+    }
+
+    internal void SendBuyFeatureRequest(int betIndex)
+    {
+        Debug.Log($"[SocketIO] BuyFeature request: betIndex={betIndex}");
+
+        var request = new BuyFeatureRequest
+        {
+            type = "BUY_FEATURE",
+            payload = new BuyFeaturePayload
+            {
+                betIndex = betIndex
             }
         };
 
@@ -393,7 +410,7 @@ public class SocketIOManager : MonoBehaviour
     }
 
     #endregion
-     private List<List<int>> GenerateRandomMatrix()
+    private List<List<int>> GenerateRandomMatrix()
     {
         var matrix = new List<List<int>>();
         for (int col = 0; col < 5; col++)

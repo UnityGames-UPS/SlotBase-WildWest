@@ -129,6 +129,7 @@ public class ServerFreeSpinState
     public int spinsRemaining;
     public int spinsUsed;
     public double totalRoundWin;
+    public bool isBought;
     public Dictionary<string, int> stickyWilds;
 }
 
@@ -198,6 +199,19 @@ public class SpinPayload
     public bool isFreeSpin;
 }
 
+[Serializable]
+public class BuyFeatureRequest
+{
+    public string type = "BUY_FEATURE";
+    public BuyFeaturePayload payload;
+}
+
+[Serializable]
+public class BuyFeaturePayload
+{
+    public int betIndex;
+}
+
 #endregion
 
 #region Game Configuration (Client Side Converted)
@@ -222,6 +236,10 @@ public class GameConfig
 
     // Scatter configuration
     public int scatterSymbolId = 12;
+
+    // Buy Feature configuration
+    public bool buyFeatureEnabled;
+    public double buyFeatureCostMultiplier;
 }
 
 [Serializable]
@@ -280,6 +298,7 @@ public class FreeSpinData
     public bool isTriggered;
     public int spinsAwarded;
     public int remainingSpins;
+    public bool isBought;
 }
 
 [Serializable]
@@ -378,6 +397,13 @@ public static class InitDataConverter
             }
         }
 
+        // Buy Feature config
+        if (serverData.features?.buyFeature != null)
+        {
+            config.buyFeatureEnabled = serverData.features.buyFeature.enabled;
+            config.buyFeatureCostMultiplier = serverData.features.buyFeature.costMultiplier;
+        }
+
         return config;
     }
 
@@ -434,7 +460,8 @@ public static class InitDataConverter
                 {
                     isTriggered = true,
                     spinsAwarded = serverResponse.features.freeSpins.spinsAwarded,
-                    remainingSpins = 0
+                    remainingSpins = 0,
+                    isBought = serverResponse.payload.freeSpinState?.isBought ?? false
                 }
                 : null,
 
@@ -447,7 +474,7 @@ public static class InitDataConverter
                     winAmount = 0 // Calculate if needed
                 }
                 : null,
-            
+
             overlayScatterData = serverResponse.features?.freeSpins?.overlayScatter != null && serverResponse.features.freeSpins.overlayScatter.isTriggered
                 ? new OverlayScatterData
                 {
@@ -457,7 +484,7 @@ public static class InitDataConverter
                     positions = serverResponse.features.freeSpins.overlayScatter.positions
                 }
                 : null,
-            
+
             stickyWilds = serverResponse.payload.freeSpinState?.stickyWilds,
 
             // Server-authoritative free spin state
@@ -619,7 +646,7 @@ public static class InitDataConverter
 
             var flatPositions = new List<int>();
 
-         
+
 
             if (serverLine.positions != null && serverLine.positions.Count > 0)
             {
@@ -631,7 +658,7 @@ public static class InitDataConverter
                         int col = pos[1];
                         int flatIndex = row * 5 + col;
                         flatPositions.Add(flatIndex);
-                      
+
                     }
                 }
             }

@@ -79,6 +79,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private RectTransform settingsPanelRect;
     [SerializeField] private Button settingsOpenButton;
     [SerializeField] private Button settingsCloseButton;
+    [SerializeField] private Button gameQuitButton;
 
     [Header("Settings - Spin Speed Toggles (mirrored in AutoPlay)")]
     [SerializeField] private Toggle settingsTurboToggle;
@@ -104,6 +105,21 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Sprite[] freeSpinNumberSprites;
     [SerializeField] private GameObject lastSpinLeftObject;
     [SerializeField] private GameObject buyFreeSpinObject;
+    [SerializeField] private TMP_Text buyFreeSpinButtonCostText;
+
+    [Header("Buy Free Spin Panel")]
+    [SerializeField] private GameObject buyFreeSpinPanel;
+    [SerializeField] private RectTransform buyFreeSpinPanelRect;
+    [SerializeField] private Button buyFreeSpinOpenButton;        
+    [SerializeField] private Button buyFreeSpinCancelButton;  
+    [SerializeField] private Button buyFreeSpinConfirmButton;      
+    [SerializeField] private Button buyFreeSpinBetPlusButton;      
+    [SerializeField] private Button buyFreeSpinBetMinusButton;     
+    [SerializeField] private TMP_Text buyFeatureCostText;
+    [SerializeField] private Image[] buyFeatureBetDigits;
+    [SerializeField] private HorizontalLayoutGroup buyFeatureBetLayoutGroup;
+    [SerializeField] private GameObject buyFeatureBetDecimalPoint;
+    [SerializeField] private Sprite[] buyFeatureNumberSprites;
 
     [Header("Free Spin Start Popup")]
     [SerializeField] private GameObject freeSpinStartPopup;
@@ -209,6 +225,7 @@ public class UIManager : MonoBehaviour
         if (freeSpinCountContainer) freeSpinCountContainer.SetActive(false);
         if (lastSpinLeftObject) lastSpinLeftObject.SetActive(false);
         if (buyFreeSpinObject) buyFreeSpinObject.SetActive(true);
+        if (buyFreeSpinPanel) buyFreeSpinPanel.SetActive(false);
 
         if (freeSpinStartPopup) freeSpinStartPopup.SetActive(false);
         if (freeSpinEndPopup) freeSpinEndPopup.SetActive(false);
@@ -338,8 +355,15 @@ public class UIManager : MonoBehaviour
             anotherDeviceCloseButton.onClick.RemoveAllListeners();
             anotherDeviceCloseButton.onClick.AddListener(OnExitButtonPressed);
         }
+        if(gameQuitButton) gameQuitButton.onClick.AddListener(OnExitButtonPressed);
 
         if (testFreeSpinButton) testFreeSpinButton.onClick.AddListener(TestFreeSpinPopups);
+
+        if (buyFreeSpinOpenButton) buyFreeSpinOpenButton.onClick.AddListener(OpenBuyFreeSpinPanel);
+        if (buyFreeSpinCancelButton) buyFreeSpinCancelButton.onClick.AddListener(CloseBuyFreeSpinPanel);
+        if (buyFreeSpinConfirmButton) buyFreeSpinConfirmButton.onClick.AddListener(OnBuyFreeSpinConfirmed);
+        if (buyFreeSpinBetPlusButton) buyFreeSpinBetPlusButton.onClick.AddListener(OnBuyFeatureBetPlus);
+        if (buyFreeSpinBetMinusButton) buyFreeSpinBetMinusButton.onClick.AddListener(OnBuyFeatureBetMinus);
     }
 
     private void SetupAutoPlayPanel()
@@ -394,6 +418,11 @@ public class UIManager : MonoBehaviour
         UpdateBetDisplay();
         UpdateBalanceDisplay();
         UpdateWinDisplay(0);
+        UpdateBuyFeatureCostDisplay(); // refresh button cost text & show/hide button
+
+        // Show buy button only if feature is enabled
+        bool buyEnabled = gameManager.gameConfig.buyFeatureEnabled;
+        if (buyFreeSpinObject) buyFreeSpinObject.SetActive(buyEnabled);
     }
 
     internal void OnSpinStarted()
@@ -502,6 +531,7 @@ public class UIManager : MonoBehaviour
             betAmountText.text = gameManager.currentBetAmount.ToString("F2");
         UpdateBetButtonStates();
         CheckMaxBetIndicator();
+        UpdateBuyFeatureCostDisplay(); // keep button cost in sync
     }
 
     private void UpdateBetButtonStates()
@@ -890,6 +920,172 @@ public class UIManager : MonoBehaviour
 
     #endregion
 
+    #region Buy Free Spin Panel
+
+    /// <summary>
+    /// Updates the cost plain-text inside the buy panel and refreshes the
+    /// sprite-digit bet-value display. Also keeps the open-panel button label in sync.
+    /// </summary>
+    internal void UpdateBuyFeatureCostDisplay()
+    {
+        if (gameManager.gameConfig == null) return;
+
+        double cost = gameManager.GetBuyFeatureCost();
+
+        // Plain-text label on the open-panel button (outside the panel)
+        if (buyFreeSpinButtonCostText)
+            buyFreeSpinButtonCostText.text = FormatCostText(cost);
+
+        // Plain-text cost label inside the panel
+        if (buyFeatureCostText)
+            buyFeatureCostText.text = FormatCostText(cost);
+
+        // Sprite-digit display for the current bet value inside the panel
+        double betValue = gameManager.gameConfig.availableBets[gameManager.buyFeatureBetIndex];
+        SetBuyFeatureBetDisplay(betValue);
+    }
+
+    /// <summary>
+    /// Renders the bet value using a sprite-digit Image array with decimal support,
+    /// matching the style of the Free Spin Total Win display.
+    /// Supports full 6-digit format (e.g. 123.23).
+    /// </summary>
+    private void SetBuyFeatureBetDisplay(double betValue)
+    {
+        if (buyFeatureBetDigits == null || buyFeatureBetDigits.Length == 0) return;
+        if (buyFeatureNumberSprites == null || buyFeatureNumberSprites.Length < 10) return;
+
+        // Hide all digit images first
+        foreach (var digit in buyFeatureBetDigits)
+            if (digit) digit.gameObject.SetActive(false);
+
+        if (buyFeatureBetDecimalPoint) buyFeatureBetDecimalPoint.SetActive(false);
+
+        // Determine format: use decimals only if the value has a fractional part
+        bool hasDecimal = (betValue % 1) != 0;
+        string betStr = hasDecimal ? betValue.ToString("F2") : betValue.ToString("F0");
+
+        // Count total visible objects (digits + decimal point) for spacing adjustment
+        int totalObjects = betStr.Replace(".", "").Length;
+        if (hasDecimal) totalObjects++;
+
+        AdjustBuyFeatureBetLayoutSpacing(totalObjects);
+
+        // Fill from right to left (same approach as SetWinAmountDisplay)
+        int arrayIndex = buyFeatureBetDigits.Length - 1;
+
+        for (int charIndex = betStr.Length - 1; charIndex >= 0 && arrayIndex >= 0; charIndex--)
+        {
+            char c = betStr[charIndex];
+            if (c == '.')
+            {
+                if (buyFeatureBetDecimalPoint) buyFeatureBetDecimalPoint.SetActive(true);
+            }
+            else if (char.IsDigit(c))
+            {
+                int num = int.Parse(c.ToString());
+                if (buyFeatureBetDigits[arrayIndex])
+                {
+                    buyFeatureBetDigits[arrayIndex].gameObject.SetActive(true);
+                    buyFeatureBetDigits[arrayIndex].sprite = buyFeatureNumberSprites[num];
+                }
+                arrayIndex--;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Adjusts the HorizontalLayoutGroup spacing for the buy feature bet display
+    /// based on how many objects are visible, matching the Free Spin Total Win style.
+    /// </summary>
+    private void AdjustBuyFeatureBetLayoutSpacing(int objectCount)
+    {
+        if (buyFeatureBetLayoutGroup == null) return;
+
+        buyFeatureBetLayoutGroup.spacing = objectCount switch
+        {
+            6 => 0f,
+            5 => 0f,
+            4 => -40f,
+            3 => -80f,
+            2 => -120f,
+            _ => 0f
+        };
+    }
+
+    /// <summary>Returns "1,234.00" or "0.50" style string for cost labels.</summary>
+    private string FormatCostText(double cost)
+    {
+        return cost.ToString("N2", System.Globalization.CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
+    /// Increases the buy-panel bet, then mirrors the change to the main bet index
+    /// so the outside bet display stays in sync.
+    /// </summary>
+    private void OnBuyFeatureBetPlus()
+    {
+        gameManager.IncreaseBuyFeatureBet();
+        // Mirror to main bet
+        gameManager.currentBetIndex = gameManager.buyFeatureBetIndex;
+        gameManager.currentBetAmount = gameManager.gameConfig.availableBets[gameManager.currentBetIndex];
+        UpdateBetDisplay(); // refreshes outside betAmountText + calls UpdateBuyFeatureCostDisplay
+    }
+
+    /// <summary>
+    /// Decreases the buy-panel bet, then mirrors the change to the main bet index
+    /// so the outside bet display stays in sync.
+    /// </summary>
+    private void OnBuyFeatureBetMinus()
+    {
+        gameManager.DecreaseBuyFeatureBet();
+        // Mirror to main bet
+        gameManager.currentBetIndex = gameManager.buyFeatureBetIndex;
+        gameManager.currentBetAmount = gameManager.gameConfig.availableBets[gameManager.currentBetIndex];
+        UpdateBetDisplay(); // refreshes outside betAmountText + calls UpdateBuyFeatureCostDisplay
+    }
+
+    private void OpenBuyFreeSpinPanel()
+    {
+        if (gameManager.currentState != GameState.Idle) return;
+        if (!gameManager.gameConfig.buyFeatureEnabled) return;
+
+        // Sync buy panel bet index to current main bet before opening
+        gameManager.buyFeatureBetIndex = gameManager.currentBetIndex;
+        UpdateBuyFeatureCostDisplay();
+
+        if (buyFreeSpinPanel) buyFreeSpinPanel.SetActive(true);
+        AnimatePopupOpen(buyFreeSpinPanelRect);
+    }
+
+    private void CloseBuyFreeSpinPanel()
+    {
+        AnimatePopupClose(buyFreeSpinPanelRect, () =>
+        {
+            if (buyFreeSpinPanel) buyFreeSpinPanel.SetActive(false);
+        });
+    }
+
+    private void OnBuyFreeSpinConfirmed()
+    {
+        // Close panel immediately, then trigger purchase
+        if (buyFreeSpinPanelRect) buyFreeSpinPanelRect.localScale = Vector3.one;
+        if (buyFreeSpinPanel) buyFreeSpinPanel.SetActive(false);
+
+        gameManager.RequestBuyFeature();
+    }
+
+    /// <summary>Called by GameManager after BUY_FEATURE is sent — disable controls.</summary>
+    internal void OnBuyFeatureConfirmed()
+    {
+        SetBetControlsEnabled(false);
+        if (spinButton) spinButton.interactable = false;
+        if (buyFreeSpinObject) buyFreeSpinObject.SetActive(false);
+        if (autoPlayOpenButton) autoPlayOpenButton.interactable = false;
+    }
+
+    #endregion
+
     #region Free Spins
 
     internal void OnFreeSpinsStarted(int spinsAwarded)
@@ -971,7 +1167,7 @@ public class UIManager : MonoBehaviour
     {
         if (!freeSpinStartPopup || !freeSpinStartPopupRect) return;
 
-        if (!isExtraSpins) 
+        if (!isExtraSpins)
         {
             isClosingExtraSpins = false;
             pausedForExtraSpins = false;
@@ -995,7 +1191,7 @@ public class UIManager : MonoBehaviour
         freeSpinStartPopupRect.anchoredPosition = new Vector2(freeSpinStartPopupRect.anchoredPosition.x, popupAppearY);
         freeSpinStartPopupRect.localScale = Vector3.one;
         freeSpinStartPopupRect.DOAnchorPosY(popupFinalY, popupDropDuration).SetEase(Ease.OutBounce);
-        
+
         // Extra spins now require manual close - no auto-hide
         // User must click the close button
     }
@@ -1019,7 +1215,7 @@ public class UIManager : MonoBehaviour
         AnimatePopupClose(freeSpinStartPopupRect, () =>
         {
             freeSpinStartPopup.SetActive(false);
-            
+
             if (wasExtraSpins)
             {
                 // Resume spinning after extra spins popup closed - bypass intro animation
@@ -1112,7 +1308,7 @@ public class UIManager : MonoBehaviour
                 tensImage.color = new Color(1f, 1f, 1f, 0f);
             }
         }
-        
+
         if (onesImage)
         {
             onesImage.gameObject.SetActive(true);
@@ -1174,10 +1370,10 @@ public class UIManager : MonoBehaviour
             _ => 0f
         };
     }
-
+  
     #endregion
 
-    #region Popup Animations (Generic)
+        #region Popup Animations (Generic)
 
     private void AnimatePopupOpen(RectTransform popupRect)
     {
