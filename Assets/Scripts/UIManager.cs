@@ -9,6 +9,7 @@ public class UIManager : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private GameManager gameManager;
+    [SerializeField] private HistoryController historyController;
 
     [Header("Loading & Intro")]
     [SerializeField] private GameObject loadingScreen;
@@ -80,6 +81,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button settingsOpenButton;
     [SerializeField] private Button settingsCloseButton;
     [SerializeField] private Button gameQuitButton;
+    [SerializeField] private Button historyOpenButton; // New: Opens bet history from settings
 
     [Header("Settings - Spin Speed Toggles (mirrored in AutoPlay)")]
     [SerializeField] private Toggle settingsTurboToggle;
@@ -158,7 +160,6 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject anotherDevicePopup;
     [SerializeField] private Button anotherDeviceCloseButton;
 
-    [SerializeField] private SocketIOManager socketManager;
 
     [Header("Animation Settings")]
     [SerializeField] private float winCountDuration = 0.25f;
@@ -356,6 +357,7 @@ public class UIManager : MonoBehaviour
             anotherDeviceCloseButton.onClick.AddListener(OnExitButtonPressed);
         }
         if(gameQuitButton) gameQuitButton.onClick.AddListener(OnExitButtonPressed);
+        if(historyOpenButton) historyOpenButton.onClick.AddListener(OnHistoryButtonPressed); // New: History button
 
         if (testFreeSpinButton) testFreeSpinButton.onClick.AddListener(TestFreeSpinPopups);
 
@@ -783,6 +785,25 @@ public class UIManager : MonoBehaviour
     {
         if (autoPlayPanelRect) autoPlayPanelRect.localScale = Vector3.one;
         if (autoPlayPanel) autoPlayPanel.SetActive(false);
+    }
+
+    private void OnHistoryButtonPressed()
+    {
+        if (historyController != null)
+        {
+            // Close settings panel first
+            if (settingsPanel && settingsPanel.activeSelf)
+            {
+                CloseSettingsPanel();
+            }
+
+            // Open history panel
+            historyController.OpenHistoryPanel();
+        }
+        else
+        {
+            Debug.LogWarning("[UIManager] HistoryController not assigned");
+        }
     }
 
     #endregion

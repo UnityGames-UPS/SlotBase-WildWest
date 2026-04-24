@@ -212,6 +212,61 @@ public class BuyFeaturePayload
     public int betIndex;
 }
 
+// ============================================================================
+// Bet History Models
+// ============================================================================
+
+[Serializable]
+public class BetHistoryRequest
+{
+    public string type = "BET_HISTORY";
+    public string userId; // Will be set from server session
+    public BetHistoryPayload payload;
+}
+
+[Serializable]
+public class BetHistoryPayload
+{
+    public int page = 1;
+    public int limit = 10;
+}
+
+[Serializable]
+public class BetHistoryResponse
+{
+    public string id = "BetHistory";
+    public bool success;
+    public BetHistoryData payload;
+}
+
+[Serializable]
+public class BetHistoryData
+{
+    public List<BetHistoryItem> betHistory;
+    public PaginationInfo pagination;
+}
+
+[Serializable]
+public class BetHistoryItem
+{
+    public string betSlipNumber;
+    public string gameMode;
+    public double startingBalance;
+    public double bet;
+    public double winLoss;
+    public double balance;
+    public string date; // ISO format: "2026-04-23T14:29:55.265Z"
+}
+
+[Serializable]
+public class PaginationInfo
+{
+    public int page;
+    public int limit;
+    public int total;
+    public int totalPages;
+}
+
 #endregion
 
 #region Game Configuration (Client Side Converted)

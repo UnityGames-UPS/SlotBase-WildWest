@@ -22,6 +22,7 @@ public class SocketIOManager : MonoBehaviour
     [SerializeField] private UIManager uiManager;
     [SerializeField] internal JSFunctCalls JSManager;
     [SerializeField] private GameObject RaycastBlocker;
+    [SerializeField] private HistoryController historyController;
 
     private SocketManager socketManager;
     private Socket gameSocket;
@@ -122,6 +123,7 @@ public class SocketIOManager : MonoBehaviour
         gameSocket.On<string>("result", OnResultReceived);
         gameSocket.On<string>("pong", OnPongReceived);
         gameSocket.On<string>("AnotherDevice", OnAnotherDevice);
+        gameSocket.On<string>("result", OnHistoryResultReceived); // For bet history responses
 
         socketManager.Open();
     }
@@ -373,6 +375,57 @@ public class SocketIOManager : MonoBehaviour
 
     #endregion
 
+    #region Bet History
+
+    internal void SendBetHistoryRequest(int page, int limit)
+    {
+        Debug.Log($"[SocketIO] BetHistory request: page={page}, limit={limit}");
+
+        var request = new BetHistoryRequest
+        {
+            type = "BET_HISTORY",
+            userId = "", // Server uses session, empty is fine
+            payload = new BetHistoryPayload
+            {
+                page = page,
+                limit = limit
+            }
+        };
+
+        string json = JsonUtility.ToJson(request);
+        gameSocket.Emit("request", json);
+    }
+
+    private void OnHistoryResultReceived(string jsonData)
+    {
+        // Check if this is a bet history response by looking for "BetHistory" id
+        if (!jsonData.Contains("\"id\":\"BetHistory\""))
+        {
+            return; // Not a history response, ignore
+        }
+
+        Debug.Log($"[SocketIO] BetHistory received: {jsonData}");
+
+        try
+        {
+            var historyResponse = JsonConvert.DeserializeObject<BetHistoryResponse>(jsonData);
+
+            if (historyController != null)
+            {
+                historyController.OnHistoryDataReceived(historyResponse);
+            }
+            else
+            {
+                Debug.LogWarning("[SocketIO] HistoryController not assigned");
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[SocketIO] BetHistory parse failed: {e.Message}");
+        }
+    }
+
+    #endregion
 
 
     #region Cleanup
