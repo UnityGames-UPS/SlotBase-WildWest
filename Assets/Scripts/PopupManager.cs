@@ -40,6 +40,7 @@ public class PopupManager : MonoBehaviour
     [SerializeField] private float rotationSpeed = 360f; // Degrees per second
     [SerializeField] private float loadingTextCycleSpeed = 0.5f; // Seconds per dot change
     [SerializeField] private float defaultLoadingDuration = 5f;
+    [SerializeField] private float minLoadingDuration = 0.8f;
 
     [Header("References")]
     [SerializeField] private GameManager gameManager;
@@ -49,6 +50,9 @@ public class PopupManager : MonoBehaviour
     private Coroutine rotationCoroutine;
     private Coroutine loadingTextCoroutine;
     private Coroutine autoCloseCoroutine;
+    private Coroutine delayedCloseCoroutine;
+    private float loadingStartTime;
+    private System.Action onLoadingClosed;
 
     // Error popup state
     private bool isErrorCritical = false;
@@ -298,16 +302,31 @@ public class PopupManager : MonoBehaviour
     /// Show loading popup with custom duration
     /// </summary>
     /// <param name="duration">Duration in seconds (0 = indefinite until manually closed)</param>
-    public void ShowLoadingPopup(float duration)
+    /// <summary>
+    /// Show loading popup with optional auto-close duration
+    /// </summary>
+    /// <param name="duration">Duration in seconds (-1 = use defaultLoadingDuration, 0 = indefinite)</param>
+    public void ShowLoadingPopup(float duration = -1f)
     {
         if (loadingPopup == null) return;
 
+        // Use default if -1
+        if (duration < 0) duration = defaultLoadingDuration;
+
         CloseCurrentPopup();
+
+        // Stop any pending delayed close
+        if (delayedCloseCoroutine != null)
+        {
+            StopCoroutine(delayedCloseCoroutine);
+            delayedCloseCoroutine = null;
+        }
 
         if (popupParent != null) popupParent.SetActive(true);
 
         currentActivePopup = loadingPopup;
         loadingPopup.SetActive(true);
+        loadingStartTime = Time.time;
 
         AnimatePopupOpen(loadingPopupRect);
         StartRotation(loadingRotatingImage);
@@ -327,9 +346,48 @@ public class PopupManager : MonoBehaviour
     /// <summary>
     /// Close loading popup manually
     /// </summary>
-    public void CloseLoadingPopup()
+    /// <summary>
+    /// Close loading popup manually, respecting minimum duration
+    /// </summary>
+    public void CloseLoadingPopup(System.Action onComplete = null)
     {
-        if (loadingPopup == null || !loadingPopup.activeSelf) return;
+        if (onComplete != null) onLoadingClosed += onComplete;
+
+        if (loadingPopup == null || !loadingPopup.activeSelf)
+        {
+            onLoadingClosed?.Invoke();
+            onLoadingClosed = null;
+            return;
+        }
+
+        float elapsed = Time.time - loadingStartTime;
+        if (elapsed < minLoadingDuration)
+        {
+            if (delayedCloseCoroutine == null)
+            {
+                delayedCloseCoroutine = StartCoroutine(CloseLoadingAfterDelay(minLoadingDuration - elapsed));
+            }
+            return;
+        }
+
+        PerformCloseLoadingPopup();
+    }
+
+    private IEnumerator CloseLoadingAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        delayedCloseCoroutine = null;
+        PerformCloseLoadingPopup();
+    }
+
+    private void PerformCloseLoadingPopup()
+    {
+        if (loadingPopup == null || !loadingPopup.activeSelf) 
+        {
+            onLoadingClosed?.Invoke();
+            onLoadingClosed = null;
+            return;
+        }
 
         if (autoCloseCoroutine != null)
         {
@@ -348,6 +406,10 @@ public class PopupManager : MonoBehaviour
                 currentActivePopup = null;
             }
             UpdatePopupParentState();
+
+            // Invoke and clear callbacks
+            onLoadingClosed?.Invoke();
+            onLoadingClosed = null;
         });
     }
 

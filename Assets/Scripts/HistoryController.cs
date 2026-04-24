@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class HistoryController : MonoBehaviour
 {
@@ -44,6 +45,7 @@ public class HistoryController : MonoBehaviour
     private double totalWinLoss = 0;
 
     private bool isLoading = false;
+    private RectTransform historyPanelRect;
 
     #region Initialization
 
@@ -52,6 +54,7 @@ public class HistoryController : MonoBehaviour
         if (historyPanel != null)
         {
             historyPanel.SetActive(false);
+            historyPanelRect = historyPanel.GetComponent<RectTransform>();
         }
 
         SetupButtons();
@@ -87,7 +90,6 @@ public class HistoryController : MonoBehaviour
         if (isLoading) return;
 
         currentPage = 1;
-        historyPanel.SetActive(true);
         RequestHistoryData(currentPage);
     }
 
@@ -96,12 +98,27 @@ public class HistoryController : MonoBehaviour
     /// </summary>
     public void CloseHistoryPanel()
     {
-        if (historyPanel != null)
+        if (historyPanel == null || !historyPanel.activeSelf) return;
+
+        if (historyPanelRect != null)
+        {
+            historyPanelRect.DOAnchorPosX(Screen.width, 0.35f)
+                .SetEase(Ease.InCubic)
+                .OnComplete(() =>
+                {
+                    historyPanel.SetActive(false);
+                    if (historyPanelRect != null)
+                    {
+                        historyPanelRect.anchoredPosition = new Vector2(0f, historyPanelRect.anchoredPosition.y);
+                    }
+                    ClearAllRows();
+                });
+        }
+        else
         {
             historyPanel.SetActive(false);
+            ClearAllRows();
         }
-
-        ClearAllRows();
     }
 
     #endregion
@@ -122,10 +139,10 @@ public class HistoryController : MonoBehaviour
         isLoading = true;
         UpdateNavigationButtons();
 
-        // Show loading popup
-        if (popupManager != null)
+        // Show loading popup only if history panel is not active
+        if (popupManager != null && (historyPanel == null || !historyPanel.activeSelf))
         {
-            popupManager.ShowLoadingPopup(5f); // 5 second default timeout
+            popupManager.ShowLoadingPopup();
         }
 
         // Send request to socket manager
@@ -139,14 +156,9 @@ public class HistoryController : MonoBehaviour
     {
         isLoading = false;
 
-        // Close loading popup
-        if (popupManager != null)
-        {
-            popupManager.CloseLoadingPopup();
-        }
-
         if (!response.success)
         {
+            if (popupManager != null) popupManager.CloseLoadingPopup();
             Debug.LogError("[HistoryController] History request failed");
             return;
         }
@@ -167,6 +179,30 @@ public class HistoryController : MonoBehaviour
         UpdateSummaryDisplay();
         UpdatePageInfo();
         UpdateNavigationButtons();
+
+        // Close loading popup and THEN show panel with animation
+        if (popupManager != null)
+        {
+            popupManager.CloseLoadingPopup(ShowPanelWithAnimation);
+        }
+        else
+        {
+            ShowPanelWithAnimation();
+        }
+    }
+
+    private void ShowPanelWithAnimation()
+    {
+        // Show panel with animation if it's not active
+        if (historyPanel != null && !historyPanel.activeSelf)
+        {
+            historyPanel.SetActive(true);
+            if (historyPanelRect != null)
+            {
+                historyPanelRect.anchoredPosition = new Vector2(Screen.width, historyPanelRect.anchoredPosition.y);
+                historyPanelRect.DOAnchorPosX(0f, 0.35f).SetEase(Ease.OutCubic);
+            }
+        }
     }
 
     #endregion
