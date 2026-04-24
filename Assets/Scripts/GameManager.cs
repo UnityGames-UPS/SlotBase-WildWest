@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
     [Header("References")]
     [SerializeField] private SocketIOManager socketManager;
     [SerializeField] private UIManager uiManager;
+    [SerializeField] private PopupManager popupManager;
     [SerializeField] private SlotView slotView;
 
     [Header("Spin Settings")]
@@ -109,7 +110,10 @@ public class GameManager : MonoBehaviour
 
         if (!isInFreeSpins && playerData.balance < currentBetAmount)
         {
-            uiManager.ShowLowBalancePopup();
+            if (popupManager != null)
+            {
+                popupManager.ShowInsufficientFundsError();
+            }
             return;
         }
 
@@ -371,7 +375,10 @@ public class GameManager : MonoBehaviour
         double cost = GetBuyFeatureCost();
         if (playerData.balance < cost)
         {
-            uiManager.ShowLowBalancePopup();
+            if (popupManager != null)
+            {
+                popupManager.ShowInsufficientFundsError();
+            }
             return;
         }
 
@@ -515,7 +522,11 @@ public class GameManager : MonoBehaviour
         }
 
         currentState = GameState.Idle;
-        uiManager.ShowDisconnectionPopup();
+        
+        if (popupManager != null)
+        {
+            popupManager.ShowDisconnectionPopup();
+        }
     }
 
     internal void ExitGame()

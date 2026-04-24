@@ -13,13 +13,11 @@ public class SocketIOManager : MonoBehaviour
     protected string nameSpace = "playground";
     protected string gameID = "SL-WW";
 
-    [Header("Scatter Configuration")]
-    [SerializeField] private int scatterSymbolId = 12;
-    [SerializeField] private int scattersRequiredForFreeSpin = 3;
 
     [Header("References")]
     [SerializeField] private GameManager gameManager;
     [SerializeField] private UIManager uiManager;
+    [SerializeField] private PopupManager popupManager;
     [SerializeField] internal JSFunctCalls JSManager;
     [SerializeField] private GameObject RaycastBlocker;
     [SerializeField] private HistoryController historyController;
@@ -37,7 +35,7 @@ public class SocketIOManager : MonoBehaviour
     private float lastPongTime;
     private bool waitingForPong;
     private int missedPongs;
-    private const int MAX_MISSED_PONGS = 3;
+    private const int MAX_MISSED_PONGS = 5;
     private const float PING_INTERVAL = 2f;
     private const float PONG_TIMEOUT = 5f;
 
@@ -141,9 +139,9 @@ public class SocketIOManager : MonoBehaviour
         missedPongs = 0;
         lastPongTime = Time.time;
 
-        if (uiManager != null)
+        if (popupManager != null)
         {
-            uiManager.CheckAndClosePopups();
+            popupManager.CloseReconnectionPopup();
         }
 
         StartPingRoutine();
@@ -156,9 +154,9 @@ public class SocketIOManager : MonoBehaviour
         isConnected = false;
         StopPingRoutine();
 
-        if (uiManager != null)
+        if (popupManager != null)
         {
-            uiManager.DisconnectionPopup();
+            popupManager.ShowDisconnectionPopup();
         }
 
         if (gameManager != null)
@@ -170,6 +168,11 @@ public class SocketIOManager : MonoBehaviour
     private void OnSocketError(Error err)
     {
         Debug.LogError($"[SocketIO] Error: {err.message}");
+
+        if (popupManager != null)
+        {
+            popupManager.ShowServerError(err.message);
+        }
 
 #if UNITY_WEBGL && !UNITY_EDITOR
         if (JSManager != null)
@@ -249,9 +252,9 @@ public class SocketIOManager : MonoBehaviour
     {
         Debug.Log("[SocketIO] Another device login");
 
-        if (uiManager != null)
+        if (popupManager != null)
         {
-            uiManager.AnotherDevicePopup();
+            popupManager.ShowAnotherDeviceError();
         }
     }
 
@@ -297,9 +300,9 @@ public class SocketIOManager : MonoBehaviour
                         yield break;
                     }
 
-                    if (missedPongs == 2 && uiManager != null)
+                    if (missedPongs >= 1 && popupManager != null)
                     {
-                        uiManager.ReconnectionPopup();
+                        popupManager.ShowReconnectionPopup(missedPongs, MAX_MISSED_PONGS);
                     }
                 }
             }
@@ -327,9 +330,9 @@ public class SocketIOManager : MonoBehaviour
         {
             missedPongs = 0;
 
-            if (uiManager != null)
+            if (popupManager != null)
             {
-                uiManager.CheckAndClosePopups();
+                popupManager.CloseReconnectionPopup();
             }
         }
     }

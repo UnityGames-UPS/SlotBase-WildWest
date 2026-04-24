@@ -9,6 +9,7 @@ public class HistoryController : MonoBehaviour
     [Header("Panel References")]
     [SerializeField] private GameObject historyPanel;
     [SerializeField] private SocketIOManager socketManager;
+    [SerializeField] private PopupManager popupManager;
 
     [Header("History Rows")]
     [SerializeField] private HistoryRow[] historyRows; // Assign 10 row components in inspector
@@ -121,6 +122,12 @@ public class HistoryController : MonoBehaviour
         isLoading = true;
         UpdateNavigationButtons();
 
+        // Show loading popup
+        if (popupManager != null)
+        {
+            popupManager.ShowLoadingPopup(5f); // 5 second default timeout
+        }
+
         // Send request to socket manager
         socketManager.SendBetHistoryRequest(page, itemsPerPage);
     }
@@ -131,6 +138,12 @@ public class HistoryController : MonoBehaviour
     public void OnHistoryDataReceived(BetHistoryResponse response)
     {
         isLoading = false;
+
+        // Close loading popup
+        if (popupManager != null)
+        {
+            popupManager.CloseLoadingPopup();
+        }
 
         if (!response.success)
         {

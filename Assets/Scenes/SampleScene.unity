@@ -4538,6 +4538,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   historyPanel: {fileID: 1096680873}
   socketManager: {fileID: 416965697}
+  popupManager: {fileID: 1163055615}
   historyRows:
   - {fileID: 610024798}
   - {fileID: 1374216147}
@@ -7950,11 +7951,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f521a04de7f494272a617b2719edd271, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testToken: 8d5878c3372343ba9cee7d769f713bdf
-  scatterSymbolId: 12
-  scattersRequiredForFreeSpin: 3
+  testToken: b4d3b3320ba04dc89a2d8a5f6342989d
   gameManager: {fileID: 855426822}
   uiManager: {fileID: 180954095}
+  popupManager: {fileID: 1163055615}
   JSManager: {fileID: 545483263}
   RaycastBlocker: {fileID: 259118117}
   historyController: {fileID: 241782068}
@@ -16730,6 +16730,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   socketManager: {fileID: 416965697}
   uiManager: {fileID: 180954095}
+  popupManager: {fileID: 1163055615}
   slotView: {fileID: 1931227598}
   normalSpinDuration: 2
   turboSpinDuration: 1.2
@@ -25364,7 +25365,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1160012226
 RectTransform:
   m_ObjectHideFlags: 0
@@ -25426,6 +25427,74 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1160012225}
   m_CullTransparentMesh: 1
+--- !u!1 &1163055614
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1163055616}
+  - component: {fileID: 1163055615}
+  m_Layer: 0
+  m_Name: PopUpManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1163055615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163055614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87e5c616ea4ee483691feabf0d554b6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  popupParent: {fileID: 1160012225}
+  disconnectionPopup: {fileID: 1683463875}
+  disconnectionPopupRect: {fileID: 1683463876}
+  disconnectionMessageText: {fileID: 824061057}
+  disconnectionOkButton: {fileID: 1520396715}
+  errorPopup: {fileID: 1446323561}
+  errorPopupRect: {fileID: 1446323562}
+  errorTitleText: {fileID: 302984355}
+  errorMessageText: {fileID: 1782700824}
+  errorOkButton: {fileID: 446583869}
+  reconnectionPopup: {fileID: 1712575667}
+  reconnectionPopupRect: {fileID: 1712575668}
+  reconnectionRotatingImage: {fileID: 2129779663}
+  reconnectionTryText: {fileID: 677696906}
+  loadingPopup: {fileID: 1504193114}
+  loadingPopupRect: {fileID: 1504193115}
+  loadingRotatingImage: {fileID: 1800193037}
+  loadingAnimatedText: {fileID: 1886402992}
+  popupScaleInDuration: 0.3
+  popupScaleOutDuration: 0.2
+  rotationSpeed: 250
+  loadingTextCycleSpeed: 0.5
+  defaultLoadingDuration: 1
+  gameManager: {fileID: 855426822}
+--- !u!4 &1163055616
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163055614}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.069732666, y: -22.018385, z: 90}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1167815581
 GameObject:
   m_ObjectHideFlags: 0
@@ -48327,3 +48396,4 @@ SceneRoots:
   - {fileID: 1931227599}
   - {fileID: 545483264}
   - {fileID: 241782069}
+  - {fileID: 1163055616}
