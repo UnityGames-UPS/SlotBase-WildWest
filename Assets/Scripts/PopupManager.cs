@@ -21,6 +21,7 @@ public class PopupManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI errorTitleText;
     [SerializeField] private TextMeshProUGUI errorMessageText;
     [SerializeField] private Button errorOkButton;
+    [SerializeField] private TextMeshProUGUI errorOkButtonText;
 
     [Header("3. Reconnection Popup")]
     [SerializeField] private GameObject reconnectionPopup;
@@ -63,7 +64,7 @@ public class PopupManager : MonoBehaviour
     {
         SetupButtons();
         HideAllPopups();
-        
+
         if (popupParent != null)
         {
             popupParent.SetActive(false);
@@ -202,6 +203,10 @@ public class PopupManager : MonoBehaviour
         if (errorMessageText != null)
         {
             errorMessageText.text = message;
+        }
+        if (errorOkButtonText != null)
+        {
+            errorOkButtonText.text = isCritical ? "Exit Game" : "OKAY";
         }
 
         isErrorCritical = isCritical;
@@ -382,7 +387,7 @@ public class PopupManager : MonoBehaviour
 
     private void PerformCloseLoadingPopup()
     {
-        if (loadingPopup == null || !loadingPopup.activeSelf) 
+        if (loadingPopup == null || !loadingPopup.activeSelf)
         {
             onLoadingClosed?.Invoke();
             onLoadingClosed = null;
@@ -550,7 +555,7 @@ public class PopupManager : MonoBehaviour
                              (errorPopup != null && errorPopup.activeSelf) ||
                              (reconnectionPopup != null && reconnectionPopup.activeSelf) ||
                              (loadingPopup != null && loadingPopup.activeSelf);
-            
+
             popupParent.SetActive(anyActive);
         }
     }
@@ -616,14 +621,7 @@ public class PopupManager : MonoBehaviour
         {
             gameManager.ExitGame();
         }
-        else
-        {
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-#else
-            Application.Quit();
-#endif
-        }
+
     }
 
     #endregion

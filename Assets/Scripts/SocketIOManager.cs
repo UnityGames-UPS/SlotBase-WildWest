@@ -169,6 +169,11 @@ public class SocketIOManager : MonoBehaviour
     {
         Debug.LogError($"[SocketIO] Error: {err.message}");
 
+        if (!gameManager.isInitialized)
+        {
+            gameManager.initializationFailed = true;
+        }
+
         if (popupManager != null)
         {
             popupManager.ShowServerError(err.message);
@@ -210,6 +215,11 @@ public class SocketIOManager : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogError($"[SocketIO] Init parse failed: {e.Message}");
+            gameManager.initializationFailed = true;
+            if (popupManager != null)
+            {
+                popupManager.ShowServerError("Failed to parse game initialization data.");
+            }
         }
     }
 
@@ -259,6 +269,11 @@ public class SocketIOManager : MonoBehaviour
     }
 
     #endregion
+
+    internal void SetRaycastBlocker(bool active)
+    {
+        if (RaycastBlocker != null) RaycastBlocker.SetActive(active);
+    }
 
     #region Ping/Pong Health Check
 

@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private SocketIOManager socketManager;
+    [SerializeField] internal SocketIOManager socketManager;
     [SerializeField] private UIManager uiManager;
     [SerializeField] private PopupManager popupManager;
     [SerializeField] private SlotView slotView;
@@ -37,6 +37,9 @@ public class GameManager : MonoBehaviour
     internal int buyFeatureBetIndex;      // Bet index selected inside the buy panel
     internal bool isBuyingFeature;        // True while waiting for server response
 
+    internal bool isInitialized;
+    internal bool initializationFailed;
+
     private Coroutine spinCoroutine;
     private bool stopRequested;
 
@@ -48,6 +51,8 @@ public class GameManager : MonoBehaviour
         currentSpinSpeed = SpinSpeed.Normal;
         waitingForFreeSpinStart = false;
         isBuyingFeature = false;
+        isInitialized = false;
+        initializationFailed = false;
     }
 
     internal void OnInitDataReceived(GameConfig config, PlayerData player, List<List<int>> initialMatrix)
@@ -63,6 +68,7 @@ public class GameManager : MonoBehaviour
             slotView.SetInitialMatrix(initialMatrix);
         }
 
+        isInitialized = true;
         currentState = GameState.Idle;
 
         uiManager.OnGameInitialized();
@@ -533,11 +539,6 @@ public class GameManager : MonoBehaviour
     {
         socketManager.CloseSocket();
 
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit();
-#endif
     }
 
     #endregion

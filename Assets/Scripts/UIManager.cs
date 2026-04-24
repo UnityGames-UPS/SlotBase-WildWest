@@ -9,6 +9,7 @@ public class UIManager : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private GameManager gameManager;
+    [SerializeField] private PopupManager popupManager;
     [SerializeField] private HistoryController historyController;
 
     [Header("Loading & Intro")]
@@ -28,6 +29,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private float maxStopDuration = 0.5f;
     [SerializeField] private float loadingSpeed = 0.5f;
     [SerializeField] private float introAnimDuration = 2f;
+    [SerializeField] private float initializationTimeout = 20f;
 
     [Header("Backgrounds")]
     [SerializeField] private GameObject normalSpinBackground;
@@ -272,6 +274,30 @@ public class UIManager : MonoBehaviour
         }
 
         yield return StartCoroutine(FillLoadingBar(currentFill, 1f));
+
+        // --- Wait for Initialization ---
+        float timer = 0f;
+        while (!gameManager.isInitialized && !gameManager.initializationFailed && timer < initializationTimeout)
+        {
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        if (gameManager.initializationFailed || !gameManager.isInitialized)
+        {
+            if (gameManager.socketManager != null)
+            {
+                gameManager.socketManager.SetRaycastBlocker(false);
+            }
+
+            if (popupManager != null)
+            {
+                string errorMsg = gameManager.initializationFailed ? "Game failed to initialize." : "Initialization timed out. Please check your connection.";
+                popupManager.ShowErrorPopup("Connection Error", errorMsg, true);
+            }
+            yield break; // Stop the sequence, don't show the game
+        }
+        // ------------------------------
 
         if (introAnimationObject) introAnimationObject.SetActive(true);
         yield return new WaitForSeconds(introAnimDuration);

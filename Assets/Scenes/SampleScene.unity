@@ -3355,6 +3355,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 855426822}
+  popupManager: {fileID: 0}
   historyController: {fileID: 241782068}
   loadingScreen: {fileID: 1853571859}
   loadingBarFill: {fileID: 663378949}
@@ -3370,6 +3371,7 @@ MonoBehaviour:
   maxStopDuration: 0.5
   loadingSpeed: 0.3
   introAnimDuration: 3
+  initializationTimeout: 20
   normalSpinBackground: {fileID: 1558342514}
   freeSpinBackground: {fileID: 1731400180}
   betAmountText: {fileID: 1926019871}
@@ -7951,7 +7953,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f521a04de7f494272a617b2719edd271, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testToken: b4d3b3320ba04dc89a2d8a5f6342989d
+  testToken: 5635
   gameManager: {fileID: 855426822}
   uiManager: {fileID: 180954095}
   popupManager: {fileID: 1163055615}
@@ -25466,6 +25468,7 @@ MonoBehaviour:
   errorTitleText: {fileID: 302984355}
   errorMessageText: {fileID: 1782700824}
   errorOkButton: {fileID: 446583869}
+  errorOkButtonText: {fileID: 1758823790}
   reconnectionPopup: {fileID: 1712575667}
   reconnectionPopupRect: {fileID: 1712575668}
   reconnectionRotatingImage: {fileID: 2129779663}
