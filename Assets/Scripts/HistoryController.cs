@@ -146,7 +146,7 @@ public class HistoryController : MonoBehaviour
         }
 
         // Send request to socket manager
-        socketManager.SendBetHistoryRequest(page, itemsPerPage);
+        socketManager.SendBetHistoryRequest(page);
     }
 
     /// <summary>
@@ -171,8 +171,10 @@ public class HistoryController : MonoBehaviour
         totalPages = response.payload.pagination.totalPages;
         totalItems = response.payload.pagination.total;
 
-        // Calculate statistics from current page data
-        CalculateStatistics();
+        // Use statistics directly from server pagination
+        totalBetsCount = response.payload.pagination.total;
+        totalBetValue = response.payload.pagination.totalBetAmount;
+        totalWinLoss = response.payload.pagination.totalWinLoss;
 
         // Update UI
         UpdateHistoryRows();
@@ -209,29 +211,6 @@ public class HistoryController : MonoBehaviour
 
     #region Data Processing
 
-    /// <summary>
-    /// Calculate statistics from current history data
-    /// </summary>
-    private void CalculateStatistics()
-    {
-        if (currentHistoryData == null || currentHistoryData.Count == 0)
-        {
-            totalBetsCount = 0;
-            totalBetValue = 0;
-            totalWinLoss = 0;
-            return;
-        }
-
-        totalBetsCount = currentHistoryData.Count;
-        totalBetValue = 0;
-        totalWinLoss = 0;
-
-        foreach (var item in currentHistoryData)
-        {
-            totalBetValue += item.bet;
-            totalWinLoss += item.winLoss;
-        }
-    }
 
     #endregion
 
@@ -279,19 +258,20 @@ public class HistoryController : MonoBehaviour
         // Total bets count
         if (totalBetsText != null)
         {
-            totalBetsText.text = $"Total Bets: {totalBetsCount}";
+            totalBetsText.text = $"{totalBetsCount}";
         }
 
         // Total bet value
         if (totalBetValueText != null)
         {
-            totalBetValueText.text = $"Total Bet: {totalBetValue:F2}";
+            totalBetValueText.text = $"{totalBetValue:F2}";
         }
 
         // Total win/loss with color coding
         if (totalWinLossText != null)
         {
-            totalWinLossText.text = $"Total Win/Loss: {totalWinLoss:F2}";
+            string sign = totalWinLoss > 0 ? "+" : "";
+            totalWinLossText.text = $"{sign}{totalWinLoss:F2}";
 
             if (totalWinLoss > 0)
             {

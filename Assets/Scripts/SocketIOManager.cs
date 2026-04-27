@@ -194,7 +194,6 @@ public class SocketIOManager : MonoBehaviour
         try
         {
             var initData = JsonConvert.DeserializeObject<InitData>(jsonData);
-
             var gameConfig = InitDataConverter.ConvertToGameConfig(initData);
             var playerData = InitDataConverter.ConvertToPlayerData(initData.player);
             var initialMatrix = GenerateRandomMatrix();
@@ -225,6 +224,11 @@ public class SocketIOManager : MonoBehaviour
 
     private void OnResultReceived(string jsonData)
     {
+        if (!jsonData.Contains("\"id\":\"ResultData\""))
+        {
+            return;
+        }
+
         Debug.Log($"[SocketIO] Result received: {jsonData}");
 
         try
@@ -395,18 +399,16 @@ public class SocketIOManager : MonoBehaviour
 
     #region Bet History
 
-    internal void SendBetHistoryRequest(int page, int limit)
+    internal void SendBetHistoryRequest(int page)
     {
-        Debug.Log($"[SocketIO] BetHistory request: page={page}, limit={limit}");
+        Debug.Log($"[SocketIO] BetHistory request: page={page}");
 
         var request = new BetHistoryRequest
         {
             type = "BET_HISTORY",
-            userId = "", // Server uses session, empty is fine
             payload = new BetHistoryPayload
             {
                 page = page,
-                limit = limit
             }
         };
 
@@ -416,10 +418,9 @@ public class SocketIOManager : MonoBehaviour
 
     private void OnHistoryResultReceived(string jsonData)
     {
-        // Check if this is a bet history response by looking for "BetHistory" id
         if (!jsonData.Contains("\"id\":\"BetHistory\""))
         {
-            return; // Not a history response, ignore
+            return; 
         }
 
         Debug.Log($"[SocketIO] BetHistory received: {jsonData}");

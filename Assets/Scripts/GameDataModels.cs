@@ -264,7 +264,11 @@ public class PaginationInfo
     public int page;
     public int limit;
     public int total;
+    public double totalBetAmount;
+    public double totalWinLoss;
     public int totalPages;
+
+
 }
 
 #endregion

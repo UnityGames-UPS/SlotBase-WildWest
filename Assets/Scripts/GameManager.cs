@@ -106,7 +106,7 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Spin Control
-
+    
     internal void RequestSpin()
     {
         if (waitingForFreeSpinStart) return;
