@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 #region Server Communication Models
 
@@ -27,6 +28,9 @@ public class ServerFeatures
 {
     public FreeSpinFeature freeSpins;
     public BuyFeature buyFeature;
+    public int betMultiplier;
+    public int maxWinMultiplier;
+    public int minWinMultiplier;
 }
 
 [Serializable]
@@ -50,10 +54,10 @@ public class OverlayScatterFeature
 [Serializable]
 public class ExtraSpinsData
 {
-    public int _2; // For 2 scatters
-    public int _3; // For 3 scatters
-    public int _4; // For 4 scatters
-    public int _5; // For 5 scatters
+    [JsonProperty("2")] public int _2; // For 2 scatters
+    [JsonProperty("3")] public int _3; // For 3 scatters
+    [JsonProperty("4")] public int _4; // For 4 scatters
+    [JsonProperty("5")] public int _5; // For 5 scatters
 }
 
 [Serializable]
@@ -299,6 +303,12 @@ public class GameConfig
     // Buy Feature configuration
     public bool buyFeatureEnabled;
     public double buyFeatureCostMultiplier;
+
+    public int betMultiplier = 100;
+    public int maxWinMultiplier = 10000;
+    public int minWinMultiplier = 10;
+    public int initialFreeSpins = 8;
+    public ExtraSpinsData extraSpinsData;
 }
 
 [Serializable]
@@ -461,6 +471,22 @@ public static class InitDataConverter
         {
             config.buyFeatureEnabled = serverData.features.buyFeature.enabled;
             config.buyFeatureCostMultiplier = serverData.features.buyFeature.costMultiplier;
+        }
+
+        if (serverData.features != null)
+        {
+            config.betMultiplier = serverData.features.betMultiplier > 0 ? serverData.features.betMultiplier : 1;
+            config.maxWinMultiplier = serverData.features.maxWinMultiplier;
+            config.minWinMultiplier = serverData.features.minWinMultiplier;
+
+            if (serverData.features.freeSpins != null)
+            {
+                config.initialFreeSpins = serverData.features.freeSpins.initialSpins;
+                if (serverData.features.freeSpins.overlayScatter != null)
+                {
+                    config.extraSpinsData = serverData.features.freeSpins.overlayScatter.extraSpins;
+                }
+            }
         }
 
         return config;

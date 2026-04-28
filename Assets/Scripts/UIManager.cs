@@ -102,6 +102,24 @@ public class UIManager : MonoBehaviour
     [SerializeField] private float pageSlideWidth = 800f;
     [SerializeField] private GameObject[] rulePageIndicators;
 
+    [Header("Game Rules Dynamic Texts")]
+    [SerializeField] private TMP_Text[] ruleBetMultiplierTexts; // 2 texts
+    [SerializeField] private TMP_Text[] ruleMinWinMultiplierTexts; // 2 fields
+    [SerializeField] private TMP_Text[] ruleMaxWinMultiplierTexts; // 2 fields
+    [SerializeField] private TMP_Text ruleSymbol0Text;
+    [SerializeField] private TMP_Text ruleSymbol1Text;
+    [SerializeField] private TMP_Text ruleSymbol2Text;
+    [SerializeField] private TMP_Text ruleSymbol3Text;
+    [SerializeField] private TMP_Text ruleSymbol4Text;
+    [SerializeField] private TMP_Text ruleSymbol5Text;
+    [SerializeField] private TMP_Text ruleSymbol6Text;
+    [SerializeField] private TMP_Text ruleSymbol7Text;
+    [SerializeField] private TMP_Text ruleSymbol8Text;
+    [SerializeField] private TMP_Text ruleSymbol9Text;
+    [SerializeField] private TMP_Text ruleSymbol10Text;
+    [SerializeField] private TMP_Text[] ruleFreeSpinInitialTexts; // 2 texts
+    [SerializeField] private TMP_Text[] ruleFreeSpinExtraTexts; // 4 texts for 2, 3, 4, 5
+
     [Header("Free Spin Count Display - Game Screen")]
     [SerializeField] private GameObject freeSpinCountContainer;
     [SerializeField] private Image freeSpinCountTens;
@@ -150,18 +168,6 @@ public class UIManager : MonoBehaviour
     [Header("Free Spin End - Total Spin Count")]
     [SerializeField] private Image freeSpinEndCountTens;
     [SerializeField] private Image freeSpinEndCountOnes;
-
-    [Header("Popups")]
-    [SerializeField] private GameObject lowBalancePopup;
-    [SerializeField] private Button lowBalanceCloseButton;
-    [SerializeField] private GameObject disconnectionPopup;
-    [SerializeField] private Button disconnectionCloseButton;
-
-    [Header("Connection Popups")]
-    [SerializeField] private GameObject reconnectionPopup;
-    [SerializeField] private GameObject anotherDevicePopup;
-    [SerializeField] private Button anotherDeviceCloseButton;
-
 
     [Header("Animation Settings")]
     [SerializeField] private float winCountDuration = 0.25f;
@@ -222,8 +228,6 @@ public class UIManager : MonoBehaviour
         if (settingsPanel) settingsPanel.SetActive(false);
         if (gameRulesPanel) gameRulesPanel.SetActive(false);
 
-        if (lowBalancePopup) lowBalancePopup.SetActive(false);
-        if (disconnectionPopup) disconnectionPopup.SetActive(false);
 
         if (freeSpinCountContainer) freeSpinCountContainer.SetActive(false);
         if (lastSpinLeftObject) lastSpinLeftObject.SetActive(false);
@@ -232,9 +236,6 @@ public class UIManager : MonoBehaviour
 
         if (freeSpinStartPopup) freeSpinStartPopup.SetActive(false);
         if (freeSpinEndPopup) freeSpinEndPopup.SetActive(false);
-
-        if (reconnectionPopup) reconnectionPopup.SetActive(false);
-        if (anotherDevicePopup) anotherDevicePopup.SetActive(false);
 
         UpdateAutoPlayButtonText();
     }
@@ -368,20 +369,6 @@ public class UIManager : MonoBehaviour
         if (freeSpinStartCloseButton) freeSpinStartCloseButton.onClick.AddListener(CloseFreeSpinStartPopup);
         if (freeSpinEndCloseButton) freeSpinEndCloseButton.onClick.AddListener(CloseFreeSpinEndPopup);
 
-        if (lowBalanceCloseButton)
-            lowBalanceCloseButton.onClick.AddListener(() => { if (lowBalancePopup) lowBalancePopup.SetActive(false); });
-
-        if (disconnectionCloseButton)
-        {
-            disconnectionCloseButton.onClick.RemoveAllListeners();
-            disconnectionCloseButton.onClick.AddListener(OnExitButtonPressed);
-        }
-
-        if (anotherDeviceCloseButton)
-        {
-            anotherDeviceCloseButton.onClick.RemoveAllListeners();
-            anotherDeviceCloseButton.onClick.AddListener(OnExitButtonPressed);
-        }
         if(gameQuitButton) gameQuitButton.onClick.AddListener(OnExitButtonPressed);
         if(historyOpenButton) historyOpenButton.onClick.AddListener(OnHistoryButtonPressed); // New: History button
 
@@ -555,11 +542,16 @@ public class UIManager : MonoBehaviour
 
     internal void UpdateBetDisplay()
     {
+        if (gameManager.gameConfig == null) return;
+
+        double totalBetAmount = gameManager.currentBetAmount * gameManager.gameConfig.betMultiplier;
+
         if (betAmountText)
-            betAmountText.text = gameManager.currentBetAmount.ToString("F2");
+            betAmountText.text = totalBetAmount.ToString("F2");
         UpdateBetButtonStates();
         CheckMaxBetIndicator();
         UpdateBuyFeatureCostDisplay(); // keep button cost in sync
+        UpdateGameRulesDynamicTexts();
     }
 
     private void UpdateBetButtonStates()
@@ -881,6 +873,8 @@ public class UIManager : MonoBehaviour
             gameRulesPanelRect.anchoredPosition = new Vector2(Screen.width, gameRulesPanelRect.anchoredPosition.y);
             gameRulesPanelRect.DOAnchorPosX(0f, 0.35f).SetEase(Ease.OutCubic);
         }
+
+        UpdateGameRulesDynamicTexts();
     }
 
     private void CloseGameRulesPanel()
@@ -989,7 +983,8 @@ public class UIManager : MonoBehaviour
 
         // Sprite-digit display for the current bet value inside the panel
         double betValue = gameManager.gameConfig.availableBets[gameManager.buyFeatureBetIndex];
-        SetBuyFeatureBetDisplay(betValue);
+        double totalBetValue = betValue * gameManager.gameConfig.betMultiplier;
+        SetBuyFeatureBetDisplay(totalBetValue);
     }
 
     /// <summary>
@@ -1508,14 +1503,97 @@ public class UIManager : MonoBehaviour
         if (betMinusButton) betMinusButton.interactable = enabled;
     }
 
-    internal void ShowLowBalancePopup()
-    {
-        if (lowBalancePopup) lowBalancePopup.SetActive(true);
-    }
 
-    internal void ShowDisconnectionPopup()
+
+    #endregion
+
+    #region Dynamic Game Rules Updates
+
+    private void UpdateGameRulesDynamicTexts()
     {
-        if (disconnectionPopup) disconnectionPopup.SetActive(true);
+        if (gameManager.gameConfig == null) return;
+
+        double totalBetAmount = gameManager.currentBetAmount * gameManager.gameConfig.betMultiplier;
+
+        // 1. Bet Multiplier Texts
+        if (ruleBetMultiplierTexts != null)
+        {
+            if (ruleBetMultiplierTexts.Length > 0 && ruleBetMultiplierTexts[0])
+            {
+                ruleBetMultiplierTexts[0].text = $"TOTAL BET IS {gameManager.gameConfig.betMultiplier}X PER BET LINE.";
+            }
+            if (ruleBetMultiplierTexts.Length > 1 && ruleBetMultiplierTexts[1])
+            {
+                ruleBetMultiplierTexts[1].text = $"{gameManager.gameConfig.betMultiplier}X";
+            }
+        }
+
+        // 2. Min Win and Max Win Multipliers (Format: "10,000X")
+        if (ruleMinWinMultiplierTexts != null)
+        {
+            foreach (var txt in ruleMinWinMultiplierTexts)
+            {
+                if (txt) txt.text = $"{gameManager.gameConfig.minWinMultiplier:N0}X";
+            }
+        }
+        if (ruleMaxWinMultiplierTexts != null)
+        {
+            foreach (var txt in ruleMaxWinMultiplierTexts)
+            {
+                if (txt) txt.text = $"{gameManager.gameConfig.maxWinMultiplier:N0}X";
+            }
+        }
+
+        // 3. Free Spin Initial and Extra Spins
+        if (ruleFreeSpinInitialTexts != null)
+        {
+            foreach (var txt in ruleFreeSpinInitialTexts)
+            {
+                if (txt) txt.text = gameManager.gameConfig.initialFreeSpins.ToString();
+            }
+        }
+        
+        if (ruleFreeSpinExtraTexts != null && ruleFreeSpinExtraTexts.Length >= 4 && gameManager.gameConfig.extraSpinsData != null)
+        {
+            if (ruleFreeSpinExtraTexts[0]) ruleFreeSpinExtraTexts[0].text = gameManager.gameConfig.extraSpinsData._2.ToString();
+            if (ruleFreeSpinExtraTexts[1]) ruleFreeSpinExtraTexts[1].text = gameManager.gameConfig.extraSpinsData._3.ToString();
+            if (ruleFreeSpinExtraTexts[2]) ruleFreeSpinExtraTexts[2].text = gameManager.gameConfig.extraSpinsData._4.ToString();
+            if (ruleFreeSpinExtraTexts[3]) ruleFreeSpinExtraTexts[3].text = gameManager.gameConfig.extraSpinsData._5.ToString();
+        }
+
+        // 4. Symbol Multipliers
+        // "5 - (currentbetamout*thatmultiper ) \n 4 - (currentbetamout*thatmultiper ) \n 3 - (currentbetamout*multiper )"
+        TMP_Text[] symbolTexts = {
+            ruleSymbol0Text, ruleSymbol1Text, ruleSymbol2Text, ruleSymbol3Text,
+            ruleSymbol4Text, ruleSymbol5Text, ruleSymbol6Text, ruleSymbol7Text,
+            ruleSymbol8Text, ruleSymbol9Text, ruleSymbol10Text
+        };
+
+        if (gameManager.gameConfig.symbols != null)
+        {
+            for (int i = 0; i < symbolTexts.Length; i++)
+            {
+                if (symbolTexts[i] == null) continue;
+
+                // Find symbol by id
+                var symbol = gameManager.gameConfig.symbols.Find(s => s.id == i);
+                if (symbol != null && symbol.multipliers != null && symbol.multipliers.Count >= 3)
+                {
+                    // multipliers list: index 0 is 5 matches, index 1 is 4 matches, index 2 is 3 matches
+                    double originalBetAmount = gameManager.currentBetAmount;
+                    double win5 = originalBetAmount * symbol.multipliers[0];
+                    double win4 = originalBetAmount * symbol.multipliers[1];
+                    double win3 = originalBetAmount * symbol.multipliers[2];
+
+                    // Format nicely, e.g., F2 if decimal, or just let ToString format it based on game's styling
+                    string text5 = $"5 - {win5.ToString("0.##")}";
+                    string text4 = $"4 - {win4.ToString("0.##")}";
+                    string text3 = $"3 - {win3.ToString("0.##")}";
+
+                    symbolTexts[i].text = $"{text5}\n{text4}\n{text3}";
+                }
+            }
+        }
     }
 
     #endregion
@@ -1542,27 +1620,6 @@ public class UIManager : MonoBehaviour
 
     #region Connection Popup Management
 
-    internal void ReconnectionPopup()
-    {
-        if (reconnectionPopup != null) reconnectionPopup.SetActive(true);
-    }
-
-    internal void DisconnectionPopup()
-    {
-        if (reconnectionPopup != null) reconnectionPopup.SetActive(false);
-        if (disconnectionPopup != null) disconnectionPopup.SetActive(true);
-    }
-
-    internal void CheckAndClosePopups()
-    {
-        if (reconnectionPopup != null && reconnectionPopup.activeSelf) reconnectionPopup.SetActive(false);
-        if (disconnectionPopup != null && disconnectionPopup.activeSelf) disconnectionPopup.SetActive(false);
-    }
-
-    internal void AnotherDevicePopup()
-    {
-        if (anotherDevicePopup != null) anotherDevicePopup.SetActive(true);
-    }
 
     private void OnExitButtonPressed()
     {

@@ -369,7 +369,7 @@ public class GameManager : MonoBehaviour
     internal double GetBuyFeatureCost(int betIndex = -1)
     {
         int idx = betIndex < 0 ? buyFeatureBetIndex : betIndex;
-        return gameConfig.availableBets[idx] * gameConfig.buyFeatureCostMultiplier;
+        return gameConfig.availableBets[idx] * gameConfig.betMultiplier * gameConfig.buyFeatureCostMultiplier;
     }
 
     internal void RequestBuyFeature()
