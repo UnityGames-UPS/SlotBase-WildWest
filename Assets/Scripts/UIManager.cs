@@ -447,6 +447,7 @@ public class UIManager : MonoBehaviour
 
         SetBetControlsEnabled(false);
         if (autoPlayOpenButton) autoPlayOpenButton.interactable = false;
+        if (settingsOpenButton) settingsOpenButton.interactable = false;
 
         if (winDisplayCoroutine != null)
         {
@@ -481,6 +482,7 @@ public class UIManager : MonoBehaviour
 
             SetBetControlsEnabled(true);
             if (autoPlayOpenButton) autoPlayOpenButton.interactable = true;
+            if (settingsOpenButton) settingsOpenButton.interactable = true;
         }
     }
 
@@ -499,6 +501,7 @@ public class UIManager : MonoBehaviour
             SetBetControlsEnabled(true);
             if (spinButton) spinButton.interactable = true;
             if (autoPlayOpenButton) autoPlayOpenButton.interactable = true;
+            if (settingsOpenButton) settingsOpenButton.interactable = true;
             if (spinNormalImage) spinNormalImage.SetActive(true);
             if (spinStopImage) spinStopImage.SetActive(false);
         }
@@ -648,6 +651,7 @@ public class UIManager : MonoBehaviour
         if (spinStopImage) spinStopImage.SetActive(false);
         SetBetControlsEnabled(true);
         if (autoPlayOpenButton) autoPlayOpenButton.interactable = true;
+        if (settingsOpenButton) settingsOpenButton.interactable = true;
     }
 
     internal void UpdateAutoPlayCount()
