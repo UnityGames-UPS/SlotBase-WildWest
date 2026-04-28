@@ -31,6 +31,28 @@ public class SlotView : MonoBehaviour
     // Internal array built from named sprites
     private Sprite[] symbolSprites;
 
+    [Header("Win Animation Sprite Arrays - One per Symbol ID")]
+    [Tooltip("Animation sprite arrays for each symbol. Array index = symbol ID (0-15)")]
+    [SerializeField] private List<Sprite> animSpritesSheriff;        // ID: 0
+    [SerializeField] private List<Sprite> animSpritesCowboyBlue;     // ID: 1
+    [SerializeField] private List<Sprite> animSpritesCowgirlGreen;   // ID: 2
+    [SerializeField] private List<Sprite> animSpritesCowgirlRed;     // ID: 3
+    [SerializeField] private List<Sprite> animSpritesTreasure;       // ID: 4
+    [SerializeField] private List<Sprite> animSpritesGun;            // ID: 5
+    [SerializeField] private List<Sprite> animSpritesA;              // ID: 6
+    [SerializeField] private List<Sprite> animSpritesK;              // ID: 7
+    [SerializeField] private List<Sprite> animSpritesQ;              // ID: 8
+    [SerializeField] private List<Sprite> animSpritesJ;              // ID: 9
+    [SerializeField] private List<Sprite> animSpritesTen;            // ID: 10
+    [SerializeField] private List<Sprite> animSpritesWild;           // ID: 11
+    [SerializeField] private List<Sprite> animSpritesScatter;        // ID: 12
+    [SerializeField] private List<Sprite> animSpritesWild2x;         // ID: 13
+    [SerializeField] private List<Sprite> animSpritesWild3x;         // ID: 14
+    [SerializeField] private List<Sprite> animSpritesWild5x;         // ID: 15
+
+    // Internal array of animation sprite lists
+    private List<Sprite>[] animationSpriteArrays;
+
     [Header("Reel Containers")]
     [SerializeField] private Transform[] reelTransforms;
 
@@ -49,6 +71,11 @@ public class SlotView : MonoBehaviour
     [SerializeField] private float dropDownDistance = 15f;
     [SerializeField] private float dropDownDuration = 0.12f;
     [SerializeField] private float settleBounceDuration = 0.18f;
+
+    [Header("Win Animation Settings")]
+    [SerializeField] private float winPopDuration = 0.4f;
+    [SerializeField] private int winPopRepeat = 3;
+
 
     [Header("Stop Animation Settings")]
     [SerializeField] private float stopOvershootDistance = 50f;
@@ -69,18 +96,29 @@ public class SlotView : MonoBehaviour
     [SerializeField] private float anticipationSpeedMultiplier = 1.5f;
 
     [Header("Win Animation Settings")]
-    [SerializeField] private float winPopScale = 1.3f;
-    [SerializeField] private float winPopDuration = 0.4f;
-    [SerializeField] private int winPopRepeat = 3;
+    [SerializeField] private float winAnimationDuration = 3.0f; // Total duration each win symbol animation plays
+    [SerializeField] private float winSymbolLoopDuration = 1.5f;
+    [SerializeField] private int winSymbolLoopCount = 3;
+    [Tooltip("Delay between enabling winBox overlay and starting the ImageAnimation - for sync timing")]
+    [SerializeField] private float winLineBoxToAnimationDelay = 0.05f;
 
     [Header("Win Box Overlays — Col 0..4  (each has 4 rows: 0=top .. 3=bottom)")]
     [SerializeField] private ColumnOverlays[] winBoxColumns = new ColumnOverlays[5];
+
+    [Header("Win Animation Objects — Col 0..4  (each has 4 rows, contains ImageAnimation component)")]
+    [Tooltip("GameObject references for win animations. Each should have an ImageAnimation component attached.")]
+    [SerializeField] private ColumnOverlays[] winAnimationColumns = new ColumnOverlays[5];
 
     [Header("Scatter / Badge Overlays — Col 0..4  (each has 4 rows)")]
     [SerializeField] private ColumnOverlays[] scatterStarColumns = new ColumnOverlays[5];
 
     [Header("Sticky Wild Overlays — Col 0..4  (each has 4 rows)")]
     [SerializeField] private ColumnOverlays[] stickyWildColumns = new ColumnOverlays[5];
+
+    [Header("Spin Mask System")]
+    [SerializeField] private Image reelMask;
+    [Tooltip("Non-display slot icon GameObjects per reel (indices 0-5 and 10-15)")]
+    [SerializeField] private List<ReelNonDisplayIcons> reelNonDisplayIconsList;
 
     [SerializeField] private GameObject anticipationFrame;
 
@@ -114,9 +152,14 @@ public class SlotView : MonoBehaviour
     private void DisableAllOverlays()
     {
         DisableColumns(winBoxColumns);
+        DisableColumns(winAnimationColumns);
         DisableColumns(scatterStarColumns);
         DisableColumns(stickyWildColumns);
         if (anticipationFrame) anticipationFrame.SetActive(false);
+        
+        // Initialize masks as disabled and non-display icons as hidden
+        DisableAllMasks();
+        DisableAllNonDisplayIcons();
     }
 
     private static void DisableColumns(ColumnOverlays[] cols)
@@ -159,6 +202,34 @@ public class SlotView : MonoBehaviour
             if (symbolSprites[i] == null)
             {
                 Debug.LogError($"[SlotView] Symbol sprite at index {i} is not assigned in inspector!");
+            }
+        }
+
+        // Build the animation sprite arrays
+        animationSpriteArrays = new List<Sprite>[16];
+        animationSpriteArrays[0] = animSpritesSheriff;
+        animationSpriteArrays[1] = animSpritesCowboyBlue;
+        animationSpriteArrays[2] = animSpritesCowgirlGreen;
+        animationSpriteArrays[3] = animSpritesCowgirlRed;
+        animationSpriteArrays[4] = animSpritesTreasure;
+        animationSpriteArrays[5] = animSpritesGun;
+        animationSpriteArrays[6] = animSpritesA;
+        animationSpriteArrays[7] = animSpritesK;
+        animationSpriteArrays[8] = animSpritesQ;
+        animationSpriteArrays[9] = animSpritesJ;
+        animationSpriteArrays[10] = animSpritesTen;
+        animationSpriteArrays[11] = animSpritesWild;
+        animationSpriteArrays[12] = animSpritesScatter;
+        animationSpriteArrays[13] = animSpritesWild2x;
+        animationSpriteArrays[14] = animSpritesWild3x;
+        animationSpriteArrays[15] = animSpritesWild5x;
+
+        // Validate animation arrays
+        for (int i = 0; i < animationSpriteArrays.Length; i++)
+        {
+            if (animationSpriteArrays[i] == null || animationSpriteArrays[i].Count == 0)
+            {
+                Debug.LogWarning($"[SlotView] Animation sprite array at index {i} is not assigned or empty!");
             }
         }
 
@@ -285,6 +356,10 @@ public class SlotView : MonoBehaviour
         {
             ApplyStickyWilds(currentStickyWilds);
         }
+
+        // Enable masks and enable non-display icons when spinning starts
+        EnableAllMasks();
+        EnableAllNonDisplayIcons();
 
         for (int i = 0; i < reelCycleCount.Count; i++)
         {
@@ -414,6 +489,11 @@ public class SlotView : MonoBehaviour
             {
                 SetReelSymbols(col, resultMatrix[col], false);
             }
+            
+            // Ensure masks are disabled and non-display icons are hidden
+            DisableAllMasks();
+            DisableAllNonDisplayIcons();
+            
             onComplete?.Invoke();
             return;
         }
@@ -490,6 +570,10 @@ public class SlotView : MonoBehaviour
         isSpinning = false;
         scatterAnticipationActive = false;
         if (anticipationFrame) anticipationFrame.SetActive(false);
+
+        // Disable masks and hide non-display icons when spinning stops
+        DisableAllMasks();
+        DisableAllNonDisplayIcons();
 
         var currentResult = gameManager.lastResult;
         if (currentResult != null)
@@ -609,6 +693,11 @@ public class SlotView : MonoBehaviour
                     );
                 }
             }
+            
+            // Ensure masks are disabled and non-display icons are hidden
+            DisableAllMasks();
+            DisableAllNonDisplayIcons();
+            
             return;
         }
 
@@ -642,7 +731,7 @@ public class SlotView : MonoBehaviour
 
     private IEnumerator PlayWinLinesSequentially(List<WinLine> winLines, System.Action onComplete)
     {
-        float lineDuration = (winPopDuration * winPopRepeat) + (0.1f * (winPopRepeat - 1));
+        float lineDuration = winSymbolLoopDuration * winSymbolLoopCount;
 
         List<int> prevPositions = null;
 
@@ -718,7 +807,26 @@ public class SlotView : MonoBehaviour
         int imageIndex = 6 + row;
         if (imageIndex >= reel.images.Count) return;
         if (reel.images[imageIndex] != null)
+        {
+            reel.images[imageIndex].DOKill();
             reel.images[imageIndex].transform.localScale = Vector3.one;
+            // Restore alpha to full opacity
+            Color c = reel.images[imageIndex].color;
+            reel.images[imageIndex].color = new Color(c.r, c.g, c.b, 1f);
+        }
+
+        // Also ensure the corresponding animation object is disabled
+        var animGO = WinBox(winAnimationColumns, col, row);
+        if (animGO != null && animGO.activeSelf)
+        {
+            ImageAnimation imageAnim = animGO.GetComponent<ImageAnimation>();
+            if (imageAnim != null)
+            {
+                if (imageAnim.rendererDelegate != null) imageAnim.rendererDelegate.DOKill();
+                imageAnim.StopAnimation();
+            }
+            animGO.SetActive(false);
+        }
     }
 
 
@@ -752,34 +860,110 @@ public class SlotView : MonoBehaviour
             return;
         }
 
-        symbolImage.transform.localScale = Vector3.one;
-
-        Sequence winSequence = DOTween.Sequence();
-
-        for (int i = 0; i < winPopRepeat; i++)
+        // Get the animation GameObject for this position
+        var animGO = WinBox(winAnimationColumns, column, row);
+        if (animGO == null)
         {
-            winSequence.Append(
-                symbolImage.transform.DOScale(winPopScale, winPopDuration / 2)
-                    .SetEase(Ease.OutBack, 1.5f)
-            );
-
-            winSequence.Append(
-                symbolImage.transform.DOScale(1f, winPopDuration / 2)
-                    .SetEase(Ease.InBack, 1.5f)
-            );
-
-            if (i < winPopRepeat - 1)
-            {
-                winSequence.AppendInterval(0.1f);
-            }
+            Debug.LogError($"[AnimateWinSymbol] Animation GameObject is NULL at col: {column}, row: {row}");
+            return;
         }
 
-        winSequence.OnComplete(() => {
-            if (symbolImage != null)
-                symbolImage.transform.localScale = Vector3.one;
-        });
+        // Get the ImageAnimation component
+        ImageAnimation imageAnim = animGO.GetComponent<ImageAnimation>();
+        if (imageAnim == null)
+        {
+            Debug.LogError($"[AnimateWinSymbol] ImageAnimation component not found on animation object at col: {column}, row: {row}");
+            return;
+        }
 
-        winTweens.Add(winSequence);
+        // Get the current symbol ID at this position
+        if (column >= currentDisplayMatrix.Count || row >= currentDisplayMatrix[column].Count)
+        {
+            Debug.LogError($"[AnimateWinSymbol] Invalid matrix position col: {column}, row: {row}");
+            return;
+        }
+
+        int symbolId = currentDisplayMatrix[column][row];
+        
+        // Validate symbolId
+        if (symbolId < 0 || symbolId >= animationSpriteArrays.Length)
+        {
+            Debug.LogError($"[AnimateWinSymbol] Invalid symbolId {symbolId} at col: {column}, row: {row}");
+            return;
+        }
+
+        // Get the animation sprite array for this symbol
+        List<Sprite> animSprites = animationSpriteArrays[symbolId];
+        if (animSprites == null || animSprites.Count == 0)
+        {
+            Debug.LogWarning($"[AnimateWinSymbol] No animation sprites for symbolId {symbolId} at col: {column}, row: {row}");
+            return;
+        }
+
+        // Set the sprite array on the ImageAnimation component
+        imageAnim.textureArray = animSprites;
+        imageAnim.useDynamicFramerate = true;
+        imageAnim.dynamicLoopDuration = winSymbolLoopDuration;
+
+        Color originalColor = symbolImage.color;
+
+        // Start coroutine to enable animation object and call PlayAnimation with delay
+        StartCoroutine(EnableAnimationWithDelay(animGO, imageAnim, symbolImage, originalColor));
+    }
+
+    private IEnumerator EnableAnimationWithDelay(GameObject animGO, ImageAnimation imageAnim, Image symbolImage, Color originalColor)
+    {
+        // Enable the animation GameObject first
+        animGO.SetActive(true);
+
+        Image animRenderer = imageAnim.rendererDelegate;
+        if (animRenderer != null)
+        {
+            Color c = animRenderer.color;
+            animRenderer.color = new Color(c.r, c.g, c.b, 0f);
+            animRenderer.DOFade(1f, 0.2f);
+        }
+
+        symbolImage.DOFade(0f, 0.2f);
+
+        // Wait for the configured delay to sync with winBox timing
+        if (winLineBoxToAnimationDelay > 0)
+        {
+            yield return new WaitForSeconds(winLineBoxToAnimationDelay);
+        }
+
+        // Now start the animation
+        imageAnim.StartAnimation();
+
+        // Schedule to disable animation and restore original image after duration
+        StartCoroutine(DisableWinAnimationAfterDuration(animGO, imageAnim, symbolImage, originalColor, winSymbolLoopDuration * winSymbolLoopCount));
+    }
+
+    private IEnumerator DisableWinAnimationAfterDuration(GameObject animGO, ImageAnimation imageAnim, Image symbolImage, Color originalColor, float duration)
+    {
+        yield return new WaitForSeconds(duration);
+
+        // Smooth transition out
+        Image animRenderer = imageAnim != null ? imageAnim.rendererDelegate : null;
+
+        if (animRenderer != null)
+        {
+            animRenderer.DOFade(0f, 0.2f).OnComplete(() => {
+                if (imageAnim != null) imageAnim.StopAnimation();
+                if (animGO != null) animGO.SetActive(false);
+            });
+        }
+        else
+        {
+            if (imageAnim != null) imageAnim.StopAnimation();
+            if (animGO != null) animGO.SetActive(false);
+        }
+
+        // Restore the original symbol image alpha smoothly
+        if (symbolImage != null)
+        {
+            symbolImage.DOFade(originalColor.a, 0.2f);
+        }
     }
 
     private void KillWinTweens()
@@ -790,8 +974,33 @@ public class SlotView : MonoBehaviour
         }
         winTweens.Clear();
 
+        // Stop all win animations and disable animation GameObjects
+        if (winAnimationColumns != null)
+        {
+            foreach (var col in winAnimationColumns)
+            {
+                if (col?.rows != null)
+                {
+                    foreach (var animGO in col.rows)
+                    {
+                        if (animGO != null && animGO.activeSelf)
+                        {
+                            ImageAnimation imageAnim = animGO.GetComponent<ImageAnimation>();
+                            if (imageAnim != null)
+                            {
+                                if (imageAnim.rendererDelegate != null) imageAnim.rendererDelegate.DOKill();
+                                imageAnim.StopAnimation();
+                            }
+                            animGO.SetActive(false);
+                        }
+                    }
+                }
+            }
+        }
+
         DisableColumns(winBoxColumns);
 
+        // Restore all symbol image alphas to full opacity
         foreach (var reel in reelImagesList)
         {
             if (reel.images != null)
@@ -799,7 +1008,78 @@ public class SlotView : MonoBehaviour
                 foreach (var image in reel.images)
                 {
                     if (image != null)
+                    {
+                        image.DOKill();
                         image.transform.localScale = Vector3.one;
+                        Color c = image.color;
+                        image.color = new Color(c.r, c.g, c.b, 1f);
+                    }
+                }
+            }
+        }
+    }
+
+    #endregion
+
+    #region Mask and Non-Display Icon Management
+
+    private void EnableAllMasks()
+    {
+        if (reelMask == null) return;
+        reelMask.enabled = true;
+    }
+
+    private void DisableAllMasks()
+    {
+        if (reelMask == null) return;
+        reelMask.enabled = false;
+    }
+
+    
+
+    private void EnableAllNonDisplayIcons()
+    {
+        if (reelNonDisplayIconsList == null) return;
+
+        foreach (var reelIcons in reelNonDisplayIconsList)
+        {
+            if (reelIcons.topIcons != null)
+            {
+                foreach (var icon in reelIcons.topIcons)
+                {
+                    if (icon != null) icon.SetActive(true);
+                }
+            }
+
+            if (reelIcons.bottomIcons != null)
+            {
+                foreach (var icon in reelIcons.bottomIcons)
+                {
+                    if (icon != null) icon.SetActive(true);
+                }
+            }
+        }
+    }
+
+    private void DisableAllNonDisplayIcons()
+    {
+        if (reelNonDisplayIconsList == null) return;
+
+        foreach (var reelIcons in reelNonDisplayIconsList)
+        {
+            if (reelIcons.topIcons != null)
+            {
+                foreach (var icon in reelIcons.topIcons)
+                {
+                    if (icon != null) icon.SetActive(false);
+                }
+            }
+
+            if (reelIcons.bottomIcons != null)
+            {
+                foreach (var icon in reelIcons.bottomIcons)
+                {
+                    if (icon != null) icon.SetActive(false);
                 }
             }
         }
@@ -912,4 +1192,14 @@ public class ColumnOverlays
 {
     [Tooltip("Row 0 = top, Row 1, Row 2, Row 3 = bottom")]
     public GameObject[] rows = new GameObject[4];
+}
+
+[System.Serializable]
+public class ReelNonDisplayIcons
+{
+    [Tooltip("Top non-display icons (indices 0-5) that should be hidden when not spinning")]
+    public List<GameObject> topIcons = new List<GameObject>();
+    
+    [Tooltip("Bottom non-display icons (indices 10-15) that should be hidden when not spinning")]
+    public List<GameObject> bottomIcons = new List<GameObject>();
 }

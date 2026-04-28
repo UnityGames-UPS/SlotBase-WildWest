@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,6 +23,12 @@ public class ImageAnimation : MonoBehaviour
     public Image rendererDelegate;
     public bool useSharedMaterial = true;
     public bool doLoopAnimation = true;
+    
+    [Header("Dynamic Timing")]
+    public bool useDynamicFramerate = false;
+    public float dynamicLoopDuration = 1.0f;
+    public System.Action<int> onLoopComplete;
+    private int currentLoopCount = 0;
     
     [SerializeField] private bool StartOnAwake;
     [SerializeField] private bool StartonEnable;
@@ -96,6 +102,9 @@ public class ImageAnimation : MonoBehaviour
             if (indexOfTexture == textureArray.Count)
             {
                 indexOfTexture = 0;
+                currentLoopCount++;
+                onLoopComplete?.Invoke(currentLoopCount);
+                
                 if (doLoopAnimation)
                 {
                     Invoke("AnimationProcess", delayBetweenAnimation + delayBetweenLoop);
@@ -182,6 +191,7 @@ public class ImageAnimation : MonoBehaviour
     {
         CancelInvoke(nameof(AnimationProcess));
         indexOfTexture = 0;
+        currentLoopCount = 0;
         
         // Reset two-phase tracking
         currentPhase = 1;
@@ -191,7 +201,16 @@ public class ImageAnimation : MonoBehaviour
         if (currentAnimationState == ImageState.NONE)
         {
             RevertToInitialState();
-            delayBetweenAnimation = idealFrameRate * (float)textureArray.Count / AnimationSpeed;
+            
+            if (useDynamicFramerate && textureArray != null && textureArray.Count > 0)
+            {
+                delayBetweenAnimation = dynamicLoopDuration / textureArray.Count;
+            }
+            else
+            {
+                delayBetweenAnimation = idealFrameRate * (float)textureArray.Count / AnimationSpeed;
+            }
+            
             currentAnimationState = ImageState.PLAYING;
             
             // Skip Phase 1 if in TWO_PHASE mode and loop count is 0
@@ -235,6 +254,7 @@ public class ImageAnimation : MonoBehaviour
             currentPhase = 1;
             phase1CurrentLoop = 0;
             phase2CurrentLoop = 0;
+            currentLoopCount = 0;
         }
     }
 
