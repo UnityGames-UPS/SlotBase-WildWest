@@ -15310,12 +15310,12 @@ MonoBehaviour:
   clipFreeSpinPopup: {fileID: 8300000, guid: fbda72bf7c2a445619b9e391e996e28f, type: 3}
   clipFreeSpinIntro: {fileID: 8300000, guid: 5675f77684dcf493e9cda5dea037d8ef, type: 3}
   clipFreeSpinTotalWin: {fileID: 8300000, guid: c8c063708b87a4161afce7af4139891f, type: 3}
-  clipWinNormal: {fileID: 0}
-  clipWinNice: {fileID: 8300000, guid: 5a2f38e21cdbc46f480956b915c25661, type: 3}
-  clipWinBig: {fileID: 8300000, guid: b330652b370134b56999d6e97306bea9, type: 3}
-  clipWinMega: {fileID: 0}
-  clipWinSuper: {fileID: 8300000, guid: a35ca95583a3c4c6c83e8c4c157a6989, type: 3}
-  clipWinUltimate: {fileID: 0}
+  clipWinNormal: {fileID: 8300000, guid: 3fd85b969d03e4d94996c8e95d9c4c42, type: 3}
+  clipWinNice: {fileID: 8300000, guid: de684b82ce3974f2c8e9c16543e4e792, type: 3}
+  clipWinBig: {fileID: 8300000, guid: 2207f46c64f7842eb9586d8fc7702468, type: 3}
+  clipWinMega: {fileID: 8300000, guid: 8a6477516c8e14c79bd10a9db8657553, type: 3}
+  clipWinSuper: {fileID: 8300000, guid: 46e461a922bc346dc8edf4661f010e60, type: 3}
+  clipWinUltimate: {fileID: 8300000, guid: 7e64818c013c847979206d723da52881, type: 3}
   clipWinLine: {fileID: 8300000, guid: 0587465391acf454b8d1f806135a5a53, type: 3}
 --- !u!4 &600777728
 Transform:

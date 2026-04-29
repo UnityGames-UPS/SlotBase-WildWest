@@ -794,7 +794,7 @@ public class SlotView : MonoBehaviour
         imageAnim.useDynamicFramerate = true;
         imageAnim.dynamicLoopDuration = winSymbolLoopDuration;
 
-        Color originalColor = symbolImage.color;
+        Color originalColor = new Color(symbolImage.color.r, symbolImage.color.g, symbolImage.color.b, 1f);
 
         Sequence seq = DOTween.Sequence();
         
@@ -1062,7 +1062,7 @@ public class SlotView : MonoBehaviour
         imageAnim.useDynamicFramerate = true;
         imageAnim.dynamicLoopDuration = winSymbolLoopDuration;
 
-        Color originalColor = symbolImage.color;
+        Color originalColor = new Color(symbolImage.color.r, symbolImage.color.g, symbolImage.color.b, 1f);
 
         Sequence seq = DOTween.Sequence();
         
