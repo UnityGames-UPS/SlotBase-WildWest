@@ -189,6 +189,8 @@ public class ImageAnimation : MonoBehaviour
 
     public void StartAnimation()
     {
+        if (textureArray == null || textureArray.Count == 0) return;
+
         CancelInvoke(nameof(AnimationProcess));
         indexOfTexture = 0;
         currentLoopCount = 0;
@@ -246,7 +248,10 @@ public class ImageAnimation : MonoBehaviour
     {
         if (currentAnimationState != 0)
         {
-            rendererDelegate.sprite = textureArray[0];
+            if (textureArray != null && textureArray.Count > 0)
+            {
+                rendererDelegate.sprite = textureArray[0];
+            }
             CancelInvoke("AnimationProcess");
             currentAnimationState = ImageState.NONE;
             
@@ -269,6 +274,8 @@ public class ImageAnimation : MonoBehaviour
 
     private void SetTextureOfIndex()
     {
+        if (textureArray == null || textureArray.Count == 0 || indexOfTexture < 0 || indexOfTexture >= textureArray.Count) return;
+
         if (useSharedMaterial)
         {
             rendererDelegate.sprite = textureArray[indexOfTexture];

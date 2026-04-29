@@ -55,6 +55,18 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_Text winDisplayText;
     [SerializeField] private float winDisplayDuration = 1f;
 
+    [Header("Win Popup Panel")]
+    [SerializeField] private GameObject winPopupPanel;
+    [SerializeField] private GameObject winRingObject;
+    [SerializeField] private ImageAnimation winPopupImageAnimation;
+    [SerializeField] private RectTransform winPopupImageRect;
+    [SerializeField] private TMP_Text winPopupText;
+    [SerializeField] private List<Sprite> niceWinSprites;
+    [SerializeField] private List<Sprite> bigWinSprites;
+    [SerializeField] private List<Sprite> megaWinSprites;
+    [SerializeField] private List<Sprite> superWinSprites;
+    [SerializeField] private List<Sprite> ultimateWinSprites;
+
     [Header("Spin Button")]
     [SerializeField] private Button spinButton;
     [SerializeField] private GameObject spinNormalImage;
@@ -227,6 +239,8 @@ public class UIManager : MonoBehaviour
 
         if (settingsPanel) settingsPanel.SetActive(false);
         if (gameRulesPanel) gameRulesPanel.SetActive(false);
+        if (winPopupPanel) winPopupPanel.SetActive(false);
+        if (winRingObject) winRingObject.SetActive(false);
 
 
         if (freeSpinCountContainer) freeSpinCountContainer.SetActive(false);
@@ -455,6 +469,12 @@ public class UIManager : MonoBehaviour
             winDisplayCoroutine = null;
         }
         if (winDisplayObject) winDisplayObject.SetActive(false);
+        if (winPopupPanel)
+        {
+            winPopupPanel.SetActive(false);
+            if (winPopupImageAnimation) winPopupImageAnimation.StopAnimation();
+        }
+        if (winRingObject) winRingObject.SetActive(false);
         if (gameRuleObject) gameRuleObject.SetActive(true);
     }
 
@@ -492,6 +512,22 @@ public class UIManager : MonoBehaviour
         if (spinButton) spinButton.interactable = false;
         if (spinNormalImage) spinNormalImage.SetActive(false);
         if (spinStopImage) spinStopImage.SetActive(false);
+        
+        if (gameManager != null && gameManager.lastResult != null)
+        {
+            double winAmount = gameManager.lastResult.winAmount;
+            double totalBetAmount = gameManager.currentBetAmount;
+            if (gameManager.gameConfig != null)
+            {
+                totalBetAmount *= gameManager.gameConfig.betMultiplier;
+            }
+            double multiplier = totalBetAmount > 0 ? (winAmount / totalBetAmount) : 0;
+            
+            if (multiplier >= 5)
+            {
+                if (winRingObject) winRingObject.SetActive(true);
+            }
+        }
     }
 
     internal void EnableControlsAfterWinAnimation()
@@ -515,14 +551,93 @@ public class UIManager : MonoBehaviour
 
     private IEnumerator ShowWinDisplayCoroutine(double winAmount)
     {
+        double totalBetAmount = gameManager.currentBetAmount;
+        if (gameManager.gameConfig != null)
+        {
+            totalBetAmount *= gameManager.gameConfig.betMultiplier;
+        }
+        
+        double multiplier = totalBetAmount > 0 ? (winAmount / totalBetAmount) : 0;
+
+        if (multiplier < 5)
+        {
+            if (gameRuleObject) gameRuleObject.SetActive(false);
+            if (winDisplayObject) winDisplayObject.SetActive(true);
+
+            if (winDisplayText) winDisplayText.text = $"WIN {winAmount:F2}";
+
+            yield return new WaitForSeconds(winDisplayDuration);
+
+            if (winDisplayObject) winDisplayObject.SetActive(false);
+            if (gameRuleObject) gameRuleObject.SetActive(true);
+            if (winRingObject) winRingObject.SetActive(false);
+            winDisplayCoroutine = null;
+            yield break;
+        }
+
+        // Big Win Popup Logic
         if (gameRuleObject) gameRuleObject.SetActive(false);
-        if (winDisplayObject) winDisplayObject.SetActive(true);
-
-        if (winDisplayText) winDisplayText.text = $"WIN {winAmount:F2}";
-
-        yield return new WaitForSeconds(winDisplayDuration);
-
         if (winDisplayObject) winDisplayObject.SetActive(false);
+
+        List<Sprite> selectedSprites = null;
+        float popupTime = 0f;
+
+        if (multiplier >= 100) {
+            selectedSprites = ultimateWinSprites;
+            popupTime = 15f;
+        } else if (multiplier >= 50) {
+            selectedSprites = superWinSprites;
+            popupTime = 12f;
+        } else if (multiplier >= 25) {
+            selectedSprites = megaWinSprites;
+            popupTime = 8f;
+        } else if (multiplier >= 10) {
+            selectedSprites = bigWinSprites;
+            popupTime = 8f;
+        } else {
+            selectedSprites = niceWinSprites;
+            popupTime = 6f;
+        }
+
+        if (winPopupImageAnimation)
+        {
+            winPopupImageAnimation.textureArray = selectedSprites;
+        }
+
+        if (winPopupPanel) winPopupPanel.SetActive(true);
+
+        if (winPopupImageAnimation)
+        {
+            winPopupImageAnimation.StartAnimation();
+        }
+
+        float animDuration = popupTime - 1f;
+
+        if (winPopupImageRect)
+        {
+            winPopupImageRect.localScale = Vector3.zero;
+            winPopupImageRect.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack).OnComplete(() => {
+                winPopupImageRect.DOScale(new Vector3(1.2f, 1.2f, 1.2f), animDuration - 0.5f).SetEase(Ease.Linear);
+            });
+        }
+
+        if (winPopupText)
+        {
+            winPopupText.text = "0.00";
+            float startVal = 0f;
+            float endVal = (float)winAmount;
+            DOTween.To(() => startVal, x => {
+                startVal = x;
+                winPopupText.text = startVal.ToString("F2");
+            }, endVal, animDuration).SetEase(Ease.OutQuad);
+        }
+
+        yield return new WaitForSeconds(popupTime);
+
+        if (winPopupPanel) winPopupPanel.SetActive(false);
+        if (winPopupImageAnimation) winPopupImageAnimation.StopAnimation();
+        if (winRingObject) winRingObject.SetActive(false);
+        
         if (gameRuleObject) gameRuleObject.SetActive(true);
         winDisplayCoroutine = null;
     }
