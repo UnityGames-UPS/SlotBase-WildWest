@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] internal SocketIOManager socketManager;
-    [SerializeField] private UIManager uiManager;
+    [SerializeField] internal UIManager uiManager;
     [SerializeField] private PopupManager popupManager;
     [SerializeField] private SlotView slotView;
 
@@ -34,7 +34,6 @@ public class GameManager : MonoBehaviour
     internal bool waitingForFreeSpinStart;
 
     // Buy Feature
-    internal int buyFeatureBetIndex;      // Bet index selected inside the buy panel
     internal bool isBuyingFeature;        // True while waiting for server response
 
     internal bool isInitialized;
@@ -61,7 +60,6 @@ public class GameManager : MonoBehaviour
         playerData = player;
         currentBetIndex = playerData.currentBetIndex;
         UpdateBetAmount();
-        buyFeatureBetIndex = currentBetIndex; // initialise buy panel to same bet
 
         if (initialMatrix != null && slotView != null)
         {
@@ -81,20 +79,19 @@ public class GameManager : MonoBehaviour
     internal void IncreaseBet()
     {
         if (currentState != GameState.Idle || isAutoPlaying) return;
-
-        currentBetIndex = (currentBetIndex + 1) % gameConfig.availableBets.Count;
-        UpdateBetAmount();
-        buyFeatureBetIndex = currentBetIndex;
-        uiManager.UpdateBetDisplay();
+        SetBetIndex((currentBetIndex + 1) % gameConfig.availableBets.Count);
     }
 
     internal void DecreaseBet()
     {
         if (currentState != GameState.Idle || isAutoPlaying) return;
+        SetBetIndex((currentBetIndex - 1 + gameConfig.availableBets.Count) % gameConfig.availableBets.Count);
+    }
 
-        currentBetIndex = (currentBetIndex - 1 + gameConfig.availableBets.Count) % gameConfig.availableBets.Count;
+    internal void SetBetIndex(int index)
+    {
+        currentBetIndex = index;
         UpdateBetAmount();
-        buyFeatureBetIndex = currentBetIndex;
         uiManager.UpdateBetDisplay();
     }
 
@@ -207,10 +204,22 @@ public class GameManager : MonoBehaviour
             uiManager.DisableControlsDuringWinAnimation();
 
             slotView.ShowWinLineAnimation(lastResult.winLines, OnWinAnimationComplete);
+
+            StartCoroutine(TriggerWinPopupWithDelay(1.5f, lastResult));
         }
         else
         {
+            uiManager.OnSpinStopping(lastResult);
             OnWinAnimationComplete();
+        }
+    }
+
+    private IEnumerator TriggerWinPopupWithDelay(float delay, SpinResult result)
+    {
+        yield return new WaitForSeconds(delay);
+        if (lastResult == result)
+        {
+            uiManager.TriggerBigWinPopupEarly(result.winAmount);
         }
     }
 
@@ -218,7 +227,10 @@ public class GameManager : MonoBehaviour
     {
         uiManager.EnableControlsAfterWinAnimation();
 
-        uiManager.OnSpinStopping(lastResult);
+        if (lastResult != null)
+        {
+            uiManager.OnSpinStopping(lastResult);
+        }
 
         if (isAutoPlaying || isInFreeSpins)
         {
@@ -354,21 +366,9 @@ public class GameManager : MonoBehaviour
 
     #region Buy Feature
 
-    internal void IncreaseBuyFeatureBet()
-    {
-        buyFeatureBetIndex = (buyFeatureBetIndex + 1) % gameConfig.availableBets.Count;
-        uiManager.UpdateBuyFeatureCostDisplay();
-    }
-
-    internal void DecreaseBuyFeatureBet()
-    {
-        buyFeatureBetIndex = (buyFeatureBetIndex - 1 + gameConfig.availableBets.Count) % gameConfig.availableBets.Count;
-        uiManager.UpdateBuyFeatureCostDisplay();
-    }
-
     internal double GetBuyFeatureCost(int betIndex = -1)
     {
-        int idx = betIndex < 0 ? buyFeatureBetIndex : betIndex;
+        int idx = betIndex < 0 ? currentBetIndex : betIndex;
         return gameConfig.availableBets[idx] * gameConfig.betMultiplier * gameConfig.buyFeatureCostMultiplier;
     }
 
@@ -392,7 +392,7 @@ public class GameManager : MonoBehaviour
         currentState = GameState.Spinning;
 
         uiManager.OnBuyFeatureConfirmed();
-        socketManager.SendBuyFeatureRequest(buyFeatureBetIndex);
+        socketManager.SendBuyFeatureRequest(currentBetIndex);
 
         // Reuse the existing spin coroutine / result flow — the server returns a
         // "result" event identical to a normal free-spin trigger, so OnSpinResultReceived

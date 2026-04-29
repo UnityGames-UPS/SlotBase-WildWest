@@ -869,7 +869,8 @@ public class SlotView : MonoBehaviour
 
     private IEnumerator PlayWinLinesSequentially(List<WinLine> winLines, System.Action onComplete)
     {
-        float lineDuration = winSymbolLoopDuration * winSymbolLoopCount;
+        bool skipScreen = gameManager != null && gameManager.uiManager != null && gameManager.uiManager.skipScreenToggle != null && gameManager.uiManager.skipScreenToggle.isOn;
+        float lineDuration = skipScreen ? 0.5f : winSymbolLoopDuration * winSymbolLoopCount;
 
         List<int> prevPositions = null;
 
@@ -998,6 +999,21 @@ public class SlotView : MonoBehaviour
         if (symbolImage == null)
         {
             Debug.LogError($"[AnimateWinSymbol] Symbol image is NULL at col: {column}, row: {row}, imageIndex: {imageIndex}");
+            return;
+        }
+
+        bool skipScreen = gameManager != null && gameManager.uiManager != null && gameManager.uiManager.skipScreenToggle != null && gameManager.uiManager.skipScreenToggle.isOn;
+
+        if (skipScreen)
+        {
+            Sequence popSeq = DOTween.Sequence();
+            popSeq.AppendCallback(() => {
+                symbolImage.DOKill();
+                symbolImage.transform.localScale = Vector3.one;
+            });
+            popSeq.Append(symbolImage.transform.DOScale(1.2f, 0.2f).SetEase(Ease.OutBack));
+            popSeq.Append(symbolImage.transform.DOScale(1f, 0.2f).SetEase(Ease.InBack));
+            winTweens.Add(popSeq);
             return;
         }
 

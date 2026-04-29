@@ -101,6 +101,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Toggle settingsTurboToggle;
     [SerializeField] private Toggle settingsQuickSpinToggle;
 
+    [Header("Skip Screen")]
+    public Toggle skipScreenToggle;
+
     [Header("Audio Toggles")]
     [Tooltip("Toggle for background music on/off.")]
     [SerializeField] private Toggle musicToggle;
@@ -417,8 +420,13 @@ public class UIManager : MonoBehaviour
             if (roundButton.button != null)
             {
                 int rounds = roundButton.rounds;
-                roundButton.button.onClick.AddListener(() => SelectAutoPlayRounds(rounds));
+                roundButton.button.onClick.AddListener(() => { AudioManager.Instance?.PlayButton(); SelectAutoPlayRounds(rounds); });
             }
+        }
+
+        if (roundButtons != null && roundButtons.Length > 0)
+        {
+            SelectAutoPlayRounds(roundButtons[0].rounds);
         }
     }
 
@@ -452,6 +460,12 @@ public class UIManager : MonoBehaviour
                 sfxToggle.isOn = AudioManager.Instance.SfxEnabled;
             sfxToggle.onValueChanged.AddListener(OnSfxToggleChanged);
             RefreshToggleBgAlpha(sfxToggle);
+        }
+
+        if (skipScreenToggle)
+        {
+            skipScreenToggle.onValueChanged.AddListener(OnSkipScreenToggleChanged);
+            RefreshToggleBgAlpha(skipScreenToggle);
         }
     }
 
@@ -489,6 +503,7 @@ public class UIManager : MonoBehaviour
         SetBetControlsEnabled(false);
         if (autoPlayOpenButton) autoPlayOpenButton.interactable = false;
         if (settingsOpenButton) settingsOpenButton.interactable = false;
+        if (buyFreeSpinOpenButton) buyFreeSpinOpenButton.interactable = false;
 
         if (winDisplayCoroutine != null)
         {
@@ -505,6 +520,27 @@ public class UIManager : MonoBehaviour
         if (gameRuleObject) gameRuleObject.SetActive(true);
     }
 
+    private bool earlyBigWinPopupTriggered = false;
+
+    internal void TriggerBigWinPopupEarly(double winAmount)
+    {
+        double totalBetAmount = gameManager.currentBetAmount;
+        if (gameManager.gameConfig != null)
+        {
+            totalBetAmount *= gameManager.gameConfig.betMultiplier;
+        }
+        double multiplier = totalBetAmount > 0 ? (winAmount / totalBetAmount) : 0;
+
+        bool skipScreen = skipScreenToggle != null && skipScreenToggle.isOn;
+
+        if (multiplier >= 5 && !skipScreen)
+        {
+            earlyBigWinPopupTriggered = true;
+            if (winDisplayCoroutine != null) StopCoroutine(winDisplayCoroutine);
+            winDisplayCoroutine = StartCoroutine(ShowWinDisplayCoroutine(winAmount));
+        }
+    }
+
     internal void OnSpinStopping(SpinResult result)
     {
         AnimateBalanceUpdate(result.playerData.balance);
@@ -512,11 +548,24 @@ public class UIManager : MonoBehaviour
         if (result.winAmount > 0)
         {
             AnimateWinUpdate(result.winAmount);
-            ShowWinDisplay(result.winAmount);
+            
+            double totalBetAmount = gameManager.currentBetAmount;
+            if (gameManager.gameConfig != null)
+            {
+                totalBetAmount *= gameManager.gameConfig.betMultiplier;
+            }
+            double multiplier = totalBetAmount > 0 ? (result.winAmount / totalBetAmount) : 0;
+
+            if (multiplier < 5 || !earlyBigWinPopupTriggered)
+            {
+                ShowWinDisplay(result.winAmount);
+            }
+            earlyBigWinPopupTriggered = false;
         }
         else
         {
             UpdateWinDisplay(0);
+            earlyBigWinPopupTriggered = false;
         }
     }
 
@@ -530,6 +579,7 @@ public class UIManager : MonoBehaviour
             SetBetControlsEnabled(true);
             if (autoPlayOpenButton) autoPlayOpenButton.interactable = true;
             if (settingsOpenButton) settingsOpenButton.interactable = true;
+            if (buyFreeSpinOpenButton) buyFreeSpinOpenButton.interactable = true;
         }
     }
 
@@ -539,6 +589,7 @@ public class UIManager : MonoBehaviour
         if (spinButton) spinButton.interactable = false;
         if (spinNormalImage) spinNormalImage.SetActive(false);
         if (spinStopImage) spinStopImage.SetActive(false);
+        if (buyFreeSpinOpenButton) buyFreeSpinOpenButton.interactable = false;
         
         if (gameManager != null && gameManager.lastResult != null)
         {
@@ -550,7 +601,9 @@ public class UIManager : MonoBehaviour
             }
             double multiplier = totalBetAmount > 0 ? (winAmount / totalBetAmount) : 0;
             
-            if (multiplier >= 5)
+            bool skipScreen = skipScreenToggle != null && skipScreenToggle.isOn;
+
+            if (multiplier >= 5 && !skipScreen)
             {
                 if (winRingObject) winRingObject.SetActive(true);
             }
@@ -565,6 +618,7 @@ public class UIManager : MonoBehaviour
             if (spinButton) spinButton.interactable = true;
             if (autoPlayOpenButton) autoPlayOpenButton.interactable = true;
             if (settingsOpenButton) settingsOpenButton.interactable = true;
+            if (buyFreeSpinOpenButton) buyFreeSpinOpenButton.interactable = true;
             if (spinNormalImage) spinNormalImage.SetActive(true);
             if (spinStopImage) spinStopImage.SetActive(false);
         }
@@ -586,14 +640,16 @@ public class UIManager : MonoBehaviour
         
         double multiplier = totalBetAmount > 0 ? (winAmount / totalBetAmount) : 0;
 
-        if (multiplier < 5)
-        {
-            AudioManager.Instance?.PlayWinNormal();
+        bool skipScreen = skipScreenToggle != null && skipScreenToggle.isOn;
 
+        if (multiplier < 5 || skipScreen)
+        {
             if (gameRuleObject) gameRuleObject.SetActive(false);
             if (winDisplayObject) winDisplayObject.SetActive(true);
 
             if (winDisplayText) winDisplayText.text = $"WIN {winAmount:F2}";
+
+            AudioManager.Instance?.PlayWinNormal();
 
             yield return new WaitForSeconds(winDisplayDuration);
 
@@ -799,6 +855,7 @@ public class UIManager : MonoBehaviour
         SetBetControlsEnabled(true);
         if (autoPlayOpenButton) autoPlayOpenButton.interactable = true;
         if (settingsOpenButton) settingsOpenButton.interactable = true;
+        if (buyFreeSpinOpenButton) buyFreeSpinOpenButton.interactable = true;
     }
 
     internal void UpdateAutoPlayCount()
@@ -814,6 +871,7 @@ public class UIManager : MonoBehaviour
     private void OnTurboToggleChanged(bool isOn)
     {
         if (isSyncingToggles) return;
+        AudioManager.Instance?.PlayButton();
         isSyncingToggles = true;
 
         if (isOn && quickSpinToggle && quickSpinToggle.isOn)
@@ -833,6 +891,7 @@ public class UIManager : MonoBehaviour
     private void OnQuickSpinToggleChanged(bool isOn)
     {
         if (isSyncingToggles) return;
+        AudioManager.Instance?.PlayButton();
         isSyncingToggles = true;
 
         if (isOn && turboToggle && turboToggle.isOn)
@@ -852,6 +911,7 @@ public class UIManager : MonoBehaviour
     private void OnSettingsTurboToggleChanged(bool isOn)
     {
         if (isSyncingToggles) return;
+        AudioManager.Instance?.PlayButton();
         isSyncingToggles = true;
 
         if (isOn && settingsQuickSpinToggle && settingsQuickSpinToggle.isOn)
@@ -871,6 +931,7 @@ public class UIManager : MonoBehaviour
     private void OnSettingsQuickSpinToggleChanged(bool isOn)
     {
         if (isSyncingToggles) return;
+        AudioManager.Instance?.PlayButton();
         isSyncingToggles = true;
 
         if (isOn && settingsTurboToggle && settingsTurboToggle.isOn)
@@ -904,14 +965,22 @@ public class UIManager : MonoBehaviour
 
     private void OnMusicToggleChanged(bool isOn)
     {
+        AudioManager.Instance?.PlayButton();
         AudioManager.Instance?.SetMusicEnabled(isOn);
         RefreshToggleBgAlpha(musicToggle);
     }
 
     private void OnSfxToggleChanged(bool isOn)
     {
+        AudioManager.Instance?.PlayButton();
         AudioManager.Instance?.SetSfxEnabled(isOn);
         RefreshToggleBgAlpha(sfxToggle);
+    }
+
+    private void OnSkipScreenToggleChanged(bool isOn)
+    {
+        AudioManager.Instance?.PlayButton();
+        RefreshToggleBgAlpha(skipScreenToggle);
     }
 
     private void RefreshAllToggleBgAlpha()
@@ -922,6 +991,7 @@ public class UIManager : MonoBehaviour
         RefreshToggleBgAlpha(settingsQuickSpinToggle);
         RefreshToggleBgAlpha(musicToggle);
         RefreshToggleBgAlpha(sfxToggle);
+        RefreshToggleBgAlpha(skipScreenToggle);
     }
 
     // Reads the background Image directly from Toggle.targetGraphic.
@@ -1148,7 +1218,7 @@ public class UIManager : MonoBehaviour
             buyFeatureCostText.text = FormatCostText(cost);
 
         // Sprite-digit display for the current bet value inside the panel
-        double betValue = gameManager.gameConfig.availableBets[gameManager.buyFeatureBetIndex];
+        double betValue = gameManager.gameConfig.availableBets[gameManager.currentBetIndex];
         double totalBetValue = betValue * gameManager.gameConfig.betMultiplier;
         SetBuyFeatureBetDisplay(totalBetValue);
     }
@@ -1163,12 +1233,6 @@ public class UIManager : MonoBehaviour
         if (buyFeatureBetDigits == null || buyFeatureBetDigits.Length == 0) return;
         if (buyFeatureNumberSprites == null || buyFeatureNumberSprites.Length < 10) return;
 
-        // Hide all digit images first
-        foreach (var digit in buyFeatureBetDigits)
-            if (digit) digit.gameObject.SetActive(false);
-
-        if (buyFeatureBetDecimalPoint) buyFeatureBetDecimalPoint.SetActive(false);
-
         // Determine format: use decimals only if the value has a fractional part
         bool hasDecimal = (betValue % 1) != 0;
         string betStr = hasDecimal ? betValue.ToString("F2") : betValue.ToString("F0");
@@ -1178,28 +1242,7 @@ public class UIManager : MonoBehaviour
         if (hasDecimal) totalObjects++;
 
         AdjustBuyFeatureBetLayoutSpacing(totalObjects);
-
-        // Fill from right to left (same approach as SetWinAmountDisplay)
-        int arrayIndex = buyFeatureBetDigits.Length - 1;
-
-        for (int charIndex = betStr.Length - 1; charIndex >= 0 && arrayIndex >= 0; charIndex--)
-        {
-            char c = betStr[charIndex];
-            if (c == '.')
-            {
-                if (buyFeatureBetDecimalPoint) buyFeatureBetDecimalPoint.SetActive(true);
-            }
-            else if (char.IsDigit(c))
-            {
-                int num = int.Parse(c.ToString());
-                if (buyFeatureBetDigits[arrayIndex])
-                {
-                    buyFeatureBetDigits[arrayIndex].gameObject.SetActive(true);
-                    buyFeatureBetDigits[arrayIndex].sprite = buyFeatureNumberSprites[num];
-                }
-                arrayIndex--;
-            }
-        }
+        RenderSpriteDigits(betValue, buyFeatureBetDigits, buyFeatureBetDecimalPoint, buyFeatureNumberSprites);
     }
 
     /// <summary>
@@ -1233,11 +1276,7 @@ public class UIManager : MonoBehaviour
     /// </summary>
     private void OnBuyFeatureBetPlus()
     {
-        gameManager.IncreaseBuyFeatureBet();
-        // Mirror to main bet
-        gameManager.currentBetIndex = gameManager.buyFeatureBetIndex;
-        gameManager.currentBetAmount = gameManager.gameConfig.availableBets[gameManager.currentBetIndex];
-        UpdateBetDisplay(); // refreshes outside betAmountText + calls UpdateBuyFeatureCostDisplay
+        gameManager.IncreaseBet();
     }
 
     /// <summary>
@@ -1246,11 +1285,7 @@ public class UIManager : MonoBehaviour
     /// </summary>
     private void OnBuyFeatureBetMinus()
     {
-        gameManager.DecreaseBuyFeatureBet();
-        // Mirror to main bet
-        gameManager.currentBetIndex = gameManager.buyFeatureBetIndex;
-        gameManager.currentBetAmount = gameManager.gameConfig.availableBets[gameManager.currentBetIndex];
-        UpdateBetDisplay(); // refreshes outside betAmountText + calls UpdateBuyFeatureCostDisplay
+        gameManager.DecreaseBet();
     }
 
     private void OpenBuyFreeSpinPanel()
@@ -1258,8 +1293,6 @@ public class UIManager : MonoBehaviour
         if (gameManager.currentState != GameState.Idle) return;
         if (!gameManager.gameConfig.buyFeatureEnabled) return;
 
-        // Sync buy panel bet index to current main bet before opening
-        gameManager.buyFeatureBetIndex = gameManager.currentBetIndex;
         UpdateBuyFeatureCostDisplay();
 
         if (buyFreeSpinPanel) buyFreeSpinPanel.SetActive(true);
@@ -1534,11 +1567,6 @@ public class UIManager : MonoBehaviour
         if (winAmountDigits == null || winAmountDigits.Length == 0) return;
         if (numberSprites == null || numberSprites.Length < 10) return;
 
-        foreach (var digit in winAmountDigits)
-            if (digit) digit.gameObject.SetActive(false);
-
-        if (decimalPointObject) decimalPointObject.SetActive(false);
-
         bool hasDecimal = (amount % 1) != 0;
         string amountStr = hasDecimal ? amount.ToString("F2") : amount.ToString("F0");
 
@@ -1546,23 +1574,35 @@ public class UIManager : MonoBehaviour
         if (hasDecimal) totalObjects++;
 
         AdjustWinAmountLayoutSpacing(totalObjects);
+        RenderSpriteDigits(amount, winAmountDigits, decimalPointObject, numberSprites);
+    }
 
-        int arrayIndex = winAmountDigits.Length - 1;
+    private void RenderSpriteDigits(double amount, Image[] digitImages, GameObject decimalPointObj, Sprite[] sprites)
+    {
+        foreach (var digit in digitImages)
+            if (digit) digit.gameObject.SetActive(false);
+
+        if (decimalPointObj) decimalPointObj.SetActive(false);
+
+        bool hasDecimal = (amount % 1) != 0;
+        string amountStr = hasDecimal ? amount.ToString("F2") : amount.ToString("F0");
+
+        int arrayIndex = digitImages.Length - 1;
 
         for (int charIndex = amountStr.Length - 1; charIndex >= 0 && arrayIndex >= 0; charIndex--)
         {
             char c = amountStr[charIndex];
             if (c == '.')
             {
-                if (decimalPointObject) decimalPointObject.SetActive(true);
+                if (decimalPointObj) decimalPointObj.SetActive(true);
             }
             else if (char.IsDigit(c))
             {
                 int num = int.Parse(c.ToString());
-                if (winAmountDigits[arrayIndex])
+                if (digitImages[arrayIndex])
                 {
-                    winAmountDigits[arrayIndex].gameObject.SetActive(true);
-                    winAmountDigits[arrayIndex].sprite = numberSprites[num];
+                    digitImages[arrayIndex].gameObject.SetActive(true);
+                    digitImages[arrayIndex].sprite = sprites[num];
                 }
                 arrayIndex--;
             }

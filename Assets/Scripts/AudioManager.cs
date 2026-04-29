@@ -435,4 +435,32 @@ public class AudioManager : MonoBehaviour
             StopSource(uiSource);
         }
     }
+
+    // ─────────────────────────────────────────────────────────────────
+    // Application Focus / Pause Handling
+    // ─────────────────────────────────────────────────────────────────
+
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        HandleFocus(hasFocus);
+    }
+
+    private void OnApplicationPause(bool isPaused)
+    {
+        HandleFocus(!isPaused);
+    }
+
+    private void HandleFocus(bool hasFocus)
+    {
+        if (!hasFocus)
+        {
+            if (bgMusicSource != null) bgMusicSource.Pause();
+            AudioListener.volume = 0f;
+        }
+        else
+        {
+            if (bgMusicSource != null) bgMusicSource.UnPause();
+            AudioListener.volume = 1f;
+        }
+    }
 }

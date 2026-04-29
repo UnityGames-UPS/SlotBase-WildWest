@@ -5307,8 +5307,9 @@ MonoBehaviour:
   historyOpenButton: {fileID: 1329098976}
   settingsTurboToggle: {fileID: 990195117}
   settingsQuickSpinToggle: {fileID: 1167815583}
-  musicToggle: {fileID: 0}
-  sfxToggle: {fileID: 0}
+  skipScreenToggle: {fileID: 1199224424}
+  musicToggle: {fileID: 503898135}
+  sfxToggle: {fileID: 1963999683}
   gameRulesPanel: {fileID: 354488344}
   gameRulesPanelRect: {fileID: 354488345}
   gameRulesOpenButton: {fileID: 1853287806}
@@ -10508,7 +10509,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f521a04de7f494272a617b2719edd271, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testToken: 8dd8c86ac8cb4d2698e664371bca1756
+  testToken: 367eaf42118c4f51a4eb6dfea68c12c8
   gameManager: {fileID: 855426822}
   uiManager: {fileID: 180954095}
   popupManager: {fileID: 1163055615}
@@ -15292,7 +15293,7 @@ MonoBehaviour:
   specialSource: {fileID: 231973188}
   reserveSource: {fileID: 1967427680}
   clipGameStart: {fileID: 8300000, guid: eae87462aa128455086fdabc73eb40b6, type: 3}
-  clipBgMusic: {fileID: 8300000, guid: 78e90814d314c41b894a7090bef423b9, type: 3}
+  clipBgMusic: {fileID: 8300000, guid: a8fb6a9072e054cd5a1d1d0210f2b4e4, type: 3}
   clipButtonGeneric: {fileID: 8300000, guid: b6a31fe41b0ab47db8700f6b2fd5e253, type: 3}
   clipPopupClose: {fileID: 8300000, guid: 13fe71aea9f0e4e888553cc31a70cd51, type: 3}
   clipPageSwipe: {fileID: 8300000, guid: 5b99637b8e8e5423abd8e55d11e5e2e1, type: 3}
@@ -20269,7 +20270,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &853735618
 RectTransform:
   m_ObjectHideFlags: 0
@@ -31832,7 +31833,7 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_IsOn: 1
+  m_IsOn: 0
 --- !u!1 &1205022856
 GameObject:
   m_ObjectHideFlags: 0
@@ -37783,7 +37784,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1461109610
 RectTransform:
   m_ObjectHideFlags: 0
@@ -46489,8 +46490,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -105}
-  m_SizeDelta: {x: 551.032, y: 101.94}
+  m_AnchoredPosition: {x: 0, y: -96.3}
+  m_SizeDelta: {x: 500, y: 101.94}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1806816181
 MonoBehaviour:
@@ -49236,7 +49237,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.671
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -53540,7 +53541,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
+  m_Transition: 2
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
@@ -53550,10 +53551,10 @@ MonoBehaviour:
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
+    m_HighlightedSprite: {fileID: 4910315128264940152, guid: b508197c96d664ae38ba1a7675bdb5b6, type: 3}
+    m_PressedSprite: {fileID: -1211914526886313762, guid: b508197c96d664ae38ba1a7675bdb5b6, type: 3}
     m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: -1211914526886313762, guid: b508197c96d664ae38ba1a7675bdb5b6, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
