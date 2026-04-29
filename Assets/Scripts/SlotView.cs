@@ -542,6 +542,12 @@ public class SlotView : MonoBehaviour
         {
             scatterAnticipationActive = true;
             if (anticipationFrame) anticipationFrame.SetActive(true);
+            AudioManager.Instance?.PlayAnticipationFastSpin();
+        }
+
+        if (scatterCount >= 3)
+        {
+            AudioManager.Instance?.Play3ScatterHit();
         }
 
         while (true)
@@ -636,6 +642,27 @@ public class SlotView : MonoBehaviour
             0
         );
 
+        // ── Play reel-stop sound immediately when symbols lock in ──────────
+        AudioManager.Instance?.PlayReelStop();
+
+        // Detect scatter / wild symbols in this column for hit sounds
+        if (currentDisplayMatrix != null && columnIndex < currentDisplayMatrix.Count)
+        {
+            int actualScatterId = gameManager?.gameConfig != null
+                ? gameManager.gameConfig.scatterSymbolId
+                : scatterSymbolId;
+            bool hasScatter = false;
+            bool hasWild    = false;
+            foreach (int sym in currentDisplayMatrix[columnIndex])
+            {
+                if (sym == actualScatterId)                              hasScatter = true;
+                if (sym == 11 || sym == 13 || sym == 14 || sym == 15) hasWild    = true;
+            }
+            if (hasScatter) AudioManager.Instance?.PlayScatterHit();
+            else if (hasWild) AudioManager.Instance?.PlayWildHit();
+        }
+        // ──────────────────────────────────────────────────────────────────
+
         if (isQuickStop)
         {
             Sequence quickStopSequence = DOTween.Sequence();
@@ -649,6 +676,8 @@ public class SlotView : MonoBehaviour
                 slotTransform.DOLocalMoveY(middlePosition, quickStopDuration * 0.7f)
                     .SetEase(Ease.OutBack, 1.2f)
             );
+
+            quickStopSequence.OnComplete(() => PlayStopAnimationsForColumn(columnIndex));
 
             spinTweens[columnIndex] = quickStopSequence;
         }
@@ -670,6 +699,8 @@ public class SlotView : MonoBehaviour
                 slotTransform.DOLocalMoveY(middlePosition, stopSettleDuration)
                     .SetEase(Ease.OutBounce)
             );
+
+            stopSequence.OnComplete(() => PlayStopAnimationsForColumn(columnIndex));
 
             spinTweens[columnIndex] = stopSequence;
         }
@@ -694,6 +725,7 @@ public class SlotView : MonoBehaviour
                         middlePosition,
                         0
                     );
+                    PlayStopAnimationsForColumn(col);
                 }
             }
             
@@ -709,6 +741,109 @@ public class SlotView : MonoBehaviour
 
     #endregion
 
+
+
+
+    #region Stop Symbol Animations
+
+    private void PlayStopAnimationsForColumn(int col)
+    {
+        if (currentDisplayMatrix == null || col >= currentDisplayMatrix.Count) return;
+        
+        int actualScatterId = gameManager?.gameConfig != null ? gameManager.gameConfig.scatterSymbolId : scatterSymbolId;
+        
+        for (int row = 0; row < currentDisplayMatrix[col].Count; row++)
+        {
+            int symId = currentDisplayMatrix[col][row];
+            bool isScatter = (symId == actualScatterId);
+            bool isWild = (symId == 11 || symId == 13 || symId == 14 || symId == 15);
+            
+            if (isScatter || isWild)
+            {
+                AnimateSymbolSingleLoop(col, row);
+            }
+        }
+    }
+
+    private void AnimateSymbolSingleLoop(int column, int row)
+    {
+        if (column >= reelImagesList.Count) return;
+
+        var reel = reelImagesList[column];
+        if (reel.images == null || reel.images.Count < 10) return;
+
+        int imageIndex = 6 + row;
+        if (imageIndex >= reel.images.Count) return;
+
+        Image symbolImage = reel.images[imageIndex];
+        if (symbolImage == null) return;
+
+        var animGO = WinBox(winAnimationColumns, column, row);
+        if (animGO == null) return;
+
+        ImageAnimation imageAnim = animGO.GetComponent<ImageAnimation>();
+        if (imageAnim == null) return;
+
+        int symbolId = currentDisplayMatrix[column][row];
+        if (symbolId < 0 || symbolId >= animationSpriteArrays.Length) return;
+
+        List<Sprite> animSprites = animationSpriteArrays[symbolId];
+        if (animSprites == null || animSprites.Count == 0) return;
+
+        imageAnim.textureArray = animSprites;
+        imageAnim.useDynamicFramerate = true;
+        imageAnim.dynamicLoopDuration = winSymbolLoopDuration;
+
+        Color originalColor = symbolImage.color;
+
+        Sequence seq = DOTween.Sequence();
+        
+        seq.AppendCallback(() => {
+            animGO.SetActive(true);
+            Image animRenderer = imageAnim.rendererDelegate;
+            if (animRenderer != null)
+            {
+                animRenderer.DOKill();
+                Color c = animRenderer.color;
+                animRenderer.color = new Color(c.r, c.g, c.b, 0f);
+                animRenderer.DOFade(1f, 0.2f);
+            }
+            symbolImage.DOKill();
+            symbolImage.DOFade(0f, 0.2f);
+            
+            imageAnim.StartAnimation();
+        });
+
+        seq.AppendInterval(winSymbolLoopDuration);
+
+        seq.AppendCallback(() => {
+            Image animRenderer = imageAnim != null ? imageAnim.rendererDelegate : null;
+
+            if (animRenderer != null)
+            {
+                animRenderer.DOKill();
+                animRenderer.DOFade(0f, 0.2f).OnComplete(() => {
+                    if (imageAnim != null) imageAnim.StopAnimation();
+                    if (animGO != null) animGO.SetActive(false);
+                });
+            }
+            else
+            {
+                if (imageAnim != null) imageAnim.StopAnimation();
+                if (animGO != null) animGO.SetActive(false);
+            }
+
+            if (symbolImage != null)
+            {
+                symbolImage.DOKill();
+                symbolImage.DOFade(originalColor.a, 0.2f);
+            }
+        });
+
+        winTweens.Add(seq);
+    }
+
+    #endregion
 
     #region Win Line Animation
 
@@ -757,6 +892,8 @@ public class SlotView : MonoBehaviour
                 }
             }
 
+            AudioManager.Instance?.PlayWinLine();
+
             foreach (int flatIndex in winLine.positions)
             {
                 int row = flatIndex / 5;
@@ -779,6 +916,7 @@ public class SlotView : MonoBehaviour
             yield return new WaitForSeconds(lineDuration);
         }
 
+        AudioManager.Instance?.StopWinLine();
         KillWinTweens();
 
         onComplete?.Invoke();

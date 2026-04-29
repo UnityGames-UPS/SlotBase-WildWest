@@ -101,6 +101,12 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Toggle settingsTurboToggle;
     [SerializeField] private Toggle settingsQuickSpinToggle;
 
+    [Header("Audio Toggles")]
+    [Tooltip("Toggle for background music on/off.")]
+    [SerializeField] private Toggle musicToggle;
+    [Tooltip("Toggle for all SFX sounds on/off.")]
+    [SerializeField] private Toggle sfxToggle;
+
     [Header("Game Rules Panel")]
     [SerializeField] private GameObject gameRulesPanel;
     [SerializeField] private RectTransform gameRulesPanelRect;
@@ -315,12 +321,14 @@ public class UIManager : MonoBehaviour
         // ------------------------------
 
         if (introAnimationObject) introAnimationObject.SetActive(true);
+        AudioManager.Instance?.PlayGameStart();
         yield return new WaitForSeconds(introAnimDuration);
 
         if (loadingScreen) loadingScreen.SetActive(false);
         if (introAnimationObject) introAnimationObject.SetActive(false);
 
         if (gameScreen) gameScreen.SetActive(true);
+        AudioManager.Instance?.PlayBgMusic();
         InitializeUI();
     }
 
@@ -361,6 +369,7 @@ public class UIManager : MonoBehaviour
     private IEnumerator ShowFreeSpinIntroAnimation(System.Action onComplete)
     {
         if (freeSpinIntroAnimation) freeSpinIntroAnimation.SetActive(true);
+        AudioManager.Instance?.PlayFreeSpinIntro();
         yield return new WaitForSeconds(freeSpinIntroDuration);
         if (freeSpinIntroAnimation) freeSpinIntroAnimation.SetActive(false);
         onComplete?.Invoke();
@@ -372,26 +381,26 @@ public class UIManager : MonoBehaviour
 
     private void SetupButtons()
     {
-        if (betPlusButton) betPlusButton.onClick.AddListener(() => gameManager.IncreaseBet());
-        if (betMinusButton) betMinusButton.onClick.AddListener(() => gameManager.DecreaseBet());
+        if (betPlusButton)  betPlusButton.onClick.AddListener(() => { AudioManager.Instance?.PlayBetPlus();  gameManager.IncreaseBet(); });
+        if (betMinusButton) betMinusButton.onClick.AddListener(() => { AudioManager.Instance?.PlayBetMinus(); gameManager.DecreaseBet(); });
         if (spinButton) spinButton.onClick.AddListener(OnSpinButtonPressed);
 
-        if (autoPlayOpenButton) autoPlayOpenButton.onClick.AddListener(OpenAutoPlayPanel);
+        if (autoPlayOpenButton)  autoPlayOpenButton.onClick.AddListener(() => { AudioManager.Instance?.PlayButton(); OpenAutoPlayPanel(); });
         if (autoPlayCloseButton) autoPlayCloseButton.onClick.AddListener(CloseAutoPlayPanel);
         if (autoPlayStartButton) autoPlayStartButton.onClick.AddListener(OnAutoPlayStart);
 
         if (freeSpinStartCloseButton) freeSpinStartCloseButton.onClick.AddListener(CloseFreeSpinStartPopup);
-        if (freeSpinEndCloseButton) freeSpinEndCloseButton.onClick.AddListener(CloseFreeSpinEndPopup);
+        if (freeSpinEndCloseButton)   freeSpinEndCloseButton.onClick.AddListener(CloseFreeSpinEndPopup);
 
-        if(gameQuitButton) gameQuitButton.onClick.AddListener(OnExitButtonPressed);
-        if(historyOpenButton) historyOpenButton.onClick.AddListener(OnHistoryButtonPressed); // New: History button
+        if (gameQuitButton)    gameQuitButton.onClick.AddListener(() => { AudioManager.Instance?.PlayButton(); OnExitButtonPressed(); });
+        if (historyOpenButton) historyOpenButton.onClick.AddListener(() => { AudioManager.Instance?.PlayButton(); OnHistoryButtonPressed(); });
 
         if (testFreeSpinButton) testFreeSpinButton.onClick.AddListener(TestFreeSpinPopups);
 
-        if (buyFreeSpinOpenButton) buyFreeSpinOpenButton.onClick.AddListener(OpenBuyFreeSpinPanel);
-        if (buyFreeSpinCancelButton) buyFreeSpinCancelButton.onClick.AddListener(CloseBuyFreeSpinPanel);
-        if (buyFreeSpinConfirmButton) buyFreeSpinConfirmButton.onClick.AddListener(OnBuyFreeSpinConfirmed);
-        if (buyFreeSpinBetPlusButton) buyFreeSpinBetPlusButton.onClick.AddListener(OnBuyFeatureBetPlus);
+        if (buyFreeSpinOpenButton)    buyFreeSpinOpenButton.onClick.AddListener(() => { AudioManager.Instance?.PlayButton(); OpenBuyFreeSpinPanel(); });
+        if (buyFreeSpinCancelButton)  buyFreeSpinCancelButton.onClick.AddListener(CloseBuyFreeSpinPanel);
+        if (buyFreeSpinConfirmButton)  buyFreeSpinConfirmButton.onClick.AddListener(OnBuyFreeSpinConfirmed);
+        if (buyFreeSpinBetPlusButton)  buyFreeSpinBetPlusButton.onClick.AddListener(OnBuyFeatureBetPlus);
         if (buyFreeSpinBetMinusButton) buyFreeSpinBetMinusButton.onClick.AddListener(OnBuyFeatureBetMinus);
     }
 
@@ -415,7 +424,7 @@ public class UIManager : MonoBehaviour
 
     private void SetupSettingsPanel()
     {
-        if (settingsOpenButton) settingsOpenButton.onClick.AddListener(OpenSettingsPanel);
+        if (settingsOpenButton) settingsOpenButton.onClick.AddListener(() => { AudioManager.Instance?.PlayButton(); OpenSettingsPanel(); });
         if (settingsCloseButton) settingsCloseButton.onClick.AddListener(CloseSettingsPanel);
 
         if (settingsTurboToggle)
@@ -427,6 +436,22 @@ public class UIManager : MonoBehaviour
         {
             settingsQuickSpinToggle.onValueChanged.AddListener(OnSettingsQuickSpinToggleChanged);
             RefreshToggleBgAlpha(settingsQuickSpinToggle);
+        }
+
+        // Audio toggles — restore state from AudioManager then wire callbacks
+        if (musicToggle)
+        {
+            if (AudioManager.Instance != null)
+                musicToggle.isOn = AudioManager.Instance.MusicEnabled;
+            musicToggle.onValueChanged.AddListener(OnMusicToggleChanged);
+            RefreshToggleBgAlpha(musicToggle);
+        }
+        if (sfxToggle)
+        {
+            if (AudioManager.Instance != null)
+                sfxToggle.isOn = AudioManager.Instance.SfxEnabled;
+            sfxToggle.onValueChanged.AddListener(OnSfxToggleChanged);
+            RefreshToggleBgAlpha(sfxToggle);
         }
     }
 
@@ -456,6 +481,8 @@ public class UIManager : MonoBehaviour
 
     internal void OnSpinStarted()
     {
+        AudioManager.Instance?.PlaySpinStart();
+
         if (spinNormalImage) spinNormalImage.SetActive(false);
         if (spinStopImage) spinStopImage.SetActive(true);
 
@@ -561,6 +588,8 @@ public class UIManager : MonoBehaviour
 
         if (multiplier < 5)
         {
+            AudioManager.Instance?.PlayWinNormal();
+
             if (gameRuleObject) gameRuleObject.SetActive(false);
             if (winDisplayObject) winDisplayObject.SetActive(true);
 
@@ -575,7 +604,9 @@ public class UIManager : MonoBehaviour
             yield break;
         }
 
-        // Big Win Popup Logic
+        // Big Win Popup Logic — play tier-specific win sound
+        AudioManager.Instance?.PlayWinByMultiplier(multiplier);
+
         if (gameRuleObject) gameRuleObject.SetActive(false);
         if (winDisplayObject) winDisplayObject.SetActive(false);
 
@@ -700,6 +731,7 @@ public class UIManager : MonoBehaviour
 
     private IEnumerator ShowMaxBetIndicator()
     {
+        AudioManager.Instance?.PlayMaxBet();
         if (maxBetObject) maxBetObject.SetActive(true);
         yield return new WaitForSeconds(maxBetDisplayDuration);
         if (maxBetObject) maxBetObject.SetActive(false);
@@ -870,12 +902,26 @@ public class UIManager : MonoBehaviour
             gameManager.SetSpinSpeed(SpinSpeed.Normal);
     }
 
+    private void OnMusicToggleChanged(bool isOn)
+    {
+        AudioManager.Instance?.SetMusicEnabled(isOn);
+        RefreshToggleBgAlpha(musicToggle);
+    }
+
+    private void OnSfxToggleChanged(bool isOn)
+    {
+        AudioManager.Instance?.SetSfxEnabled(isOn);
+        RefreshToggleBgAlpha(sfxToggle);
+    }
+
     private void RefreshAllToggleBgAlpha()
     {
         RefreshToggleBgAlpha(turboToggle);
         RefreshToggleBgAlpha(quickSpinToggle);
         RefreshToggleBgAlpha(settingsTurboToggle);
         RefreshToggleBgAlpha(settingsQuickSpinToggle);
+        RefreshToggleBgAlpha(musicToggle);
+        RefreshToggleBgAlpha(sfxToggle);
     }
 
     // Reads the background Image directly from Toggle.targetGraphic.
@@ -1041,6 +1087,7 @@ public class UIManager : MonoBehaviour
         RectTransform toPage = gameRulePages[toIndex];
         if (fromPage == null || toPage == null) return;
 
+        AudioManager.Instance?.PlayPageSwipe();
         isPageAnimating = true;
 
         float direction = slideLeft ? 1f : -1f;
@@ -1340,6 +1387,8 @@ public class UIManager : MonoBehaviour
             hideExtraSpinsCoroutine = null;
         }
 
+        AudioManager.Instance?.PlayFreeSpinPopup();
+
         // Activate popup first so child modifications happen in active hierarchy
         freeSpinStartPopup.SetActive(true);
 
@@ -1409,6 +1458,8 @@ public class UIManager : MonoBehaviour
     private void ShowFreeSpinEndPopup(double totalWin, int totalSpins)
     {
         if (!freeSpinEndPopup || !freeSpinEndPopupRect) return;
+
+        AudioManager.Instance?.PlayFreeSpinTotalWin();
 
         SetCountImages(totalSpins, freeSpinEndCountTens, freeSpinEndCountOnes);
         SetWinAmountDisplay(totalWin);
@@ -1546,6 +1597,8 @@ public class UIManager : MonoBehaviour
     private void AnimatePopupClose(RectTransform popupRect, System.Action onComplete)
     {
         if (!popupRect) return;
+
+        AudioManager.Instance?.PlayPopupClose();
 
         Sequence closeSeq = DOTween.Sequence();
         closeSeq.Append(popupRect.DOScale(1.1f, 0.1f));
