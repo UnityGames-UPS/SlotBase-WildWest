@@ -505,6 +505,25 @@ public class SlotView : MonoBehaviour
     {
         currentDisplayMatrix = resultMatrix;
 
+        var currentResult = gameManager.lastResult;
+        if (currentResult != null)
+        {
+            // Overlay scatter badges early so they appear while spinning
+            if (currentResult.overlayScatterData != null && currentResult.overlayScatterData.isTriggered)
+            {
+                foreach (var pos in currentResult.overlayScatterData.positions)
+                {
+                    if (pos.Count >= 2)
+                    {
+                        int row = pos[0];
+                        int col = pos[1];
+                        var go = WinBox(scatterStarColumns, col, row);
+                        if (go) go.SetActive(true);
+                    }
+                }
+            }
+        }
+
         int actualScatterId = gameManager.gameConfig != null ? gameManager.gameConfig.scatterSymbolId : scatterSymbolId;
         int scatterCount = 0;
         for (int col = 0; col < 4; col++)
@@ -575,7 +594,6 @@ public class SlotView : MonoBehaviour
         DisableAllMasks();
         DisableAllNonDisplayIcons();
 
-        var currentResult = gameManager.lastResult;
         if (currentResult != null)
         {
             // Sticky wilds — store state for next spin (overlays only shown during spinning)
@@ -585,21 +603,6 @@ public class SlotView : MonoBehaviour
                 // Don't apply overlays here — they only show during spinning.
                 // The reel symbols already display the correct wild sprite after stopping.
                 DisableColumns(stickyWildColumns);
-            }
-
-            // Overlay scatter badges — server pos format: [row, col]
-            if (currentResult.overlayScatterData != null && currentResult.overlayScatterData.isTriggered)
-            {
-                foreach (var pos in currentResult.overlayScatterData.positions)
-                {
-                    if (pos.Count >= 2)
-                    {
-                        int row = pos[0];
-                        int col = pos[1];
-                        var go = WinBox(scatterStarColumns, col, row);
-                        if (go) go.SetActive(true);
-                    }
-                }
             }
         }
 
@@ -817,7 +820,7 @@ public class SlotView : MonoBehaviour
 
         // Also ensure the corresponding animation object is disabled
         var animGO = WinBox(winAnimationColumns, col, row);
-        if (animGO != null && animGO.activeSelf)
+        if (animGO != null)
         {
             ImageAnimation imageAnim = animGO.GetComponent<ImageAnimation>();
             if (imageAnim != null)
@@ -907,63 +910,58 @@ public class SlotView : MonoBehaviour
 
         Color originalColor = symbolImage.color;
 
-        // Start coroutine to enable animation object and call PlayAnimation with delay
-        StartCoroutine(EnableAnimationWithDelay(animGO, imageAnim, symbolImage, originalColor));
-    }
+        Sequence seq = DOTween.Sequence();
+        
+        seq.AppendCallback(() => {
+            animGO.SetActive(true);
+            Image animRenderer = imageAnim.rendererDelegate;
+            if (animRenderer != null)
+            {
+                animRenderer.DOKill();
+                Color c = animRenderer.color;
+                animRenderer.color = new Color(c.r, c.g, c.b, 0f);
+                animRenderer.DOFade(1f, 0.2f);
+            }
+            symbolImage.DOKill();
+            symbolImage.DOFade(0f, 0.2f);
+        });
 
-    private IEnumerator EnableAnimationWithDelay(GameObject animGO, ImageAnimation imageAnim, Image symbolImage, Color originalColor)
-    {
-        // Enable the animation GameObject first
-        animGO.SetActive(true);
-
-        Image animRenderer = imageAnim.rendererDelegate;
-        if (animRenderer != null)
-        {
-            Color c = animRenderer.color;
-            animRenderer.color = new Color(c.r, c.g, c.b, 0f);
-            animRenderer.DOFade(1f, 0.2f);
-        }
-
-        symbolImage.DOFade(0f, 0.2f);
-
-        // Wait for the configured delay to sync with winBox timing
         if (winLineBoxToAnimationDelay > 0)
         {
-            yield return new WaitForSeconds(winLineBoxToAnimationDelay);
+            seq.AppendInterval(winLineBoxToAnimationDelay);
         }
 
-        // Now start the animation
-        imageAnim.StartAnimation();
+        seq.AppendCallback(() => {
+            imageAnim.StartAnimation();
+        });
 
-        // Schedule to disable animation and restore original image after duration
-        StartCoroutine(DisableWinAnimationAfterDuration(animGO, imageAnim, symbolImage, originalColor, winSymbolLoopDuration * winSymbolLoopCount));
-    }
+        seq.AppendInterval(winSymbolLoopDuration * winSymbolLoopCount);
 
-    private IEnumerator DisableWinAnimationAfterDuration(GameObject animGO, ImageAnimation imageAnim, Image symbolImage, Color originalColor, float duration)
-    {
-        yield return new WaitForSeconds(duration);
+        seq.AppendCallback(() => {
+            Image animRenderer = imageAnim != null ? imageAnim.rendererDelegate : null;
 
-        // Smooth transition out
-        Image animRenderer = imageAnim != null ? imageAnim.rendererDelegate : null;
-
-        if (animRenderer != null)
-        {
-            animRenderer.DOFade(0f, 0.2f).OnComplete(() => {
+            if (animRenderer != null)
+            {
+                animRenderer.DOKill();
+                animRenderer.DOFade(0f, 0.2f).OnComplete(() => {
+                    if (imageAnim != null) imageAnim.StopAnimation();
+                    if (animGO != null) animGO.SetActive(false);
+                });
+            }
+            else
+            {
                 if (imageAnim != null) imageAnim.StopAnimation();
                 if (animGO != null) animGO.SetActive(false);
-            });
-        }
-        else
-        {
-            if (imageAnim != null) imageAnim.StopAnimation();
-            if (animGO != null) animGO.SetActive(false);
-        }
+            }
 
-        // Restore the original symbol image alpha smoothly
-        if (symbolImage != null)
-        {
-            symbolImage.DOFade(originalColor.a, 0.2f);
-        }
+            if (symbolImage != null)
+            {
+                symbolImage.DOKill();
+                symbolImage.DOFade(originalColor.a, 0.2f);
+            }
+        });
+
+        winTweens.Add(seq);
     }
 
     private void KillWinTweens()

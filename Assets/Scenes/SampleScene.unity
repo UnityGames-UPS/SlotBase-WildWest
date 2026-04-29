@@ -20065,7 +20065,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &853735618
 RectTransform:
   m_ObjectHideFlags: 0
@@ -37579,7 +37579,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1461109610
 RectTransform:
   m_ObjectHideFlags: 0
@@ -49588,7 +49588,7 @@ MonoBehaviour:
   spriteCowboyBlue: {fileID: -7059714089215120145, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
   spriteCowgirlGreen: {fileID: 1976773210906642190, guid: a951654dcc5db4c2786a1964c0cfc3ad, type: 3}
   spriteCowgirlRed: {fileID: 1976773210906642190, guid: bbf6a7bdacfe24489a32dac56dc50abb, type: 3}
-  spriteTreasure: {fileID: 8837785113923931230, guid: 7a03a94eee5f540ffb6305b7b79b9335, type: 3}
+  spriteTreasure: {fileID: 1976773210906642190, guid: 4da0de1b9cc3941cea46a4a3994b76c9, type: 3}
   spriteGun: {fileID: 1976773210906642190, guid: 16df678f243fd4e82af9d141a29e37d8, type: 3}
   spriteA: {fileID: -8680797543115379092, guid: feef0bacc334e48128044b58c0d2f0b7, type: 3}
   spriteK: {fileID: 1646720447909147354, guid: 246a88333f52940e69205b6cc5ef6398, type: 3}
@@ -49741,7 +49741,52 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 5a5015b7c01634faea52312a27546782, type: 3}
   - {fileID: 21300000, guid: 7208e65882e0d4aa79d53ea60a36624b, type: 3}
   - {fileID: 21300000, guid: fb65ea6b3905b422484b6c7287c39051, type: 3}
-  animSpritesTreasure: []
+  animSpritesTreasure:
+  - {fileID: 21300000, guid: 6d34c3eda25114c948f5b40b8a012110, type: 3}
+  - {fileID: 21300000, guid: 81a812c6bc219474b9ae0b0e23184ac9, type: 3}
+  - {fileID: 21300000, guid: 76711ae944915405aa7e829b08c0e564, type: 3}
+  - {fileID: 21300000, guid: 1a861e8a2d3874f1f971be815b6dc6a4, type: 3}
+  - {fileID: 21300000, guid: 8beb109cc8585470b98adf7439994972, type: 3}
+  - {fileID: 21300000, guid: 3ff55b4b291e048de863e493a5da04bd, type: 3}
+  - {fileID: 21300000, guid: a11d6d65751b2450a9a38a18066db29c, type: 3}
+  - {fileID: 21300000, guid: dbde141b33aac4969a3dc86d89bd8033, type: 3}
+  - {fileID: 21300000, guid: ca2d85a441a084e2b9154ac32b982987, type: 3}
+  - {fileID: 21300000, guid: 0e5c42baff4984bc2af61759bdb3d025, type: 3}
+  - {fileID: 21300000, guid: 81b06eac5c5a347f2b05527f94c9010d, type: 3}
+  - {fileID: 21300000, guid: b2366abf5e0984ee8b5233fe89743879, type: 3}
+  - {fileID: 21300000, guid: b4039f22488d340a0a33a760c18a91c5, type: 3}
+  - {fileID: 21300000, guid: 6942d20433c4c4b5cb7566400746d5fb, type: 3}
+  - {fileID: 21300000, guid: 077f5742b2d5443288aa2d41da4466ca, type: 3}
+  - {fileID: 21300000, guid: 22bccde3a5d8f4f31b37b10a493e5cda, type: 3}
+  - {fileID: 21300000, guid: f740258cf0a9645078bc662e0b64c8ab, type: 3}
+  - {fileID: 21300000, guid: 87c3e7bb90f3347f7ae0c61ae041c7c0, type: 3}
+  - {fileID: 21300000, guid: 1f25a4c7848bc45ed86ae00b69580e1a, type: 3}
+  - {fileID: 21300000, guid: 41f6659806a754f668b5ed7160fd80d5, type: 3}
+  - {fileID: 21300000, guid: 1cb3081783755492897b21bdc1c7337a, type: 3}
+  - {fileID: 21300000, guid: 81bcdbd10bdd8456aa63e98835652b5a, type: 3}
+  - {fileID: 21300000, guid: d0eb7767e4cda49f3a50202a89a629b4, type: 3}
+  - {fileID: 21300000, guid: 7461036329c1a457991135aaf5be6efc, type: 3}
+  - {fileID: 21300000, guid: 825f78c4d6d6743118015b76fd5d92c1, type: 3}
+  - {fileID: 21300000, guid: 6a4f91956e0694556ad9ce79e62cb947, type: 3}
+  - {fileID: 21300000, guid: 0d699ccb662c94bdda0cc67da1b1bd09, type: 3}
+  - {fileID: 21300000, guid: 21893d8c0a27e41c6b50546b8f4de92a, type: 3}
+  - {fileID: 21300000, guid: 7963c0794f9114f86a825e32739cffec, type: 3}
+  - {fileID: 21300000, guid: 26507f4a780db4d4e95f82a99273da8c, type: 3}
+  - {fileID: 21300000, guid: 1fba3865f678c4f98917fc3b980c0b67, type: 3}
+  - {fileID: 21300000, guid: 7bf56aaa99d194d27836734dfc0eb297, type: 3}
+  - {fileID: 21300000, guid: d91692a7d8406466a89fd92fb7b70d9f, type: 3}
+  - {fileID: 21300000, guid: 6c5d2f02a6e164b6c96f34fd112cc5ca, type: 3}
+  - {fileID: 21300000, guid: 7884a4f959f40433c868950fae9db72a, type: 3}
+  - {fileID: 21300000, guid: 81226ca3f955946d8bef54a750f4ce93, type: 3}
+  - {fileID: 21300000, guid: d47c286b7d41e4f9eb9220b417f85c52, type: 3}
+  - {fileID: 21300000, guid: 96b57aa80b1df49049582e39f13b70d8, type: 3}
+  - {fileID: 21300000, guid: 91aed25567d0f4fef80204c198c71ab5, type: 3}
+  - {fileID: 21300000, guid: 06487cf0727e94c05a1dc280e7c70bc3, type: 3}
+  - {fileID: 21300000, guid: c04efdf4e8f124b4898bad4cd330acd3, type: 3}
+  - {fileID: 21300000, guid: b4ee2b33ae2bb415aa67001c5afaeed2, type: 3}
+  - {fileID: 21300000, guid: 346afaff6020f451b8252c12532042eb, type: 3}
+  - {fileID: 21300000, guid: 2f17fd8d7335043b8b003f3d506722c5, type: 3}
+  - {fileID: 21300000, guid: 4a30819ccb6cf4b0ba6d838dd4af9477, type: 3}
   animSpritesGun:
   - {fileID: 21300000, guid: 6e69019f6d5d24fedba1074e4ede8707, type: 3}
   - {fileID: 21300000, guid: 174164571679c4c77a3e8cd8fcc62292, type: 3}
@@ -54333,7 +54378,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 1976773210906642190, guid: 16df678f243fd4e82af9d141a29e37d8, type: 3}
+  m_Sprite: {fileID: 1976773210906642190, guid: 4da0de1b9cc3941cea46a4a3994b76c9, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -56135,10 +56180,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Image
       objectReference: {fileID: 0}
-    - target: {fileID: 3202830153885363251, guid: 67b29b154231f47f1abdf411c3741821, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3927160850723304328, guid: 67b29b154231f47f1abdf411c3741821, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -56165,11 +56206,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3927160850723304328, guid: 67b29b154231f47f1abdf411c3741821, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 70
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 3927160850723304328, guid: 67b29b154231f47f1abdf411c3741821, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 70
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 3927160850723304328, guid: 67b29b154231f47f1abdf411c3741821, type: 3}
       propertyPath: m_LocalPosition.x
