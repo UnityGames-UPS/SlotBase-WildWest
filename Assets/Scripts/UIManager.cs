@@ -95,7 +95,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button settingsOpenButton;
     [SerializeField] private Button settingsCloseButton;
     [SerializeField] private Button gameQuitButton;
-    [SerializeField] private Button historyOpenButton; // New: Opens bet history from settings
+    [SerializeField] private Button historyOpenButton; 
 
     [Header("Settings - Spin Speed Toggles (mirrored in AutoPlay)")]
     [SerializeField] private Toggle settingsTurboToggle;
@@ -1316,12 +1316,22 @@ public class UIManager : MonoBehaviour
 
         UpdateBuyFeatureCostDisplay();
 
+        if (buyFreeSpinOpenButton)
+        {
+            buyFreeSpinOpenButton.transform.DOScale(0f, 0.3f).SetEase(Ease.InBack);
+        }
+
         if (buyFreeSpinPanel) buyFreeSpinPanel.SetActive(true);
         AnimatePopupOpen(buyFreeSpinPanelRect);
     }
 
     private void CloseBuyFreeSpinPanel()
     {
+        if (buyFreeSpinOpenButton)
+        {
+            buyFreeSpinOpenButton.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack);
+        }
+
         AnimatePopupClose(buyFreeSpinPanelRect, () =>
         {
             if (buyFreeSpinPanel) buyFreeSpinPanel.SetActive(false);
@@ -1333,6 +1343,11 @@ public class UIManager : MonoBehaviour
         // Close panel immediately, then trigger purchase
         if (buyFreeSpinPanelRect) buyFreeSpinPanelRect.localScale = Vector3.one;
         if (buyFreeSpinPanel) buyFreeSpinPanel.SetActive(false);
+
+        if (buyFreeSpinOpenButton)
+        {
+            buyFreeSpinOpenButton.transform.localScale = Vector3.one;
+        }
 
         gameManager.RequestBuyFeature();
     }
@@ -1360,9 +1375,9 @@ public class UIManager : MonoBehaviour
 
     internal void OnFreeSpinsEnded(double serverTotalRoundWin, int serverTotalSpinsUsed)
     {
-        // Use server spinsUsed if available, otherwise fall back to totalFreeSpinsAwarded
-        // (on the last spin, freeSpinState can be null so spinsUsed defaults to 0)
-        int totalSpins = serverTotalSpinsUsed > 0 ? serverTotalSpinsUsed : totalFreeSpinsAwarded;
+        // Use server spinsUsed if available, otherwise fall back to the actual number of spins spun
+        // (on the last spin or early stop, freeSpinState can be null so serverSpinsUsed defaults to 0)
+        int totalSpins = serverTotalSpinsUsed > 0 ? serverTotalSpinsUsed : gameManager.freeSpinsUsed;
         ShowFreeSpinEndPopup(serverTotalRoundWin, totalSpins);
     }
 

@@ -216,9 +216,6 @@ public class BuyFeaturePayload
     public int betIndex;
 }
 
-// ============================================================================
-// Bet History Models
-// ============================================================================
 
 [Serializable]
 public class BetHistoryRequest

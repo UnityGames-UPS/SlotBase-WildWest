@@ -31,6 +31,7 @@ public class GameManager : MonoBehaviour
 
     internal bool isInFreeSpins;
     internal int freeSpinsRemaining;
+    internal int freeSpinsUsed;
     internal bool waitingForFreeSpinStart;
 
     // Buy Feature
@@ -143,6 +144,11 @@ public class GameManager : MonoBehaviour
     {
         currentState = GameState.Spinning;
         stopRequested = false;
+
+        if (isInFreeSpins)
+        {
+            freeSpinsUsed++;
+        }
 
         uiManager.OnSpinStarted();
 
@@ -352,7 +358,8 @@ public class GameManager : MonoBehaviour
 
             if (isRoundOver || freeSpinsRemaining <= 0)
             {
-                EndFreeSpins(serverTotalRoundWin, serverSpinsUsed);
+                int finalSpinsUsed = serverSpinsUsed > 0 ? serverSpinsUsed : freeSpinsUsed;
+                EndFreeSpins(serverTotalRoundWin, finalSpinsUsed);
             }
             else
             {
@@ -477,6 +484,7 @@ public class GameManager : MonoBehaviour
     {
         isInFreeSpins = true;
         freeSpinsRemaining = spins;
+        freeSpinsUsed = 0;
         waitingForFreeSpinStart = true;
 
         if (isAutoPlaying)
