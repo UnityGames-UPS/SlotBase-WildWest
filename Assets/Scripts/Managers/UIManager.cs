@@ -11,6 +11,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameManager gameManager;
     [SerializeField] private PopupManager popupManager;
     [SerializeField] private HistoryController historyController;
+[SerializeField] private JSFunctCalls jsFunctCalls;
 
     [Header("Loading & Intro")]
     [SerializeField] private GameObject loadingScreen;
@@ -199,8 +200,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private int popupBounceCount = 2;
     [SerializeField] private float freeSpinIntroDuration = 2f;
 
-    [Header("Test Controls")]
-    [SerializeField] private Button testFreeSpinButton;
+    [Header("Expand-Shrink Controls")]
+    [SerializeField] private Button expandButton;
+    [SerializeField] private Button shrinkButton;
+    private bool isExpanded = false;
 
     private int selectedRounds = 10;
     private Tween balanceTween;
@@ -225,11 +228,11 @@ public class UIManager : MonoBehaviour
         SetupGameRulesPanel();
 
         InitializeDisplayPanel();
-
-        if (maxBetObject) maxBetObject.SetActive(false);
+InitializeExpandShrink();
 
         InitializeBackgrounds();
         StartCoroutine(LoadingSequence());
+        RegisterFullscreenListener();
     }
 
     private void InitializeBackgrounds()
@@ -243,6 +246,7 @@ public class UIManager : MonoBehaviour
         if (spinNormalImage) spinNormalImage.SetActive(true);
         if (spinStopImage) spinStopImage.SetActive(false);
 
+        if (maxBetObject) maxBetObject.SetActive(false);
         if (autoPlayPanel) autoPlayPanel.SetActive(false);
         if (autoPlayCountDisplay) autoPlayCountDisplay.SetActive(false);
 
@@ -398,13 +402,13 @@ public class UIManager : MonoBehaviour
         if (gameQuitButton)    gameQuitButton.onClick.AddListener(() => { AudioManager.Instance?.PlayButton(); OnExitButtonPressed(); });
         if (historyOpenButton) historyOpenButton.onClick.AddListener(() => { AudioManager.Instance?.PlayButton(); OnHistoryButtonPressed(); });
 
-        if (testFreeSpinButton) testFreeSpinButton.onClick.AddListener(TestFreeSpinPopups);
-
         if (buyFreeSpinOpenButton)    buyFreeSpinOpenButton.onClick.AddListener(() => { AudioManager.Instance?.PlayBuyFreeSpinOpen(); OpenBuyFreeSpinPanel(); });
         if (buyFreeSpinCancelButton)  buyFreeSpinCancelButton.onClick.AddListener(() => { AudioManager.Instance?.PlayBuyConfirmClose(); CloseBuyFreeSpinPanel(); });
         if (buyFreeSpinConfirmButton)  buyFreeSpinConfirmButton.onClick.AddListener(() => { AudioManager.Instance?.PlayBuyConfirmClose(); OnBuyFreeSpinConfirmed(); });
         if (buyFreeSpinBetPlusButton)  buyFreeSpinBetPlusButton.onClick.AddListener(() => { AudioManager.Instance?.PlayBuyBetPlusMinus(); OnBuyFeatureBetPlus(); });
         if (buyFreeSpinBetMinusButton) buyFreeSpinBetMinusButton.onClick.AddListener(() => { AudioManager.Instance?.PlayBuyBetPlusMinus(); OnBuyFeatureBetMinus(); });
+        if(expandButton) expandButton.onClick.AddListener(() => { AudioManager.Instance?.PlayButton(); OnExpand(); });
+        if(shrinkButton) shrinkButton.onClick.AddListener(() => { AudioManager.Instance?.PlayButton(); OnShrink(); });
     }
 
     private void SetupAutoPlayPanel()
@@ -1670,8 +1674,44 @@ public class UIManager : MonoBehaviour
     }
   
     #endregion
+    #region Expand / Shrink
 
-        #region Popup Animations (Generic)
+    private void InitializeExpandShrink()
+    {
+
+        SetExpandShrinkButtons(isExpanded: false);
+    }
+
+    private void OnExpand()
+    {
+        isExpanded = true;
+        jsFunctCalls?.RequestExpandGame();
+        SetExpandShrinkButtons(isExpanded: true);
+    }
+
+    private void OnShrink()
+    {
+        isExpanded = false;
+        jsFunctCalls?.RequestShrinkGame();
+        SetExpandShrinkButtons(isExpanded: false);
+    }
+
+
+    private void SetExpandShrinkButtons(bool isExpanded)
+    {
+        if (expandButton) expandButton.gameObject.SetActive(!isExpanded);
+        if (shrinkButton) shrinkButton.gameObject.SetActive(isExpanded);
+    }
+
+    private void RegisterFullscreenListener()
+    {
+        jsFunctCalls?.RegisterFullscreenListener(gameObject.name);
+    }
+
+    
+    #endregion
+
+    #region Popup Animations (Generic)
 
     private void AnimatePopupOpen(RectTransform popupRect)
     {
