@@ -16,6 +16,7 @@ public class SocketIOManager : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private GameManager gameManager;
+
     [SerializeField] private UIManager uiManager;
     [SerializeField] private PopupManager popupManager;
     [SerializeField] internal JSFunctCalls JSManager;

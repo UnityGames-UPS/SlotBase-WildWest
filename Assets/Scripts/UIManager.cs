@@ -841,8 +841,14 @@ public class UIManager : MonoBehaviour
 
     private void OnAutoPlayStart()
     {
-        CloseAutoPlayPanel();
-        gameManager.StartAutoPlay(selectedRounds);
+        int rounds = selectedRounds;
+        // Delay StartAutoPlay until after the close animation finishes (~0.35 s)
+        // to avoid the panel-close DOTween fighting with the spin-start UI changes.
+        AnimatePopupClose(autoPlayPanelRect, () =>
+        {
+            if (autoPlayPanel) autoPlayPanel.SetActive(false);
+            gameManager.StartAutoPlay(rounds);
+        });
     }
 
     internal void OnAutoPlayStarted()
@@ -857,11 +863,19 @@ public class UIManager : MonoBehaviour
     internal void OnAutoPlayStopped()
     {
         if (autoPlayCountDisplay) autoPlayCountDisplay.SetActive(false);
-        if (spinNormalImage) spinNormalImage.SetActive(true);
-        if (spinStopImage) spinStopImage.SetActive(false);
+
+        // Only restore spin visuals if we are NOT entering free spins
+        // (free-spin flow manages its own spin button state)
+        if (!gameManager.isInFreeSpins)
+        {
+            if (spinNormalImage) spinNormalImage.SetActive(true);
+            if (spinStopImage)   spinStopImage.SetActive(false);
+            if (spinButton)      spinButton.interactable = true;
+        }
+
         SetBetControlsEnabled(true);
-        if (autoPlayOpenButton) autoPlayOpenButton.interactable = true;
-        if (settingsOpenButton) settingsOpenButton.interactable = true;
+        if (autoPlayOpenButton)    autoPlayOpenButton.interactable    = true;
+        if (settingsOpenButton)    settingsOpenButton.interactable    = true;
         if (buyFreeSpinOpenButton) buyFreeSpinOpenButton.interactable = true;
     }
 
@@ -1530,6 +1544,16 @@ public class UIManager : MonoBehaviour
             StartCoroutine(ShowFreeSpinIntroAnimation(() =>
             {
                 if (buyFreeSpinObject) buyFreeSpinObject.SetActive(true);
+
+                // Fully restore all controls that may have been locked
+                // during the buy-feature or free-spin sequence.
+                if (spinButton)            spinButton.interactable            = true;
+                if (spinNormalImage)       spinNormalImage.SetActive(true);
+                if (spinStopImage)         spinStopImage.SetActive(false);
+                if (autoPlayOpenButton)    autoPlayOpenButton.interactable    = true;
+                if (settingsOpenButton)    settingsOpenButton.interactable    = true;
+                if (buyFreeSpinOpenButton) buyFreeSpinOpenButton.interactable = true;
+                SetBetControlsEnabled(true);
             }));
         });
     }

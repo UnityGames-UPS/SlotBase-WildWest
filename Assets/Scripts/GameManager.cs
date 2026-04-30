@@ -111,7 +111,8 @@ public class GameManager : MonoBehaviour
         if (currentState != GameState.Idle) return;
         if (!socketManager.isConnected) return;
 
-        if (!isInFreeSpins && playerData.balance < currentBetAmount)
+        double totalBet = currentBetAmount * (gameConfig != null ? gameConfig.betMultiplier : 1);
+        if (!isInFreeSpins && playerData.balance < totalBet)
         {
             if (popupManager != null)
             {
@@ -329,8 +330,20 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                currentState = GameState.Idle;
-                RequestSpin();
+                // Before requesting the next spin, verify the player can still afford it.
+                // If not, stop autoplay (restores all UI) then show the popup.
+                double totalBet = currentBetAmount * (gameConfig != null ? gameConfig.betMultiplier : 1);
+                if (playerData.balance < totalBet)
+                {
+                    StopAutoPlay();
+                    currentState = GameState.Idle;
+                    if (popupManager != null) popupManager.ShowInsufficientFundsError();
+                }
+                else
+                {
+                    currentState = GameState.Idle;
+                    RequestSpin();
+                }
             }
         }
         else if (isInFreeSpins)
@@ -431,6 +444,14 @@ public class GameManager : MonoBehaviour
     internal void StartAutoPlay(int rounds)
     {
         if (currentState != GameState.Idle) return;
+
+        // Check balance BEFORE locking any UI — if insufficient, show popup and bail.
+        double totalBet = currentBetAmount * (gameConfig != null ? gameConfig.betMultiplier : 1);
+        if (playerData.balance < totalBet)
+        {
+            if (popupManager != null) popupManager.ShowInsufficientFundsError();
+            return;
+        }
 
         isAutoPlaying = true;
         autoPlayTotalRounds = rounds;
@@ -547,7 +568,8 @@ public class GameManager : MonoBehaviour
 
     internal bool CanAffordBet()
     {
-        return playerData.balance >= currentBetAmount;
+        double totalBet = currentBetAmount * (gameConfig != null ? gameConfig.betMultiplier : 1);
+        return playerData.balance >= totalBet;
     }
 
     internal bool IsSpinning()
