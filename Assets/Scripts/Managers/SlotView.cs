@@ -901,7 +901,7 @@ public class SlotView : MonoBehaviour
            
             if (prevPositions != null)
             {
-                KillWinTweens();
+                KillWinTweens(false);
                 foreach (int flatIdx in prevPositions)
                 {
                     int r = flatIdx / 5;
@@ -936,7 +936,7 @@ public class SlotView : MonoBehaviour
         }
 
         AudioManager.Instance?.StopWinLine();
-        KillWinTweens();
+        KillWinTweens(false);
 
         onComplete?.Invoke();
     }
@@ -1137,7 +1137,7 @@ public class SlotView : MonoBehaviour
         winTweens.Add(seq);
     }
 
-    private void KillWinTweens()
+    private void KillWinTweens(bool stopCoroutine = true)
     {
         foreach (var tween in winTweens)
         {
@@ -1145,7 +1145,7 @@ public class SlotView : MonoBehaviour
         }
         winTweens.Clear();
 
-        if (winAnimationCoroutine != null)
+        if (stopCoroutine && winAnimationCoroutine != null)
         {
             StopCoroutine(winAnimationCoroutine);
             winAnimationCoroutine = null;

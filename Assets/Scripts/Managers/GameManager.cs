@@ -142,6 +142,12 @@ public class GameManager : MonoBehaviour
 
     private void StartSpin()
     {
+        if (lastResult != null)
+        {
+            ProcessSpinResult();
+        }
+
+        lastResult = null;
         currentState = GameState.Spinning;
         stopRequested = false;
 
@@ -221,6 +227,7 @@ public class GameManager : MonoBehaviour
             if (multiplier >= 5)
             {
                 uiManager.DisableControlsDuringWinAnimation();
+                currentState = GameState.Idle;
             }
             else
             {
