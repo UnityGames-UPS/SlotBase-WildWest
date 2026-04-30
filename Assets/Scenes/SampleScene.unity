@@ -154,7 +154,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -99}
   m_SizeDelta: {x: 900, y: 268}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1360872
@@ -4832,6 +4832,7 @@ MonoBehaviour:
   historyOpenButton: {fileID: 1329098976}
   settingsTurboToggle: {fileID: 990195117}
   settingsQuickSpinToggle: {fileID: 1167815583}
+  skipScreenToggle: {fileID: 1199224424}
   musicToggle: {fileID: 503898135}
   sfxToggle: {fileID: 1963999683}
   gameRulesPanel: {fileID: 354488344}
@@ -10203,7 +10204,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f521a04de7f494272a617b2719edd271, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testToken: 762c6ef97b354a5d880918be5640a03e
+  testToken: 9503a65a5b1b45af85adb02b80234fcd
   gameManager: {fileID: 855426822}
   uiManager: {fileID: 180954095}
   popupManager: {fileID: 1163055615}
@@ -22472,7 +22473,7 @@ MonoBehaviour:
   StartOnAwake: 0
   StartonEnable: 1
   currentAnimationState: 0
-  AnimationSpeed: 75
+  AnimationSpeed: 85
   delayBetweenLoop: 0
   animationMode: 0
   phase2StartIndex: 0

@@ -148,6 +148,7 @@ public class GameManager : MonoBehaviour
         if (isInFreeSpins)
         {
             freeSpinsUsed++;
+            if (freeSpinsRemaining > 0) freeSpinsRemaining--;
         }
 
         uiManager.OnSpinStarted();
@@ -206,12 +207,31 @@ public class GameManager : MonoBehaviour
 
     private void OnReelsStoppedComplete()
     {
+        if (lastResult.freeSpinData != null && lastResult.freeSpinData.isTriggered && !isInFreeSpins)
+        {
+            StartCoroutine(DelayScatterTriggerResult());
+            return;
+        }
+
         if (lastResult.winAmount > 0 && lastResult.winLines != null && lastResult.winLines.Count > 0)
         {
-            uiManager.DisableControlsDuringWinAnimation();
+            double totalBet = currentBetAmount * (gameConfig != null ? gameConfig.betMultiplier : 1);
+            double multiplier = totalBet > 0 ? (lastResult.winAmount / totalBet) : 0;
+
+            if (multiplier >= 5)
+            {
+                uiManager.DisableControlsDuringWinAnimation();
+            }
+            else
+            {
+                // For normal wins, trigger UI update immediately and enable controls
+                uiManager.OnSpinStopping(lastResult);
+                uiManager.EnableControlsAfterWinAnimation();
+                uiManager.OnSpinCompleted(lastResult);
+                currentState = GameState.Idle;
+            }
 
             slotView.ShowWinLineAnimation(lastResult.winLines, OnWinAnimationComplete);
-
             StartCoroutine(TriggerWinPopupWithDelay(1.5f, lastResult));
         }
         else
@@ -232,11 +252,16 @@ public class GameManager : MonoBehaviour
 
     private void OnWinAnimationComplete()
     {
-        uiManager.EnableControlsAfterWinAnimation();
-
         if (lastResult != null)
         {
-            uiManager.OnSpinStopping(lastResult);
+            double totalBet = currentBetAmount * (gameConfig != null ? gameConfig.betMultiplier : 1);
+            double multiplier = totalBet > 0 ? (lastResult.winAmount / totalBet) : 0;
+
+            // Only update UI here if it wasn't already updated in OnReelsStoppedComplete (multiplier < 5)
+            if (multiplier >= 5)
+            {
+                uiManager.OnSpinStopping(lastResult);
+            }
         }
 
         if (isAutoPlaying || isInFreeSpins)
@@ -247,6 +272,20 @@ public class GameManager : MonoBehaviour
         {
             ProcessSpinResult();
         }
+    }
+
+    private IEnumerator DelayScatterTriggerResult()
+    {
+        // Play special 3-scatter trigger sound AFTER all reels have stopped
+        AudioManager.Instance?.Play3ScatterHit();
+
+        // Start scatter animations together AFTER all reels have stopped
+        // Using 4 loops to match the 6-second delay (4 * 1.5s = 6s)
+        slotView.AnimateAllScatters(4);
+
+        // Wait for scatter hit animations to play
+        yield return new WaitForSeconds(3.5f);
+        ProcessSpinResult();
     }
 
     private IEnumerator DelayBeforeNextRound()

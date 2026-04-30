@@ -130,6 +130,7 @@ public class SlotView : MonoBehaviour
     private List<Tween> spinTweens = new List<Tween>();
     private List<Tween> winTweens = new List<Tween>();
     private List<int> reelCycleCount = new List<int>();
+    private Coroutine winAnimationCoroutine;
 
 
     internal List<List<int>> currentDisplayMatrix;
@@ -526,7 +527,7 @@ public class SlotView : MonoBehaviour
 
         int actualScatterId = gameManager.gameConfig != null ? gameManager.gameConfig.scatterSymbolId : scatterSymbolId;
         int scatterCount = 0;
-        for (int col = 0; col < 4; col++)
+        for (int col = 0; col < 5; col++)
         {
             for (int row = 0; row < resultMatrix[col].Count; row++)
             {
@@ -543,11 +544,6 @@ public class SlotView : MonoBehaviour
             scatterAnticipationActive = true;
             if (anticipationFrame) anticipationFrame.SetActive(true);
             AudioManager.Instance?.PlayAnticipationFastSpin();
-        }
-
-        if (scatterCount >= 3)
-        {
-            AudioManager.Instance?.Play3ScatterHit();
         }
 
         while (true)
@@ -760,12 +756,33 @@ public class SlotView : MonoBehaviour
             
             if (isScatter || isWild)
             {
-                AnimateSymbolSingleLoop(col, row);
+                AnimateSymbolSingleLoop(col, row, 1);
             }
         }
     }
 
-    private void AnimateSymbolSingleLoop(int column, int row)
+    internal void AnimateAllScatters(int loopCount)
+    {
+        if (currentDisplayMatrix == null) return;
+
+        // Clear any individual hit animations before starting the collective one
+        KillWinTweens();
+
+        int actualScatterId = gameManager?.gameConfig != null ? gameManager.gameConfig.scatterSymbolId : scatterSymbolId;
+        
+        for (int col = 0; col < 5; col++)
+        {
+            for (int row = 0; row < currentDisplayMatrix[col].Count; row++)
+            {
+                if (currentDisplayMatrix[col][row] == actualScatterId)
+                {
+                    AnimateSymbolSingleLoop(col, row, loopCount);
+                }
+            }
+        }
+    }
+
+    private void AnimateSymbolSingleLoop(int column, int row, int loopCount = 1)
     {
         if (column >= reelImagesList.Count) return;
 
@@ -814,7 +831,7 @@ public class SlotView : MonoBehaviour
             imageAnim.StartAnimation();
         });
 
-        seq.AppendInterval(winSymbolLoopDuration);
+        seq.AppendInterval(winSymbolLoopDuration * loopCount);
 
         seq.AppendCallback(() => {
             Image animRenderer = imageAnim != null ? imageAnim.rendererDelegate : null;
@@ -863,14 +880,15 @@ public class SlotView : MonoBehaviour
         }
 
         KillWinTweens();
-        StartCoroutine(PlayWinLinesSequentially(winLines, onComplete));
+        winAnimationCoroutine = StartCoroutine(PlayWinLinesSequentially(winLines, onComplete));
     }
 
 
     private IEnumerator PlayWinLinesSequentially(List<WinLine> winLines, System.Action onComplete)
     {
         bool skipScreen = gameManager != null && gameManager.uiManager != null && gameManager.uiManager.skipScreenToggle != null && gameManager.uiManager.skipScreenToggle.isOn;
-        float lineDuration = skipScreen ? 0.5f : winSymbolLoopDuration * winSymbolLoopCount;
+        int loopCount = (gameManager != null && gameManager.isInFreeSpins) ? 1 : winSymbolLoopCount;
+        float lineDuration = skipScreen ? 0.5f : winSymbolLoopDuration * loopCount;
 
         List<int> prevPositions = null;
 
@@ -1089,7 +1107,8 @@ public class SlotView : MonoBehaviour
             imageAnim.StartAnimation();
         });
 
-        seq.AppendInterval(winSymbolLoopDuration * winSymbolLoopCount);
+        int loopCount = (gameManager != null && gameManager.isInFreeSpins) ? 1 : winSymbolLoopCount;
+        seq.AppendInterval(winSymbolLoopDuration * loopCount);
 
         seq.AppendCallback(() => {
             Image animRenderer = imageAnim != null ? imageAnim.rendererDelegate : null;
@@ -1125,6 +1144,13 @@ public class SlotView : MonoBehaviour
             tween?.Kill();
         }
         winTweens.Clear();
+
+        if (winAnimationCoroutine != null)
+        {
+            StopCoroutine(winAnimationCoroutine);
+            winAnimationCoroutine = null;
+        }
+        AudioManager.Instance?.StopWinLine();
 
         // Stop all win animations and disable animation GameObjects
         if (winAnimationColumns != null)

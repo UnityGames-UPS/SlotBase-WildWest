@@ -103,7 +103,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Toggle settingsQuickSpinToggle;
 
     [Header("Skip Screen")]
-    internal Toggle skipScreenToggle;
+    [SerializeField] internal Toggle skipScreenToggle;
 
     [Header("Audio Toggles")]
     [Tooltip("Toggle for background music on/off.")]
@@ -210,13 +210,17 @@ public class UIManager : MonoBehaviour
     private Tween winTween;
     private double totalFreeSpinWin = 0;
     private int totalFreeSpinsAwarded = 0;
+
     private int initialFreeSpins = 0;
     private Coroutine maxBetCoroutine;
     private Coroutine winDisplayCoroutine;
 
     private int currentRulesPage = 0;
-    private bool isPageAnimating = false;
+    private bool isPageAnimating;
+    [Header("UI State")]
     private bool isSyncingToggles = false;
+    private double currentWinDisplayValue = 0;
+    private bool isSpecialWinActive = false;
 
     #region Initialization
 
@@ -487,6 +491,7 @@ InitializeExpandShrink();
 
     internal void OnGameInitialized()
     {
+        currentWinDisplayValue = 0;
         UpdateBetDisplay();
         UpdateBalanceDisplay();
         UpdateWinDisplay(0);
@@ -525,6 +530,16 @@ InitializeExpandShrink();
         }
         if (winRingObject) winRingObject.SetActive(false);
         if (gameRuleObject) gameRuleObject.SetActive(true);
+        isSpecialWinActive = false;
+
+        if (gameManager.isInFreeSpins)
+        {
+            UpdateFreeSpinCount(gameManager.freeSpinsRemaining);
+        }
+        else
+        {
+            UpdateWinDisplay(0);
+        }
     }
 
     private bool earlyBigWinPopupTriggered = false;
@@ -554,7 +569,18 @@ InitializeExpandShrink();
 
         if (result.winAmount > 0)
         {
-            AnimateWinUpdate(result.winAmount);
+            // If in free spins, we use the server's total round win which accumulates
+            if (gameManager.isInFreeSpins)
+            {
+                if (!earlyBigWinPopupTriggered)
+                {
+                    AnimateWinUpdate(result.serverTotalRoundWin);
+                }
+            }
+            else if (!earlyBigWinPopupTriggered)
+            {
+                AnimateWinUpdate(result.winAmount);
+            }
             
             double totalBetAmount = gameManager.currentBetAmount;
             if (gameManager.gameConfig != null)
@@ -571,13 +597,22 @@ InitializeExpandShrink();
         }
         else
         {
-            UpdateWinDisplay(0);
+            // If in free spins and no win this spin, maintain the accumulated win display
+            if (gameManager.isInFreeSpins)
+            {
+                UpdateWinDisplay(result.serverTotalRoundWin);
+            }
+            else
+            {
+                UpdateWinDisplay(0);
+            }
             earlyBigWinPopupTriggered = false;
         }
     }
 
     internal void OnSpinCompleted(SpinResult result)
     {
+        if (isSpecialWinActive) return;
         if (!gameManager.isAutoPlaying && !gameManager.isInFreeSpins)
         {
             if (spinNormalImage) spinNormalImage.SetActive(true);
@@ -619,6 +654,7 @@ InitializeExpandShrink();
 
     internal void EnableControlsAfterWinAnimation()
     {
+        if (isSpecialWinActive) return;
         if (!gameManager.isAutoPlaying && !gameManager.isInFreeSpins)
         {
             SetBetControlsEnabled(true);
@@ -667,12 +703,24 @@ InitializeExpandShrink();
             yield break;
         }
 
+        // --- Special Win Triggered ---
+        isSpecialWinActive = true;
+        DisableControlsDuringWinAnimation();
+
         // Big Win Popup Logic — play opening jingle once, then start looping BG
         AudioManager.Instance?.PlayWinOpeningJingle(multiplier);
         AudioManager.Instance?.PlayWinPopupBg(multiplier);
 
         if (gameRuleObject) gameRuleObject.SetActive(false);
-        if (winDisplayObject) winDisplayObject.SetActive(false);
+        
+        float startVal = gameManager.isInFreeSpins ? (float)currentWinDisplayValue : 0f;
+        float endVal = startVal + (float)winAmount;
+
+        if (winDisplayObject) 
+        {
+            winDisplayObject.SetActive(true);
+            if (winDisplayText) winDisplayText.text = $"WIN {startVal:F2}";
+        }
 
         List<Sprite> selectedSprites = null;
         float popupTime = 0f;
@@ -719,11 +767,18 @@ InitializeExpandShrink();
         if (winPopupText)
         {
             winPopupText.text = "0.00";
-            float startVal = 0f;
-            float endVal = (float)winAmount;
-            DOTween.To(() => startVal, x => {
-                startVal = x;
-                winPopupText.text = startVal.ToString("F2");
+            float currentVal = startVal;
+            DOTween.To(() => currentVal, x => {
+                currentVal = x;
+                float hitAmount = currentVal - startVal;
+                string formattedHit = hitAmount.ToString("F2");
+                string formattedTotal = currentVal.ToString("F2");
+                
+                winPopupText.text = formattedHit;
+                if (winAmountText) winAmountText.text = formattedTotal;
+                if (winDisplayText) winDisplayText.text = $"WIN {formattedTotal}";
+                
+                currentWinDisplayValue = currentVal;
             }, endVal, animDuration).SetEase(Ease.OutQuad);
         }
 
@@ -736,7 +791,20 @@ InitializeExpandShrink();
         if (winPopupImageAnimation) winPopupImageAnimation.StopAnimation();
         if (winRingObject) winRingObject.SetActive(false);
         
+        // --- Keep normal win display visible for a moment after special win popup closes ---
+        if (winDisplayObject && winDisplayObject.activeSelf)
+        {
+            yield return new WaitForSeconds(winDisplayDuration);
+            winDisplayObject.SetActive(false);
+        }
+
         if (gameRuleObject) gameRuleObject.SetActive(true);
+
+        // --- Reset Controls ---
+        isSpecialWinActive = false;
+        EnableControlsAfterWinAnimation();
+        OnSpinCompleted(null);
+
         winDisplayCoroutine = null;
     }
 
@@ -1373,6 +1441,8 @@ InitializeExpandShrink();
     {
         initialFreeSpins = spinsAwarded;
         totalFreeSpinsAwarded = spinsAwarded;
+        currentWinDisplayValue = 0;
+        UpdateWinDisplay(0);
         if (buyFreeSpinObject) buyFreeSpinObject.SetActive(false);
         ShowFreeSpinStartPopup(spinsAwarded, false);
     }
@@ -1707,7 +1777,19 @@ InitializeExpandShrink();
     {
         jsFunctCalls?.RegisterFullscreenListener(gameObject.name);
     }
+ internal void OnFullscreenChanged(string isFullscreen)
+    {
+        bool newExpandedState = isFullscreen == "1";
+        Debug.Log($"[UI] OnFullscreenChanged callback: isFullscreen={isFullscreen}, newState={newExpandedState}");
 
+        // Only update if state actually changed
+        if (isExpanded != newExpandedState)
+        {
+            isExpanded = newExpandedState;
+            SetExpandShrinkButtons(isExpanded);
+            Debug.Log($"[UI] Button states synced to fullscreen: {(isExpanded ? "EXPANDED" : "SHRINK")}");
+        }
+    }
     
     #endregion
 
@@ -1748,6 +1830,7 @@ InitializeExpandShrink();
 
     private void UpdateWinDisplay(double amount)
     {
+        currentWinDisplayValue = amount;
         if (winAmountText)
             winAmountText.text = amount.ToString("F2");
     }
@@ -1770,10 +1853,11 @@ InitializeExpandShrink();
     {
         if (winTween != null) winTween.Kill();
 
-        if (winAmount > 0)
+        if (winAmount > currentWinDisplayValue)
         {
+            double startValue = currentWinDisplayValue;
             winTween = DOTween.To(
-                () => 0.0,
+                () => startValue,
                 x => UpdateWinDisplay(x),
                 winAmount,
                 winCountDuration
@@ -1782,7 +1866,7 @@ InitializeExpandShrink();
         }
         else
         {
-            UpdateWinDisplay(0);
+            UpdateWinDisplay(winAmount);
         }
     }
 
