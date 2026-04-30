@@ -400,11 +400,11 @@ public class UIManager : MonoBehaviour
 
         if (testFreeSpinButton) testFreeSpinButton.onClick.AddListener(TestFreeSpinPopups);
 
-        if (buyFreeSpinOpenButton)    buyFreeSpinOpenButton.onClick.AddListener(() => { AudioManager.Instance?.PlayButton(); OpenBuyFreeSpinPanel(); });
-        if (buyFreeSpinCancelButton)  buyFreeSpinCancelButton.onClick.AddListener(CloseBuyFreeSpinPanel);
-        if (buyFreeSpinConfirmButton)  buyFreeSpinConfirmButton.onClick.AddListener(OnBuyFreeSpinConfirmed);
-        if (buyFreeSpinBetPlusButton)  buyFreeSpinBetPlusButton.onClick.AddListener(OnBuyFeatureBetPlus);
-        if (buyFreeSpinBetMinusButton) buyFreeSpinBetMinusButton.onClick.AddListener(OnBuyFeatureBetMinus);
+        if (buyFreeSpinOpenButton)    buyFreeSpinOpenButton.onClick.AddListener(() => { AudioManager.Instance?.PlayBuyFreeSpinOpen(); OpenBuyFreeSpinPanel(); });
+        if (buyFreeSpinCancelButton)  buyFreeSpinCancelButton.onClick.AddListener(() => { AudioManager.Instance?.PlayBuyConfirmClose(); CloseBuyFreeSpinPanel(); });
+        if (buyFreeSpinConfirmButton)  buyFreeSpinConfirmButton.onClick.AddListener(() => { AudioManager.Instance?.PlayBuyConfirmClose(); OnBuyFreeSpinConfirmed(); });
+        if (buyFreeSpinBetPlusButton)  buyFreeSpinBetPlusButton.onClick.AddListener(() => { AudioManager.Instance?.PlayBuyBetPlusMinus(); OnBuyFeatureBetPlus(); });
+        if (buyFreeSpinBetMinusButton) buyFreeSpinBetMinusButton.onClick.AddListener(() => { AudioManager.Instance?.PlayBuyBetPlusMinus(); OnBuyFeatureBetMinus(); });
     }
 
     private void SetupAutoPlayPanel()
@@ -504,6 +504,9 @@ public class UIManager : MonoBehaviour
         if (autoPlayOpenButton) autoPlayOpenButton.interactable = false;
         if (settingsOpenButton) settingsOpenButton.interactable = false;
         if (buyFreeSpinOpenButton) buyFreeSpinOpenButton.interactable = false;
+
+        // Stop win popup BG loop if a new spin starts while popup is still showing
+        AudioManager.Instance?.StopWinPopupBg();
 
         if (winDisplayCoroutine != null)
         {
@@ -660,8 +663,9 @@ public class UIManager : MonoBehaviour
             yield break;
         }
 
-        // Big Win Popup Logic — play tier-specific win sound
-        AudioManager.Instance?.PlayWinByMultiplier(multiplier);
+        // Big Win Popup Logic — play opening jingle once, then start looping BG
+        AudioManager.Instance?.PlayWinOpeningJingle(multiplier);
+        AudioManager.Instance?.PlayWinPopupBg(multiplier);
 
         if (gameRuleObject) gameRuleObject.SetActive(false);
         if (winDisplayObject) winDisplayObject.SetActive(false);
@@ -720,6 +724,9 @@ public class UIManager : MonoBehaviour
         }
 
         yield return new WaitForSeconds(popupTime);
+
+        // Popup auto-closed — stop the looping BG
+        AudioManager.Instance?.StopWinPopupBg();
 
         if (winPopupPanel) winPopupPanel.SetActive(false);
         if (winPopupImageAnimation) winPopupImageAnimation.StopAnimation();
