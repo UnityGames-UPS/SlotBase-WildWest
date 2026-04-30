@@ -472,7 +472,7 @@ public class UIManager : MonoBehaviour
     private void SetupGameRulesPanel()
     {
         if (gameRulesOpenButton) gameRulesOpenButton.onClick.AddListener(OpenGameRulesPanel);
-        if (gameRulesBackButton) gameRulesBackButton.onClick.AddListener(CloseGameRulesPanel);
+        if (gameRulesBackButton) gameRulesBackButton.onClick.AddListener(() => { AudioManager.Instance?.PlayPopupClose(); CloseGameRulesPanel(); });
         if (gameRulesNextPageButton) gameRulesNextPageButton.onClick.AddListener(NextRulesPage);
         if (gameRulesPrevPageButton) gameRulesPrevPageButton.onClick.AddListener(PrevRulesPage);
     }

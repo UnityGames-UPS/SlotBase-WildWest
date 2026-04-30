@@ -549,11 +549,8 @@ public class GameManager : MonoBehaviour
         }
 
         currentState = GameState.Idle;
-        
-        if (popupManager != null)
-        {
-            popupManager.ShowDisconnectionPopup();
-        }
+        // Note: The disconnection popup is shown by SocketIOManager.OnSocketDisconnected()
+        // to avoid duplicates. GameManager only cleans up state here.
     }
 
     internal void ExitGame()

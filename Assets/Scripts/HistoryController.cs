@@ -340,6 +340,7 @@ public class HistoryController : MonoBehaviour
     {
         if (isLoading || currentPage <= 1) return;
 
+        AudioManager.Instance?.PlayPageSwipe();
         RequestHistoryData(currentPage - 1);
     }
 
@@ -347,11 +348,13 @@ public class HistoryController : MonoBehaviour
     {
         if (isLoading || currentPage >= totalPages) return;
 
+        AudioManager.Instance?.PlayPageSwipe();
         RequestHistoryData(currentPage + 1);
     }
 
     private void OnBackToGameClicked()
     {
+        AudioManager.Instance?.PlayPopupClose();
         CloseHistoryPanel();
     }
 

@@ -590,6 +590,14 @@ public class PopupManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Check if the loading popup is currently active
+    /// </summary>
+    public bool IsLoadingPopupActive()
+    {
+        return loadingPopup != null && loadingPopup.activeSelf;
+    }
+
+    /// <summary>
     /// Force close all popups (emergency cleanup)
     /// </summary>
     public void ForceCloseAllPopups()

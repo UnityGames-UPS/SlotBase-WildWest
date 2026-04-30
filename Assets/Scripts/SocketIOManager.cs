@@ -31,6 +31,7 @@ public class SocketIOManager : MonoBehaviour
 
     internal bool isConnected;
     internal bool isInitialized;
+    internal bool isExiting;   // True when CloseSocket is called intentionally (exit button)
 
     private Coroutine pingCoroutine;
     private float lastPongTime;
@@ -46,6 +47,7 @@ public class SocketIOManager : MonoBehaviour
     {
         isInitialized = false;
         isConnected = false;
+        isExiting = false;
     }
 
     private void Start()
@@ -155,14 +157,27 @@ public class SocketIOManager : MonoBehaviour
         isConnected = false;
         StopPingRoutine();
 
-        if (popupManager != null)
+        if (isExiting)
         {
-            popupManager.ShowDisconnectionPopup();
+            // Intentional exit — show loading popup (animation) instead of disconnect popup
+            if (popupManager != null)
+            {
+                popupManager.ShowLoadingPopup(0f); // 0 = indefinite, JS will reload the page
+            }
+            // Do NOT call gameManager.OnDisconnected for an intentional exit
         }
-
-        if (gameManager != null)
+        else
         {
-            gameManager.OnDisconnected();
+            // Unexpected disconnection — show the regular disconnection popup
+            if (popupManager != null)
+            {
+                popupManager.ShowDisconnectionPopup();
+            }
+
+            if (gameManager != null)
+            {
+                gameManager.OnDisconnected();
+            }
         }
     }
 
@@ -452,6 +467,10 @@ public class SocketIOManager : MonoBehaviour
 
     internal void CloseSocket()
     {
+        // Mark as intentional exit BEFORE closing so OnSocketDisconnected shows
+        // the loading popup (with its animation) instead of the disconnect popup.
+        isExiting = true;
+
         if (RaycastBlocker) RaycastBlocker.SetActive(true);
 
         StopPingRoutine();
@@ -463,6 +482,13 @@ public class SocketIOManager : MonoBehaviour
         }
 
         isConnected = false;
+
+        // If the socket close does not fire OnSocketDisconnected (e.g. already disconnected),
+        // still show the loading popup so the exit transition always looks clean.
+        if (popupManager != null && !popupManager.IsLoadingPopupActive())
+        {
+            popupManager.ShowLoadingPopup(0f);
+        }
 
 #if UNITY_WEBGL && !UNITY_EDITOR
         if (JSManager != null)
