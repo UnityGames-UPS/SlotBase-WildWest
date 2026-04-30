@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class AudioManager : MonoBehaviour
 {
 
-    public static AudioManager Instance { get; private set; }
+    internal static AudioManager Instance { get; private set; }
 
     private void Awake()
     {
@@ -89,11 +89,11 @@ public class AudioManager : MonoBehaviour
     private bool _musicEnabled = true;
     private bool _sfxEnabled   = true;
 
-    public bool MusicEnabled => _musicEnabled;
-    public bool SfxEnabled   => _sfxEnabled;
+    internal bool MusicEnabled => _musicEnabled;
+    internal bool SfxEnabled   => _sfxEnabled;
 
 
-    public void SetMusicEnabled(bool on)
+    internal void SetMusicEnabled(bool on)
     {
         _musicEnabled = on;
         PlayerPrefs.SetInt(PrefKeyMusic, on ? 1 : 0);
@@ -102,7 +102,7 @@ public class AudioManager : MonoBehaviour
     }
 
 
-    public void SetSfxEnabled(bool on)
+    internal void SetSfxEnabled(bool on)
     {
         _sfxEnabled = on;
         PlayerPrefs.SetInt(PrefKeysfx, on ? 1 : 0);
@@ -151,14 +151,14 @@ public class AudioManager : MonoBehaviour
         source.loop = false;
     }
 
-    public void PlayGameStart()
+    internal void PlayGameStart()
     {
         if (!_sfxEnabled) return;
         PlayOneShot(specialSource, clipGameStart);
     }
 
  
-    public void PlayBgMusic()
+    internal void PlayBgMusic()
     {
         if (bgMusicSource == null || clipBgMusic == null) return;
         if (bgMusicSource.isPlaying && bgMusicSource.clip == clipBgMusic) return;
@@ -168,61 +168,61 @@ public class AudioManager : MonoBehaviour
         bgMusicSource.Play();
     }
 
-    public void StopBgMusic()
+    internal void StopBgMusic()
     {
         StopSource(bgMusicSource);
     }
 
-    public void PlayButton()
+    internal void PlayButton()
     {
         if (!_sfxEnabled) return;
         PlayOneShot(uiSource, clipButtonGeneric);
     }
 
-    public void PlayPopupClose()
+    internal void PlayPopupClose()
     {
         if (!_sfxEnabled) return;
         PlayOneShot(uiSource, clipPopupClose);
     }
 
-    public void PlayPageSwipe()
+    internal void PlayPageSwipe()
     {
         if (!_sfxEnabled) return;
         PlayOneShot(uiSource, clipPageSwipe);
     }
 
 
-    public void PlayBetPlus()
+    internal void PlayBetPlus()
     {
         if (!_sfxEnabled) return;
         PlayOneShot(uiSource, clipBetPlus);
     }
 
-    public void PlayBetMinus()
+    internal void PlayBetMinus()
     {
         if (!_sfxEnabled) return;
         PlayOneShot(uiSource, clipBetMinus);
     }
 
-    public void PlayMaxBet()
+    internal void PlayMaxBet()
     {
         if (!_sfxEnabled) return;
         PlayOneShot(uiSource, clipMaxBet);
     }
 
-    public void PlayBuyFreeSpinOpen()
+    internal void PlayBuyFreeSpinOpen()
     {
         if (!_sfxEnabled) return;
         PlayOneShot(uiSource, clipBuyFreeSpinOpen);
     }
 
-    public void PlayBuyConfirmClose()
+    internal void PlayBuyConfirmClose()
     {
         if (!_sfxEnabled) return;
         PlayOneShot(uiSource, clipBuyConfirmClose);
     }
 
-    public void PlayBuyBetPlusMinus()
+    internal void PlayBuyBetPlusMinus()
     {
         if (!_sfxEnabled) return;
         PlayOneShot(uiSource, clipBuyBetPlusMinus);
@@ -230,19 +230,19 @@ public class AudioManager : MonoBehaviour
 
 
 
-    public void PlaySpinStart()
+    internal void PlaySpinStart()
     {
         if (!_sfxEnabled) return;
         PlayOneShot(uiSource, clipSpinStart);
     }
 
-    public void PlaySpinStop()
+    internal void PlaySpinStop()
     {
         if (!_sfxEnabled) return;
         PlayOneShot(uiSource, clipSpinStop);
     }
 
-    public void PlayReelStop()
+    internal void PlayReelStop()
     {
         if (!_sfxEnabled) return;
         if (specialSource != null && !specialSource.isPlaying)
@@ -251,56 +251,56 @@ public class AudioManager : MonoBehaviour
             PlayOneShot(reserveSource, clipReelStop);
     }
 
-    public void PlayScatterHit()
+    internal void PlayScatterHit()
     {
         if (!_sfxEnabled) return;
         PlayOneShot(specialSource, clipScatterHit);
     }
 
-    public void PlayWildHit()
+    internal void PlayWildHit()
     {
         if (!_sfxEnabled) return;
         PlayOneShot(specialSource, clipWildHit);
     }
 
-    public void Play3ScatterHit()
+    internal void Play3ScatterHit()
     {
         if (!_sfxEnabled) return;
         PlayOneShot(specialSource, clip3ScatterHit);
     }
 
-    public void PlayAnticipationFastSpin()
+    internal void PlayAnticipationFastSpin()
     {
         if (!_sfxEnabled) return;
         PlayOneShot(specialSource, clipAnticipationFastSpin);
     }
 
-    public void PlayFreeSpinPopup()
+    internal void PlayFreeSpinPopup()
     {
         if (!_sfxEnabled) return;
         PlayOneShot(specialSource, clipFreeSpinPopup);
     }
 
-    public void PlayFreeSpinIntro()
+    internal void PlayFreeSpinIntro()
     {
         if (!_sfxEnabled) return;
         PlayOneShot(specialSource, clipFreeSpinIntro);
     }
 
-    public void PlayFreeSpinTotalWin()
+    internal void PlayFreeSpinTotalWin()
     {
         if (!_sfxEnabled) return;
         PlayOneShot(specialSource, clipFreeSpinTotalWin);
     }
 
-    public void PlayWinNormal()
+    internal void PlayWinNormal()
     {
         if (!_sfxEnabled) return;
         PlayOneShot(specialSource, clipWinNormal);
     }
 
   
-    public void PlayWinOpeningJingle(double multiplier)
+    internal void PlayWinOpeningJingle(double multiplier)
     {
         if (!_sfxEnabled) return;
 
@@ -314,7 +314,7 @@ public class AudioManager : MonoBehaviour
         PlayOneShot(specialSource, clip);
     }
 
-    public void PlayWinPopupBg(double multiplier)
+    internal void PlayWinPopupBg(double multiplier)
     {
         if (!_sfxEnabled) return;
         if (winBgSource == null) return;
@@ -333,23 +333,23 @@ public class AudioManager : MonoBehaviour
         winBgSource.Play();
     }
 
-    public void StopWinPopupBg()
+    internal void StopWinPopupBg()
     {
         StopSource(winBgSource);
     }
 
-    public void PlayWinByMultiplier(double multiplier)
+    internal void PlayWinByMultiplier(double multiplier)
     {
         PlayWinOpeningJingle(multiplier);
     }
 
-    public void PlayWinLine()
+    internal void PlayWinLine()
     {
         if (!_sfxEnabled) return;
         PlayLoop(uiSource, clipWinLine);
     }
 
-    public void StopWinLine()
+    internal void StopWinLine()
     {
         if (uiSource != null && uiSource.loop && uiSource.clip == clipWinLine)
         {

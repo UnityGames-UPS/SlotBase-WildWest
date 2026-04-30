@@ -85,7 +85,7 @@ public class HistoryController : MonoBehaviour
     /// <summary>
     /// Open history panel and load first page
     /// </summary>
-    public void OpenHistoryPanel()
+    internal void OpenHistoryPanel()
     {
         if (isLoading) return;
 
@@ -96,7 +96,7 @@ public class HistoryController : MonoBehaviour
     /// <summary>
     /// Close history panel
     /// </summary>
-    public void CloseHistoryPanel()
+    internal void CloseHistoryPanel()
     {
         if (historyPanel == null || !historyPanel.activeSelf) return;
 
@@ -152,7 +152,7 @@ public class HistoryController : MonoBehaviour
     /// <summary>
     /// Called by SocketIOManager when history data is received
     /// </summary>
-    public void OnHistoryDataReceived(BetHistoryResponse response)
+    internal void OnHistoryDataReceived(BetHistoryResponse response)
     {
         isLoading = false;
 

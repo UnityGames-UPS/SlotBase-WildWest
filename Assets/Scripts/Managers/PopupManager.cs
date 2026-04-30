@@ -99,7 +99,7 @@ public class PopupManager : MonoBehaviour
     /// <summary>
     /// Show disconnection popup - triggered when max ping attempts fail
     /// </summary>
-    public void ShowDisconnectionPopup()
+    internal void ShowDisconnectionPopup()
     {
         ShowDisconnectionPopup("Game disconnected due to network error. Please relaunch the game.");
     }
@@ -107,7 +107,7 @@ public class PopupManager : MonoBehaviour
     /// <summary>
     /// Show disconnection popup with custom message
     /// </summary>
-    public void ShowDisconnectionPopup(string message)
+    internal void ShowDisconnectionPopup(string message)
     {
         if (disconnectionPopup == null) return;
 
@@ -144,7 +144,7 @@ public class PopupManager : MonoBehaviour
     /// <summary>
     /// Show error popup for insufficient funds
     /// </summary>
-    public void ShowInsufficientFundsError()
+    internal void ShowInsufficientFundsError()
     {
         ShowErrorPopup("Information", "Insufficient balance. Please add funds to continue.", false);
     }
@@ -152,7 +152,7 @@ public class PopupManager : MonoBehaviour
     /// <summary>
     /// Show error popup for another device detected
     /// </summary>
-    public void ShowAnotherDeviceError()
+    internal void ShowAnotherDeviceError()
     {
         ShowErrorPopup("Warning", "Your account has been logged in from another device. This session will be closed.", true);
     }
@@ -160,7 +160,7 @@ public class PopupManager : MonoBehaviour
     /// <summary>
     /// Show error popup for session expired
     /// </summary>
-    public void ShowSessionExpiredError()
+    internal void ShowSessionExpiredError()
     {
         ShowErrorPopup("Warning", "Your session has expired. Please log in again.", true);
     }
@@ -168,7 +168,7 @@ public class PopupManager : MonoBehaviour
     /// <summary>
     /// Show error popup for invalid auth token
     /// </summary>
-    public void ShowInvalidAuthError()
+    internal void ShowInvalidAuthError()
     {
         ShowErrorPopup("Warning", "Invalid authentication token. Please log in again.", true);
     }
@@ -176,7 +176,7 @@ public class PopupManager : MonoBehaviour
     /// <summary>
     /// Show error popup for server error
     /// </summary>
-    public void ShowServerError(string message = "A server error occurred. Please try again later.")
+    internal void ShowServerError(string message = "A server error occurred. Please try again later.")
     {
         ShowErrorPopup("Server Error", message, true);
     }
@@ -187,7 +187,7 @@ public class PopupManager : MonoBehaviour
     /// <param name="title">Error title (Information, Warning, Server Error)</param>
     /// <param name="message">Error message</param>
     /// <param name="isCritical">If true, OK button will exit the game</param>
-    public void ShowErrorPopup(string title, string message, bool isCritical)
+    internal void ShowErrorPopup(string title, string message, bool isCritical)
     {
         if (errorPopup == null) return;
 
@@ -241,7 +241,7 @@ public class PopupManager : MonoBehaviour
     /// </summary>
     /// <param name="currentTry">Current retry attempt (1-based)</param>
     /// <param name="maxTries">Maximum retry attempts</param>
-    public void ShowReconnectionPopup(int currentTry, int maxTries)
+    internal void ShowReconnectionPopup(int currentTry, int maxTries)
     {
         if (reconnectionPopup == null) return;
 
@@ -274,7 +274,7 @@ public class PopupManager : MonoBehaviour
     /// <summary>
     /// Close reconnection popup (called when reconnection succeeds)
     /// </summary>
-    public void CloseReconnectionPopup()
+    internal void CloseReconnectionPopup()
     {
         if (reconnectionPopup == null || !reconnectionPopup.activeSelf) return;
 
@@ -298,7 +298,7 @@ public class PopupManager : MonoBehaviour
     /// <summary>
     /// Show loading popup with default 5 second duration
     /// </summary>
-    public void ShowLoadingPopup()
+    internal void ShowLoadingPopup()
     {
         ShowLoadingPopup(defaultLoadingDuration);
     }
@@ -311,7 +311,7 @@ public class PopupManager : MonoBehaviour
     /// Show loading popup with optional auto-close duration
     /// </summary>
     /// <param name="duration">Duration in seconds (-1 = use defaultLoadingDuration, 0 = indefinite)</param>
-    public void ShowLoadingPopup(float duration = -1f)
+    internal void ShowLoadingPopup(float duration = -1f)
     {
         if (loadingPopup == null) return;
 
@@ -354,7 +354,7 @@ public class PopupManager : MonoBehaviour
     /// <summary>
     /// Close loading popup manually, respecting minimum duration
     /// </summary>
-    public void CloseLoadingPopup(System.Action onComplete = null)
+    internal void CloseLoadingPopup(System.Action onComplete = null)
     {
         if (onComplete != null) onLoadingClosed += onComplete;
 
@@ -584,7 +584,7 @@ public class PopupManager : MonoBehaviour
     /// <summary>
     /// Check if any popup is currently active
     /// </summary>
-    public bool IsAnyPopupActive()
+    internal bool IsAnyPopupActive()
     {
         return currentActivePopup != null && currentActivePopup.activeSelf;
     }
@@ -592,7 +592,7 @@ public class PopupManager : MonoBehaviour
     /// <summary>
     /// Check if the loading popup is currently active
     /// </summary>
-    public bool IsLoadingPopupActive()
+    internal bool IsLoadingPopupActive()
     {
         return loadingPopup != null && loadingPopup.activeSelf;
     }
@@ -600,7 +600,7 @@ public class PopupManager : MonoBehaviour
     /// <summary>
     /// Force close all popups (emergency cleanup)
     /// </summary>
-    public void ForceCloseAllPopups()
+    internal void ForceCloseAllPopups()
     {
         StopRotation();
         StopLoadingTextAnimation();

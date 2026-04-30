@@ -102,7 +102,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Toggle settingsQuickSpinToggle;
 
     [Header("Skip Screen")]
-    public Toggle skipScreenToggle;
+    internal Toggle skipScreenToggle;
 
     [Header("Audio Toggles")]
     [Tooltip("Toggle for background music on/off.")]

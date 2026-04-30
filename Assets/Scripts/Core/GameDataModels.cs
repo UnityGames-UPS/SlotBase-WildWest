@@ -426,7 +426,7 @@ public enum SpinSpeed
 /// </summary>
 public static class InitDataConverter
 {
-    public static GameConfig ConvertToGameConfig(InitData serverData)
+    internal static GameConfig ConvertToGameConfig(InitData serverData)
     {
         var config = new GameConfig
         {
@@ -489,7 +489,7 @@ public static class InitDataConverter
         return config;
     }
 
-    public static PlayerData ConvertToPlayerData(ServerPlayer serverPlayer, int defaultBetIndex = 0)
+    internal static PlayerData ConvertToPlayerData(ServerPlayer serverPlayer, int defaultBetIndex = 0)
     {
         return new PlayerData
         {
@@ -503,7 +503,7 @@ public static class InitDataConverter
     /// Handles string-to-int conversion, matrix transposition, and wild multiplier mapping
     /// Server sends [row][col] (4 rows x 5 cols), Client needs [col][row] (5 cols x 4 rows)
     /// </summary>
-    public static SpinResult ConvertServerResponseToSpinResult(ServerSpinResponse serverResponse, double currentBalance, double betAmount, GameConfig gameConfig)
+    internal static SpinResult ConvertServerResponseToSpinResult(ServerSpinResponse serverResponse, double currentBalance, double betAmount, GameConfig gameConfig)
     {
         // Use server balance directly if available
         double newBalance = serverResponse.player?.balance ?? CalculateNewBalance(currentBalance, betAmount, serverResponse.payload.totalWin);
