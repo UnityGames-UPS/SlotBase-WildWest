@@ -42,6 +42,7 @@ public class GameManager : MonoBehaviour
 
     private Coroutine spinCoroutine;
     private bool stopRequested;
+    private bool waitingForSpecialWin;
 
     #region Initialization
 
@@ -133,7 +134,7 @@ public class GameManager : MonoBehaviour
             {
                 StopAutoPlay();
             }
-            else
+            else if (!isInFreeSpins)
             {
                 stopRequested = true;
             }
@@ -250,10 +251,31 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator TriggerWinPopupWithDelay(float delay, SpinResult result)
     {
+        double totalBet = currentBetAmount * (gameConfig != null ? gameConfig.betMultiplier : 1);
+        double multiplier = totalBet > 0 ? (result.winAmount / totalBet) : 0;
+        bool skipScreen = uiManager.skipScreenToggle != null && uiManager.skipScreenToggle.isOn;
+
+        if (multiplier >= 5 && !skipScreen)
+        {
+            waitingForSpecialWin = true;
+        }
+        else
+        {
+            waitingForSpecialWin = false;
+        }
+
         yield return new WaitForSeconds(delay);
+
         if (lastResult == result)
         {
-            uiManager.TriggerBigWinPopupEarly(result.winAmount);
+            uiManager.TriggerBigWinPopupEarly(result, () =>
+            {
+                waitingForSpecialWin = false;
+            });
+        }
+        else
+        {
+            waitingForSpecialWin = false;
         }
     }
 
@@ -299,6 +321,13 @@ public class GameManager : MonoBehaviour
     {
         float delayTime = currentSpinSpeed == SpinSpeed.QuickSpin ? 0.3f : 0.5f;
         yield return new WaitForSeconds(delayTime);
+
+        // Wait for special win popup using the flag and active state
+        while (waitingForSpecialWin || uiManager.IsSpecialWinActive)
+        {
+            yield return null;
+        }
+
         ProcessSpinResult();
     }
 
@@ -566,6 +595,13 @@ public class GameManager : MonoBehaviour
     private IEnumerator DelayBeforeNextFreeSpin()
     {
         yield return new WaitForSeconds(0.3f);
+
+        // Wait for special win popup if it's still active or pending
+        while (waitingForSpecialWin || uiManager.IsSpecialWinActive)
+        {
+            yield return null;
+        }
+
         RequestSpin();
     }
 

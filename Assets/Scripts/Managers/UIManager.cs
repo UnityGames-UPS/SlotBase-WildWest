@@ -221,6 +221,8 @@ public class UIManager : MonoBehaviour
     private bool isSyncingToggles = false;
     private double currentWinDisplayValue = 0;
     private bool isSpecialWinActive = false;
+    public bool IsSpecialWinActive => isSpecialWinActive;
+    public System.Action OnSpecialWinComplete;
 
     #region Initialization
 
@@ -507,7 +509,17 @@ InitializeExpandShrink();
         AudioManager.Instance?.PlaySpinStart();
 
         if (spinNormalImage) spinNormalImage.SetActive(false);
-        if (spinStopImage) spinStopImage.SetActive(true);
+        
+        if (gameManager.isInFreeSpins)
+        {
+            if (spinStopImage) spinStopImage.SetActive(false);
+            if (spinButton) spinButton.interactable = false;
+        }
+        else
+        {
+            if (spinStopImage) spinStopImage.SetActive(true);
+            if (spinButton) spinButton.interactable = true;
+        }
 
         SetBetControlsEnabled(false);
         if (autoPlayOpenButton) autoPlayOpenButton.interactable = false;
@@ -544,13 +556,16 @@ InitializeExpandShrink();
 
     private bool earlyBigWinPopupTriggered = false;
 
-    internal void TriggerBigWinPopupEarly(double winAmount)
+    internal void TriggerBigWinPopupEarly(SpinResult result, System.Action onComplete = null)
     {
         double totalBetAmount = gameManager.currentBetAmount;
         if (gameManager.gameConfig != null)
         {
             totalBetAmount *= gameManager.gameConfig.betMultiplier;
         }
+        
+        // Always calculate multiplier for popup level based on the current result's winAmount
+        double winAmount = result.winAmount;
         double multiplier = totalBetAmount > 0 ? (winAmount / totalBetAmount) : 0;
 
         bool skipScreen = skipScreenToggle != null && skipScreenToggle.isOn;
@@ -559,7 +574,11 @@ InitializeExpandShrink();
         {
             earlyBigWinPopupTriggered = true;
             if (winDisplayCoroutine != null) StopCoroutine(winDisplayCoroutine);
-            winDisplayCoroutine = StartCoroutine(ShowWinDisplayCoroutine(winAmount));
+            winDisplayCoroutine = StartCoroutine(ShowWinDisplayCoroutine(result, onComplete));
+        }
+        else
+        {
+            onComplete?.Invoke();
         }
     }
 
@@ -567,19 +586,13 @@ InitializeExpandShrink();
     {
         AnimateBalanceUpdate(result.playerData.balance);
 
+        double targetWin = gameManager.isInFreeSpins ? result.serverTotalRoundWin : result.winAmount;
+
         if (result.winAmount > 0)
         {
-            // If in free spins, we use the server's total round win which accumulates
-            if (gameManager.isInFreeSpins)
+            if (!earlyBigWinPopupTriggered)
             {
-                if (!earlyBigWinPopupTriggered)
-                {
-                    AnimateWinUpdate(result.serverTotalRoundWin);
-                }
-            }
-            else if (!earlyBigWinPopupTriggered)
-            {
-                AnimateWinUpdate(result.winAmount);
+                AnimateWinUpdate(targetWin);
             }
             
             double totalBetAmount = gameManager.currentBetAmount;
@@ -591,21 +604,14 @@ InitializeExpandShrink();
 
             if (multiplier < 5 || !earlyBigWinPopupTriggered)
             {
-                ShowWinDisplay(result.winAmount);
+                ShowWinDisplay(result);
             }
             earlyBigWinPopupTriggered = false;
         }
         else
         {
-            // If in free spins and no win this spin, maintain the accumulated win display
-            if (gameManager.isInFreeSpins)
-            {
-                UpdateWinDisplay(result.serverTotalRoundWin);
-            }
-            else
-            {
-                UpdateWinDisplay(0);
-            }
+            // Update display to target total (maintains round total in Free Spins)
+            UpdateWinDisplay(targetWin);
             earlyBigWinPopupTriggered = false;
         }
     }
@@ -613,7 +619,20 @@ InitializeExpandShrink();
     internal void OnSpinCompleted(SpinResult result)
     {
         if (isSpecialWinActive) return;
-        if (!gameManager.isAutoPlaying && !gameManager.isInFreeSpins)
+
+        if (gameManager.isAutoPlaying)
+        {
+            if (spinNormalImage) spinNormalImage.SetActive(false);
+            if (spinStopImage) spinStopImage.SetActive(true);
+            if (spinButton) spinButton.interactable = true;
+        }
+        else if (gameManager.isInFreeSpins)
+        {
+            if (spinNormalImage) spinNormalImage.SetActive(false);
+            if (spinStopImage) spinStopImage.SetActive(false);
+            if (spinButton) spinButton.interactable = false;
+        }
+        else
         {
             if (spinNormalImage) spinNormalImage.SetActive(true);
             if (spinStopImage) spinStopImage.SetActive(false);
@@ -622,6 +641,7 @@ InitializeExpandShrink();
             if (autoPlayOpenButton) autoPlayOpenButton.interactable = true;
             if (settingsOpenButton) settingsOpenButton.interactable = true;
             if (buyFreeSpinOpenButton) buyFreeSpinOpenButton.interactable = true;
+            if (spinButton) spinButton.interactable = true;
         }
     }
 
@@ -655,7 +675,20 @@ InitializeExpandShrink();
     internal void EnableControlsAfterWinAnimation()
     {
         if (isSpecialWinActive) return;
-        if (!gameManager.isAutoPlaying && !gameManager.isInFreeSpins)
+
+        if (gameManager.isAutoPlaying)
+        {
+            if (spinButton) spinButton.interactable = true;
+            if (spinNormalImage) spinNormalImage.SetActive(false);
+            if (spinStopImage) spinStopImage.SetActive(true);
+        }
+        else if (gameManager.isInFreeSpins)
+        {
+            if (spinButton) spinButton.interactable = false;
+            if (spinNormalImage) spinNormalImage.SetActive(false);
+            if (spinStopImage) spinStopImage.SetActive(false);
+        }
+        else
         {
             SetBetControlsEnabled(true);
             if (spinButton) spinButton.interactable = true;
@@ -667,14 +700,15 @@ InitializeExpandShrink();
         }
     }
 
-    private void ShowWinDisplay(double winAmount)
+    private void ShowWinDisplay(SpinResult result)
     {
         if (winDisplayCoroutine != null) StopCoroutine(winDisplayCoroutine);
-        winDisplayCoroutine = StartCoroutine(ShowWinDisplayCoroutine(winAmount));
+        winDisplayCoroutine = StartCoroutine(ShowWinDisplayCoroutine(result));
     }
 
-    private IEnumerator ShowWinDisplayCoroutine(double winAmount)
+    private IEnumerator ShowWinDisplayCoroutine(SpinResult result, System.Action onComplete = null)
     {
+        double winAmount = result.winAmount;
         double totalBetAmount = gameManager.currentBetAmount;
         if (gameManager.gameConfig != null)
         {
@@ -682,15 +716,20 @@ InitializeExpandShrink();
         }
         
         double multiplier = totalBetAmount > 0 ? (winAmount / totalBetAmount) : 0;
-
         bool skipScreen = skipScreenToggle != null && skipScreenToggle.isOn;
+
+        // --- Capping Logic ---
+        double startVal = gameManager.isInFreeSpins ? currentWinDisplayValue : 0;
+        double endVal = gameManager.isInFreeSpins ? result.serverTotalRoundWin : winAmount;
+        double popupWinAmount = winAmount;
 
         if (multiplier < 5 || skipScreen)
         {
             if (gameRuleObject) gameRuleObject.SetActive(false);
             if (winDisplayObject) winDisplayObject.SetActive(true);
 
-            if (winDisplayText) winDisplayText.text = $"WIN {winAmount:F2}";
+            // Use the authoritative target win for the small display label
+            if (winDisplayText) winDisplayText.text = $"WIN {endVal:F2}";
 
             AudioManager.Instance?.PlayWinNormal();
 
@@ -707,15 +746,12 @@ InitializeExpandShrink();
         isSpecialWinActive = true;
         DisableControlsDuringWinAnimation();
 
-        // Big Win Popup Logic — play opening jingle once, then start looping BG
+        // Big Win Popup Logic — based on the spin's winAmount field
         AudioManager.Instance?.PlayWinOpeningJingle(multiplier);
         AudioManager.Instance?.PlayWinPopupBg(multiplier);
 
         if (gameRuleObject) gameRuleObject.SetActive(false);
         
-        float startVal = gameManager.isInFreeSpins ? (float)currentWinDisplayValue : 0f;
-        float endVal = startVal + (float)winAmount;
-
         if (winDisplayObject) 
         {
             winDisplayObject.SetActive(true);
@@ -767,19 +803,26 @@ InitializeExpandShrink();
         if (winPopupText)
         {
             winPopupText.text = "0.00";
-            float currentVal = startVal;
-            DOTween.To(() => currentVal, x => {
-                currentVal = x;
-                float hitAmount = currentVal - startVal;
-                string formattedHit = hitAmount.ToString("F2");
-                string formattedTotal = currentVal.ToString("F2");
+            float currentAnimVal = (float)startVal;
+            DOTween.To(() => currentAnimVal, x => {
+                currentAnimVal = x;
                 
-                winPopupText.text = formattedHit;
+                // 1. Calculate progress from startVal to endVal
+                double range = endVal - startVal;
+                float progress = range > 0 ? (float)((currentAnimVal - startVal) / range) : 1f;
+                progress = Mathf.Clamp01(progress);
+
+                // 2. Update popup text based on spin win amount
+                double currentPopupHit = progress * popupWinAmount;
+                winPopupText.text = currentPopupHit.ToString("F2");
+
+                // 3. Update main UI displays based on authoritative round total
+                string formattedTotal = ((double)currentAnimVal).ToString("F2");
                 if (winAmountText) winAmountText.text = formattedTotal;
                 if (winDisplayText) winDisplayText.text = $"WIN {formattedTotal}";
                 
-                currentWinDisplayValue = currentVal;
-            }, endVal, animDuration).SetEase(Ease.OutQuad);
+                currentWinDisplayValue = (double)currentAnimVal;
+            }, (float)endVal, animDuration).SetEase(Ease.OutQuad);
         }
 
         yield return new WaitForSeconds(popupTime);
@@ -804,6 +847,9 @@ InitializeExpandShrink();
         isSpecialWinActive = false;
         EnableControlsAfterWinAnimation();
         OnSpinCompleted(null);
+
+        onComplete?.Invoke();
+        OnSpecialWinComplete?.Invoke();
 
         winDisplayCoroutine = null;
     }
