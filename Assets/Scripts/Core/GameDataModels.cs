@@ -172,6 +172,7 @@ public class ServerFreeSpinResult
     public bool isFreeSpin;
     public bool isRoundOver;
     public int spinsRemaining;
+    public int spinsUsed;  // Added: Server sends this in features.freeSpins
     public int stickyWildsCount;
     public ServerOverlayScatter overlayScatter;
 }
@@ -510,7 +511,7 @@ public static class InitDataConverter
 
         // Get server free spin state values
         int spinsRemaining = serverResponse.features?.freeSpins?.spinsRemaining ?? serverResponse.payload.freeSpinState?.spinsRemaining ?? 0;
-        int spinsUsed = serverResponse.payload.freeSpinState?.spinsUsed ?? 0;
+        int spinsUsed = serverResponse.features?.freeSpins?.spinsUsed ?? serverResponse.payload.freeSpinState?.spinsUsed ?? 0;
         double totalRoundWin = serverResponse.payload.totalRoundWin > 0
             ? serverResponse.payload.totalRoundWin
             : (serverResponse.payload.freeSpinState?.totalRoundWin ?? 0);

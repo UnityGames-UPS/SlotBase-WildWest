@@ -527,10 +527,11 @@ public class SlotView : MonoBehaviour
 
         int actualScatterId = gameManager.gameConfig != null ? gameManager.gameConfig.scatterSymbolId : scatterSymbolId;
         int scatterCount = 0;
-        for (int col = 0; col < 5; col++)
+        for (int col = 0; col < 4; col++) // Only check first 4 reels (0..3) for anticipation trigger
         {
             for (int row = 0; row < resultMatrix[col].Count; row++)
             {
+                // Count ONLY the actual scatter ID, excluding wilds or any other symbols
                 if (resultMatrix[col][row] == actualScatterId)
                 {
                     scatterCount++;

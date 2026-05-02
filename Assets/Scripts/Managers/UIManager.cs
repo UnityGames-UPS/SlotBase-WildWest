@@ -544,11 +544,9 @@ InitializeExpandShrink();
         if (gameRuleObject) gameRuleObject.SetActive(true);
         isSpecialWinActive = false;
 
-        if (gameManager.isInFreeSpins)
-        {
-            UpdateFreeSpinCount(gameManager.freeSpinsRemaining);
-        }
-        else
+        // Don't update free spin count here - wait for server result
+        // The count will be updated in ProcessSpinResult with server data
+        if (!gameManager.isInFreeSpins)
         {
             UpdateWinDisplay(0);
         }
@@ -1495,10 +1493,8 @@ InitializeExpandShrink();
 
     internal void OnFreeSpinsEnded(double serverTotalRoundWin, int serverTotalSpinsUsed)
     {
-        // Use server spinsUsed if available, otherwise fall back to the actual number of spins spun
-        // (on the last spin or early stop, freeSpinState can be null so serverSpinsUsed defaults to 0)
-        int totalSpins = serverTotalSpinsUsed > 0 ? serverTotalSpinsUsed : gameManager.freeSpinsUsed;
-        ShowFreeSpinEndPopup(serverTotalRoundWin, totalSpins);
+        // Always use server-provided spinsUsed (server is authoritative)
+        ShowFreeSpinEndPopup(serverTotalRoundWin, serverTotalSpinsUsed);
     }
 
     internal void UpdateFreeSpinCount(int remainingSpins)
@@ -1528,17 +1524,17 @@ InitializeExpandShrink();
     {
         if (freeSpinNumberSprites == null || freeSpinNumberSprites.Length < 10) return;
 
-        // Use alpha to hide tens digit when count is single-digit
+        // Use SetActive instead of alpha to show/hide tens digit
         if (freeSpinCountTens)
         {
             if (count >= 10)
             {
-                freeSpinCountTens.color = Color.white;
+                freeSpinCountTens.gameObject.SetActive(true);
                 freeSpinCountTens.sprite = freeSpinNumberSprites[count / 10];
             }
             else
             {
-                freeSpinCountTens.color = new Color(1f, 1f, 1f, 0f);
+                freeSpinCountTens.gameObject.SetActive(false);
             }
         }
         if (freeSpinCountOnes) freeSpinCountOnes.sprite = freeSpinNumberSprites[count % 10];
@@ -1680,8 +1676,7 @@ InitializeExpandShrink();
             {
                 if (buyFreeSpinObject) buyFreeSpinObject.SetActive(true);
 
-                // Fully restore all controls that may have been locked
-                // during the buy-feature or free-spin sequence.
+
                 if (spinButton)            spinButton.interactable            = true;
                 if (spinNormalImage)       spinNormalImage.SetActive(true);
                 if (spinStopImage)         spinStopImage.SetActive(false);

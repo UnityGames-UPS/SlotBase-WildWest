@@ -152,11 +152,8 @@ public class GameManager : MonoBehaviour
         currentState = GameState.Spinning;
         stopRequested = false;
 
-        if (isInFreeSpins)
-        {
-            freeSpinsUsed++;
-            if (freeSpinsRemaining > 0) freeSpinsRemaining--;
-        }
+        // Server handles spin counting - we just display what server sends
+        // No client-side freeSpinsUsed++ or freeSpinsRemaining-- here
 
         uiManager.OnSpinStarted();
 
@@ -346,6 +343,13 @@ public class GameManager : MonoBehaviour
     {
         lastResult = result;
 
+        // CRITICAL FIX: Update free spin counter IMMEDIATELY when server response arrives
+        // This ensures the display shows the exact server-authoritative count without lag
+        if (isInFreeSpins && result.serverSpinsRemaining >= 0)
+        {
+            freeSpinsRemaining = result.serverSpinsRemaining;
+            uiManager.UpdateFreeSpinCount(freeSpinsRemaining);
+        }
 
         if (result.winLines != null)
         {
@@ -369,13 +373,16 @@ public class GameManager : MonoBehaviour
         double serverTotalRoundWin = lastResult.serverTotalRoundWin;
         bool isRoundOver = lastResult.isRoundOver;
 
-        if (isInFreeSpins)
+        // Note: freeSpinsRemaining already updated in OnSpinResultReceived
+        // Keeping this for safety in case OnSpinResultReceived wasn't called
+        if (isInFreeSpins && freeSpinsRemaining != serverSpinsRemaining)
         {
             freeSpinsRemaining = serverSpinsRemaining;
         }
 
-        // Show overlay scatter extra spins popup (display only — server already updated spinsRemaining)
-        if (lastResult.overlayScatterData != null && lastResult.overlayScatterData.isTriggered)
+        // Show overlay scatter extra spins popup ONLY if round is NOT over
+        // When isRoundOver=true, go directly to end popup regardless of overlay scatter
+        if (lastResult.overlayScatterData != null && lastResult.overlayScatterData.isTriggered && !isRoundOver)
         {
             if (isInFreeSpins)
             {
@@ -429,12 +436,13 @@ public class GameManager : MonoBehaviour
         }
         else if (isInFreeSpins)
         {
-            uiManager.UpdateFreeSpinCount(freeSpinsRemaining);
+            // Free spin counter already updated in OnSpinResultReceived
+            // No need to update again here
 
             if (isRoundOver || freeSpinsRemaining <= 0)
             {
-                int finalSpinsUsed = serverSpinsUsed > 0 ? serverSpinsUsed : freeSpinsUsed;
-                EndFreeSpins(serverTotalRoundWin, finalSpinsUsed);
+                // Always use server-authoritative spinsUsed
+                EndFreeSpins(serverTotalRoundWin, serverSpinsUsed);
             }
             else
             {
