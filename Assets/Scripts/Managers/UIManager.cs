@@ -858,6 +858,12 @@ InitializeExpandShrink();
 
     private void OnSpinButtonPressed()
     {
+        if (gameManager.isAutoPlaying)
+        {
+            gameManager.StopAutoPlay();
+            return;
+        }
+
         if (gameManager.IsSpinning())
             gameManager.RequestStop();
         else
@@ -980,19 +986,26 @@ InitializeExpandShrink();
     {
         if (autoPlayCountDisplay) autoPlayCountDisplay.SetActive(false);
 
-        // Only restore spin visuals if we are NOT entering free spins
-        // (free-spin flow manages its own spin button state)
-        if (!gameManager.isInFreeSpins)
+        // If game is not spinning and no round is in progress, restore controls
+        bool isRoundActive = gameManager.IsSpinning() || gameManager.lastResult != null;
+
+        if (!isRoundActive && !gameManager.isInFreeSpins)
         {
             if (spinNormalImage) spinNormalImage.SetActive(true);
             if (spinStopImage)   spinStopImage.SetActive(false);
             if (spinButton)      spinButton.interactable = true;
-        }
 
-        SetBetControlsEnabled(true);
-        if (autoPlayOpenButton)    autoPlayOpenButton.interactable    = true;
-        if (settingsOpenButton)    settingsOpenButton.interactable    = true;
-        if (buyFreeSpinOpenButton) buyFreeSpinOpenButton.interactable = true;
+            SetBetControlsEnabled(true);
+            if (autoPlayOpenButton)    autoPlayOpenButton.interactable    = true;
+            if (settingsOpenButton)    settingsOpenButton.interactable    = true;
+            if (buyFreeSpinOpenButton) buyFreeSpinOpenButton.interactable = true;
+        }
+        else if (isRoundActive)
+        {
+            // If round is active, we just requested to stop autoplay.
+            // Disable spin button so user knows it's stopping.
+            if (spinButton) spinButton.interactable = false;
+        }
     }
 
     internal void UpdateAutoPlayCount()

@@ -888,7 +888,7 @@ public class SlotView : MonoBehaviour
     private IEnumerator PlayWinLinesSequentially(List<WinLine> winLines, System.Action onComplete)
     {
         bool skipScreen = gameManager != null && gameManager.uiManager != null && gameManager.uiManager.skipScreenToggle != null && gameManager.uiManager.skipScreenToggle.isOn;
-        int loopCount = (gameManager != null && gameManager.isInFreeSpins) ? 1 : winSymbolLoopCount;
+        int loopCount = (gameManager != null && (gameManager.isInFreeSpins || gameManager.isAutoPlaying)) ? 1 : winSymbolLoopCount;
         float lineDuration = skipScreen ? 0.5f : winSymbolLoopDuration * loopCount;
 
         List<int> prevPositions = null;
@@ -1108,7 +1108,7 @@ public class SlotView : MonoBehaviour
             imageAnim.StartAnimation();
         });
 
-        int loopCount = (gameManager != null && gameManager.isInFreeSpins) ? 1 : winSymbolLoopCount;
+        int loopCount = (gameManager != null && (gameManager.isInFreeSpins || gameManager.isAutoPlaying)) ? 1 : winSymbolLoopCount;
         seq.AppendInterval(winSymbolLoopDuration * loopCount);
 
         seq.AppendCallback(() => {
