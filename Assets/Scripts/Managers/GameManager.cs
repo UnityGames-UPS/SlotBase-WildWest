@@ -242,6 +242,7 @@ public class GameManager : MonoBehaviour
         else
         {
             uiManager.OnSpinStopping(lastResult);
+            currentState = GameState.Idle;
             OnWinAnimationComplete();
         }
     }
@@ -413,8 +414,8 @@ public class GameManager : MonoBehaviour
 
             if (autoPlayRemainingRounds <= 0)
             {
-                StopAutoPlay();
                 currentState = GameState.Idle;
+                StopAutoPlay();
             }
             else
             {
@@ -423,8 +424,8 @@ public class GameManager : MonoBehaviour
                 double totalBet = currentBetAmount * (gameConfig != null ? gameConfig.betMultiplier : 1);
                 if (playerData.balance < totalBet)
                 {
-                    StopAutoPlay();
                     currentState = GameState.Idle;
+                    StopAutoPlay();
                     if (popupManager != null) popupManager.ShowInsufficientFundsError();
                 }
                 else

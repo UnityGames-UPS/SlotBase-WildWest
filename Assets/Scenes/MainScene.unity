@@ -10107,7 +10107,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f521a04de7f494272a617b2719edd271, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testToken: b5e8115d29f444d582a1ca55c634d758
+  testToken: a1f7ebe186b441149216654f763bae7e
   gameManager: {fileID: 855426822}
   uiManager: {fileID: 180954095}
   popupManager: {fileID: 1163055615}
@@ -22308,7 +22308,7 @@ MonoBehaviour:
   StartOnAwake: 0
   StartonEnable: 1
   currentAnimationState: 0
-  AnimationSpeed: 97
+  AnimationSpeed: 94
   delayBetweenLoop: 0
   animationMode: 0
   phase2StartIndex: 0
