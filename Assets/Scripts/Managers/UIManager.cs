@@ -911,11 +911,24 @@ InitializeExpandShrink();
 
             lastRapidStopTime = Time.unscaledTime;
             gameManager.RequestStop();
+            // Button disable is handled inside RequestStop -> DisableSpinButtonDuringStop
         }
         else
         {
             gameManager.RequestSpin();
         }
+    }
+
+    /// <summary>
+    /// Called by GameManager.RequestStop when a forced/manual stop is accepted.
+    /// Immediately hides both spin images and disables the button so the player
+    /// cannot spam. Re-enabled in OnSpinCompleted once all reels have settled.
+    /// </summary>
+    internal void DisableSpinButtonDuringStop()
+    {
+        if (spinButton) spinButton.interactable = false;
+        if (spinNormalImage) spinNormalImage.SetActive(false);
+        if (spinStopImage) spinStopImage.SetActive(false);
     }
 
     #endregion

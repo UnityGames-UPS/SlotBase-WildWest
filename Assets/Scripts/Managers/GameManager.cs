@@ -137,6 +137,7 @@ public class GameManager : MonoBehaviour
             else if (!isInFreeSpins)
             {
                 stopRequested = true;
+                uiManager.DisableSpinButtonDuringStop();
             }
         }
     }
@@ -180,6 +181,13 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
 
+        // Player pressed Stop manually — hold for 0.5s so the reels keep
+        // spinning briefly before snapping, giving clear visual feedback.
+        if (stopRequested)
+        {
+            yield return new WaitForSeconds(0.5f);
+        }
+
         while (lastResult == null)
         {
             yield return null;
@@ -193,6 +201,7 @@ public class GameManager : MonoBehaviour
             {
                 slotView.QuickStop(lastResult.resultMatrix);
 
+                // Wait for the snap animation to settle before processing result
                 float quickStopWaitTime = 0.5f;
                 yield return new WaitForSeconds(quickStopWaitTime);
 
