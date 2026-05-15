@@ -498,9 +498,6 @@ public class GameManager : MonoBehaviour
         uiManager.OnBuyFeatureConfirmed();
         socketManager.SendBuyFeatureRequest(currentBetIndex);
 
-        // Reuse the existing spin coroutine / result flow — the server returns a
-        // "result" event identical to a normal free-spin trigger, so OnSpinResultReceived
-        // will be called automatically and StartFreeSpins will handle the rest.
         if (slotView != null) slotView.StartSpin();
 
         if (spinCoroutine != null) StopCoroutine(spinCoroutine);
@@ -523,6 +520,11 @@ public class GameManager : MonoBehaviour
             slotView.QuickStop(lastResult.resultMatrix);
             yield return new WaitForSeconds(0.5f);
         }
+
+        // Update balance display from server result immediately.
+        // BuyFeature always has totalWin=0, so OnWinAnimationComplete's multiplier
+        // guard (>= 5) would skip OnSpinStopping entirely — call it explicitly here.
+        uiManager.OnSpinStopping(lastResult);
 
         // No win lines for a buy-feature trigger — go straight to result processing
         OnWinAnimationComplete();

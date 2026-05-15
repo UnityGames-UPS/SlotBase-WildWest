@@ -4807,6 +4807,7 @@ MonoBehaviour:
   freeSpinIntroDuration: 3.7
   expandButton: {fileID: 1004629642}
   shrinkButton: {fileID: 1416164658}
+  rapidStopCooldown: 1
 --- !u!4 &180954096
 Transform:
   m_ObjectHideFlags: 0
@@ -10107,7 +10108,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f521a04de7f494272a617b2719edd271, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testToken: a1f7ebe186b441149216654f763bae7e
+  testToken: 70cff40891b14e348b27112b29b6ffb6
   gameManager: {fileID: 855426822}
   uiManager: {fileID: 180954095}
   popupManager: {fileID: 1163055615}

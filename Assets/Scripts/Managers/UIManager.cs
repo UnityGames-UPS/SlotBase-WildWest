@@ -213,6 +213,15 @@ public class UIManager : MonoBehaviour
 
     private int initialFreeSpins = 0;
     private Coroutine maxBetCoroutine;
+
+    // Optimistic balance: the locally-deducted balance shown while the spin is in flight
+    private double optimisticBalance = 0;
+    private bool hasOptimisticBalance = false;
+
+    [Header("Rapid Stop Cooldown")]
+    [Tooltip("Seconds the player must wait before pressing Stop again after an immediate stop.")]
+    [SerializeField] private float rapidStopCooldown = 1f;
+    private float lastRapidStopTime = -99f;
     private Coroutine winDisplayCoroutine;
 
     private int currentRulesPage = 0;
@@ -544,6 +553,26 @@ InitializeExpandShrink();
         if (gameRuleObject) gameRuleObject.SetActive(true);
         isSpecialWinActive = false;
 
+        // --- Optimistic balance deduction ---
+        // Immediately deduct total stake from displayed balance so the player
+        // sees the cost before the server responds. The server balance will
+        // overwrite (animate to) the correct value in AnimateBalanceUpdate.
+        if (!gameManager.isInFreeSpins && gameManager.gameConfig != null && gameManager.playerData != null)
+        {
+            double totalBet = gameManager.currentBetAmount * gameManager.gameConfig.betMultiplier;
+            optimisticBalance = gameManager.playerData.balance - totalBet;
+            hasOptimisticBalance = true;
+
+            // Kill any previous balance tween and show deducted value immediately
+            if (balanceTween != null) balanceTween.Kill();
+            if (balanceText != null) balanceText.text = optimisticBalance.ToString("F2");
+        }
+        else
+        {
+            hasOptimisticBalance = false;
+        }
+        // ------------------------------------
+
         // Don't update free spin count here - wait for server result
         // The count will be updated in ProcessSpinResult with server data
         if (!gameManager.isInFreeSpins)
@@ -582,7 +611,12 @@ InitializeExpandShrink();
 
     internal void OnSpinStopping(SpinResult result)
     {
-        AnimateBalanceUpdate(result.playerData.balance);
+        // If a special win popup is active, the balance is updated in sync with
+        // the popup counter inside ShowWinDisplayCoroutine — skip it here.
+        if (!isSpecialWinActive)
+        {
+            AnimateBalanceUpdate(result.playerData.balance);
+        }
 
         double targetWin = gameManager.isInFreeSpins ? result.serverTotalRoundWin : result.winAmount;
 
@@ -802,6 +836,11 @@ InitializeExpandShrink();
         {
             winPopupText.text = "0.00";
             float currentAnimVal = (float)startVal;
+
+            // Start balance animation in sync with the popup counter so both
+            // count up together and finish at the same time.
+            AnimateBalanceUpdate(result.playerData.balance, animDuration);
+
             DOTween.To(() => currentAnimVal, x => {
                 currentAnimVal = x;
                 
@@ -865,9 +904,18 @@ InitializeExpandShrink();
         }
 
         if (gameManager.IsSpinning())
+        {
+            // Rapid-stop cooldown: prevent the player from spamming the stop button
+            if (Time.unscaledTime - lastRapidStopTime < rapidStopCooldown)
+                return;
+
+            lastRapidStopTime = Time.unscaledTime;
             gameManager.RequestStop();
+        }
         else
+        {
             gameManager.RequestSpin();
+        }
     }
 
     #endregion
@@ -1889,18 +1937,25 @@ InitializeExpandShrink();
             winAmountText.text = amount.ToString("F2");
     }
 
-    private void AnimateBalanceUpdate(double newBalance)
+    private void AnimateBalanceUpdate(double newBalance, float durationOverride = -1f)
     {
         if (balanceTween != null) balanceTween.Kill();
 
-        double oldBalance = gameManager.playerData.balance;
+        // Start from the optimistic value (already shown at spin-start) if available,
+        // otherwise start from the current stored player balance.
+        double oldBalance = hasOptimisticBalance ? optimisticBalance : gameManager.playerData.balance;
+        hasOptimisticBalance = false;
 
+        float duration = durationOverride > 0f ? durationOverride : balanceCountDuration;
+
+        // Always tween so the update is visibly confirmed when the server responds.
         balanceTween = DOTween.To(
             () => oldBalance,
             x => { if (balanceText != null) balanceText.text = x.ToString("F2"); },
             newBalance,
-            balanceCountDuration
-        ).SetEase(Ease.OutCubic);
+            duration
+        ).SetEase(Ease.OutCubic)
+         .OnComplete(() => { if (balanceText != null) balanceText.text = newBalance.ToString("F2"); });
     }
 
     private void AnimateWinUpdate(double winAmount)
