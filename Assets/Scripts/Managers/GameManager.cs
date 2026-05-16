@@ -524,16 +524,33 @@ public class GameManager : MonoBehaviour
         isBuyingFeature = false;
         currentState = GameState.Stopping;
 
+        // Wait for reels to fully land before starting the scatter sequence.
+        // We use a callback flag so we react exactly when StopSpinSequence finishes
+        // rather than relying on a fixed time guess.
         if (slotView != null && lastResult.resultMatrix != null)
         {
-            slotView.QuickStop(lastResult.resultMatrix);
-            yield return new WaitForSeconds(0.5f);
+            bool reelsStopped = false;
+            slotView.QuickStop(lastResult.resultMatrix, () => reelsStopped = true);
+            while (!reelsStopped)
+            {
+                yield return null;
+            }
         }
-
-        // Update balance display from server result immediately.
+      // Update balance display from server result immediately.
         // BuyFeature always has totalWin=0, so OnWinAnimationComplete's multiplier
         // guard (>= 5) would skip OnSpinStopping entirely — call it explicitly here.
         uiManager.OnSpinStopping(lastResult);
+        // --- Scatter sound + animation sequence ---
+        // Only play if scatter symbols are actually present in the result matrix.
+        if (ResultMatrixHasScatter(lastResult.resultMatrix))
+        {
+            AudioManager.Instance?.Play3ScatterHit();
+            if (slotView != null) slotView.AnimateAllScatters(4);
+            yield return new WaitForSeconds(3.5f);
+        }
+        // -----------------------------------------
+
+  
 
         // No win lines for a buy-feature trigger — go straight to result processing
         OnWinAnimationComplete();
@@ -682,6 +699,28 @@ public class GameManager : MonoBehaviour
     internal bool IsSpinning()
     {
         return currentState == GameState.Spinning || currentState == GameState.Stopping;
+    }
+
+    /// <summary>
+    /// Returns true if at least one scatter symbol appears anywhere in the result matrix.
+    /// Uses the server-configured scatterSymbolId (default 12) as the reference ID.
+    /// </summary>
+    private bool ResultMatrixHasScatter(List<List<int>> matrix)
+    {
+        if (matrix == null) return false;
+
+        int scatterId = gameConfig != null ? gameConfig.scatterSymbolId : 12;
+
+        foreach (var col in matrix)
+        {
+            if (col == null) continue;
+            foreach (int sym in col)
+            {
+                if (sym == scatterId) return true;
+            }
+        }
+
+        return false;
     }
 
     #endregion

@@ -707,7 +707,7 @@ public class SlotView : MonoBehaviour
 
     #region Quick Spin
 
-    internal void QuickStop(List<List<int>> resultMatrix)
+    internal void QuickStop(List<List<int>> resultMatrix, System.Action onComplete = null)
     {
         if (!isSpinning)
         {
@@ -729,11 +729,12 @@ public class SlotView : MonoBehaviour
             // Ensure masks are disabled and non-display icons are hidden
             DisableAllMasks();
             DisableAllNonDisplayIcons();
-            
+
+            onComplete?.Invoke();
             return;
         }
 
-        StartCoroutine(StopSpinSequence(resultMatrix, null, true));
+        StartCoroutine(StopSpinSequence(resultMatrix, onComplete, true));
     }
 
     #endregion

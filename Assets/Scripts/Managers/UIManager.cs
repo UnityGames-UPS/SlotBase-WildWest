@@ -1854,6 +1854,7 @@ InitializeExpandShrink();
             5 => -40f,
             4 => -90f,
             3 => -140f,
+            2 => -162f,
             _ => 0f
         };
     }
