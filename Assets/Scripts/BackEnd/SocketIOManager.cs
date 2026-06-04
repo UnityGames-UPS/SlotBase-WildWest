@@ -190,17 +190,25 @@ public class SocketIOManager : MonoBehaviour
             gameManager.initializationFailed = true;
         }
 
-        if (popupManager != null)
+        if (!string.IsNullOrEmpty(err.message) && err.message.Contains("Session expired"))
         {
-            popupManager.ShowServerError(err.message);
-        }
-
+            Debug.LogWarning("Session expired detected");
+            OnSocketDisconnected();
 #if UNITY_WEBGL && !UNITY_EDITOR
-        if (JSManager != null)
-        {
-            JSManager.SendCustomMessage("error");
-        }
+        JSManager.SendCustomMessage("session_expired");
 #endif
+        }
+        else
+        {
+
+            if (popupManager != null)
+            {
+                popupManager.ShowServerError(err.message);
+            }
+#if UNITY_WEBGL && !UNITY_EDITOR
+        JSManager.SendCustomMessage("error");
+#endif
+        }
     }
 
     private void OnInitReceived(string jsonData)
@@ -436,7 +444,7 @@ public class SocketIOManager : MonoBehaviour
     {
         if (!jsonData.Contains("\"id\":\"BetHistory\""))
         {
-            return; 
+            return;
         }
 
         Debug.Log($"[SocketIO] BetHistory received: {jsonData}");
