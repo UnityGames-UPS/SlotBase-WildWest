@@ -358,29 +358,27 @@ public class AudioManager : MonoBehaviour
     }
 
 
+    private bool isForceMuted = false;
+
+    internal void SetMuteAll(bool forceMute)
+    {
+        if (forceMute == isForceMuted) return;
+        isForceMuted = forceMute;
+
+        if (bgMusicSource != null) bgMusicSource.mute = forceMute;
+        if (uiSource      != null) uiSource.mute      = forceMute;
+        if (specialSource != null) specialSource.mute = forceMute;
+        if (reserveSource != null) reserveSource.mute = forceMute;
+        if (winBgSource   != null) winBgSource.mute   = forceMute;
+    }
+
     private void OnApplicationFocus(bool hasFocus)
     {
-        HandleFocus(hasFocus);
+        SetMuteAll(!hasFocus);
     }
 
     private void OnApplicationPause(bool isPaused)
     {
-        HandleFocus(!isPaused);
-    }
-
-    private void HandleFocus(bool hasFocus)
-    {
-        if (!hasFocus)
-        {
-            if (bgMusicSource != null) bgMusicSource.Pause();
-            if (winBgSource   != null) winBgSource.Pause();
-            AudioListener.volume = 0f;
-        }
-        else
-        {
-            if (bgMusicSource != null) bgMusicSource.UnPause();
-            if (winBgSource   != null) winBgSource.UnPause();
-            AudioListener.volume = 1f;
-        }
+        SetMuteAll(isPaused);
     }
 }

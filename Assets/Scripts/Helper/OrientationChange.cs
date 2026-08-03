@@ -14,7 +14,9 @@ public class OrientationChange : MonoBehaviour
     [SerializeField] private float waitForRotation = 0.2f;
     private Vector2 referenceResolution;
     private Tween matchTween;
+    private Tween rotationTween;
     private Coroutine rotationRoutine;
+    private bool isLandscape;
 
     private void Awake()
     {
@@ -49,13 +51,37 @@ public class OrientationChange : MonoBehaviour
 
     private void ApplyMatch(int screenW, int screenH, bool instant)
     {
-        float refW = referenceResolution.x;  
+        isLandscape = screenW > screenH;
+
+        Quaternion targetRotation = isLandscape ? Quaternion.identity : Quaternion.Euler(0, 0, -90);
+        if (UIWrapper != null)
+        {
+            if (rotationTween != null && rotationTween.IsActive()) rotationTween.Kill();
+            if (instant)
+                UIWrapper.localRotation = targetRotation;
+            else
+                rotationTween = UIWrapper.DOLocalRotateQuaternion(targetRotation, transitionDuration).SetEase(Ease.OutCubic);
+        }
+
+        float refW = referenceResolution.x;
         float refH = referenceResolution.y;
 
-        float scaleW = screenW / refW;
-        float scaleH = screenH / refH;
+        float widthScale = screenW / refW;
+        float heightScale = screenH / refH;
 
-        float targetMatch = (scaleW <= scaleH) ? 0f : 1f;
+        float targetMatch;
+        if (Mathf.Abs(heightScale - widthScale) < 0.0001f)
+        {
+            targetMatch = 0.5f;
+        }
+        else
+        {
+            float targetScale = isLandscape
+                ? Mathf.Min(widthScale, heightScale)
+                : Mathf.Min((float)screenH / refW, (float)screenW / refH);
+            float logRatio = Mathf.Log(heightScale / widthScale);
+            targetMatch = Mathf.Clamp01(Mathf.Log(targetScale / widthScale) / logRatio);
+        }
 
         if (instant)
         {

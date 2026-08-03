@@ -41,6 +41,11 @@ public class SocketIOManager : MonoBehaviour
     private const float PING_INTERVAL = 2f;
     private const float PONG_TIMEOUT = 5f;
 
+    private bool hasFocus = true;
+    private float focusLostTime = 0f;
+    private Coroutine focusCheckRoutine;
+    private float maxBackgroundTime = 60f;
+
     #region Initialization
 
     private void Awake()
@@ -125,8 +130,60 @@ public class SocketIOManager : MonoBehaviour
         gameSocket.On<string>("pong", OnPongReceived);
         gameSocket.On<string>("AnotherDevice", OnAnotherDevice);
         gameSocket.On<string>("result", OnHistoryResultReceived); // For bet history responses
+        gameSocket.On<string>("balance:sync", OnBalanceSync);
 
         socketManager.Open();
+    }
+
+    #endregion
+
+    #region Focus / Background Timeout
+
+    internal void HandleFocusChange(bool focus)
+    {
+        hasFocus = focus;
+
+        if (!focus)
+        {
+            focusLostTime = Time.time;
+            if (focusCheckRoutine == null && !isExiting)
+                focusCheckRoutine = StartCoroutine(FocusTimeoutCheck());
+        }
+        else
+        {
+            if (focusCheckRoutine != null)
+            {
+                StopCoroutine(focusCheckRoutine);
+                focusCheckRoutine = null;
+            }
+        }
+    }
+
+    private IEnumerator FocusTimeoutCheck()
+    {
+        while (!hasFocus && !isExiting)
+        {
+            if (Time.time - focusLostTime >= maxBackgroundTime)
+            {
+                Debug.LogWarning("[SocketIO] Background timeout — closing connection");
+                isConnected = false;
+                StopPingRoutine();
+
+                if (socketManager != null)
+                {
+                    try { socketManager.Close(); }
+                    catch (Exception e) { Debug.LogWarning($"[SocketIO] Focus close error: {e.Message}"); }
+                }
+
+                if (popupManager != null) popupManager.ShowDisconnectionPopup();
+                focusCheckRoutine = null;
+                yield break;
+            }
+
+            yield return new WaitForSecondsRealtime(1f);
+        }
+
+        focusCheckRoutine = null;
     }
 
     #endregion
@@ -284,6 +341,15 @@ public class SocketIOManager : MonoBehaviour
         {
             Debug.LogError($"[SocketIO] Result parse failed: {e.Message}");
         }
+    }
+
+    private void OnBalanceSync(string data)
+    {
+        var syncPayload = JsonConvert.DeserializeObject<BalanceSyncPayload>(data);
+        if (syncPayload == null) return;
+
+        gameManager.playerData.balance = syncPayload.balance;
+        uiManager.UpdateBalanceDisplay();
     }
 
     private void OnAnotherDevice(string data)

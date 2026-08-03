@@ -235,6 +235,19 @@ public class UIManager : MonoBehaviour
 
     #region Initialization
 
+    private void Awake()
+    {
+        jsFunctCalls?.RegisterVisibilityListener(gameObject.name);
+    }
+
+    public void OnFocusChanged(string value)
+    {
+        bool focused = value == "1";
+        Debug.Log("UNITY FOCUS CHANGED: " + value + " (focused: " + focused + ")");
+        AudioManager.Instance?.SetMuteAll(!focused);
+        gameManager.socketManager?.HandleFocusChange(focused);
+    }
+
     private void Start()
     {
         SetupButtons();
@@ -1938,7 +1951,7 @@ InitializeExpandShrink();
 
     #region Display Updates
 
-    private void UpdateBalanceDisplay()
+    internal void UpdateBalanceDisplay()
     {
         if (balanceText)
             balanceText.text = gameManager.playerData.balance.ToString("F2");
