@@ -24,7 +24,7 @@ public class HistoryRow : MonoBehaviour
     /// <summary>
     /// Set all row data from a BetHistoryItem
     /// </summary>
-    public void SetRowData(int index, BetHistoryItem historyItem)
+    internal void SetRowData(int index, BetHistoryItem historyItem)
     {
         rowIndex = index;
 
@@ -95,7 +95,7 @@ public class HistoryRow : MonoBehaviour
     /// <summary>
     /// Clear all row data
     /// </summary>
-    public void ClearRowData()
+    internal void ClearRowData()
     {
         if (noText != null) noText.text = "";
         if (betIdText != null) betIdText.text = "";
@@ -161,7 +161,7 @@ public class HistoryRow : MonoBehaviour
     /// <summary>
     /// Toggle row visibility
     /// </summary>
-    public void SetVisible(bool visible)
+    internal void SetVisible(bool visible)
     {
         gameObject.SetActive(visible);
     }

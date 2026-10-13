@@ -407,7 +407,7 @@ public class AuthData
 
 #region Enums
 
-public enum GameState
+internal enum GameState
 {
     Initializing,
     Idle,
@@ -417,7 +417,7 @@ public enum GameState
     FreeSpinMode
 }
 
-public enum SpinSpeed
+internal enum SpinSpeed
 {
     Normal,
     Turbo,
@@ -431,7 +431,7 @@ public enum SpinSpeed
 /// <summary>
 /// Converts server data to client GameConfig
 /// </summary>
-public static class InitDataConverter
+internal static class InitDataConverter
 {
     internal static GameConfig ConvertToGameConfig(InitData serverData)
     {

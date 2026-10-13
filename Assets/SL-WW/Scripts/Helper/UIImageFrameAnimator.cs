@@ -4,12 +4,12 @@ using System.Collections;
 
 public class UIImageFrameAnimator : MonoBehaviour
 {
-    public RectTransform parentRect;
-    public RectTransform[] childImages;
-    public float startDelay = 0.5f;
-    public float displayTime = 2f;
-    public float scrollSpeed = 100f;
-    public float endPauseTime = 1f;
+    [SerializeField] private RectTransform parentRect;
+    [SerializeField] private RectTransform[] childImages;
+    [SerializeField] private float startDelay = 0.5f;
+    [SerializeField] private float displayTime = 2f;
+    [SerializeField] private float scrollSpeed = 100f;
+    [SerializeField] private float endPauseTime = 1f;
 
     private Vector2[] originalPositions;
 
